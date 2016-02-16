@@ -45,3 +45,11 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+
+# IntellIJ workspace files
+# =========================
+
+.idea
+Android/DevGames/.idea
+Jenkins/devgames/.idea
