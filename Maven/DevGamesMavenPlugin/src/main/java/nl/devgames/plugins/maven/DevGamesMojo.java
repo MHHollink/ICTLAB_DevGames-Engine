@@ -1,4 +1,4 @@
-package nl.devgames.jenkins.plugin;
+package nl.devgames.plugins.maven;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;

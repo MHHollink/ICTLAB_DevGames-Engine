@@ -52,11 +52,16 @@ Temporary Items
 
 .idea
 Android/DevGames/.idea
-Jenkins/devgames/.idea
+Jenkins/*/.idea
 Maven/*/.idea
 
 # Targets
 # =========================
 
-Jenkins/devgames/target
+Jenkins/*/target
 Maven/*/target
+
+# Jenkins files
+# =========================
+
+Jenkins/*/work
