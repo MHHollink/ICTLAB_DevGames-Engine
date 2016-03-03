@@ -4,10 +4,7 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 
-import java.util.Stack;
-
 import baecon.devgames.R;
-import baecon.devgames.model.Project;
 import baecon.devgames.ui.fragment.ProfileFragment;
 import baecon.devgames.ui.fragment.ProjectsFragment;
 import baecon.devgames.ui.widget.SlidingTabLayout;
