@@ -20,6 +20,10 @@ public class DevGamesApplication extends Application {
         super.onCreate();
 
         preferenceManager = PreferenceManager.get(this);
+
+        if( preferenceManager.isRememberPasswordEnabled() &&
+                preferenceManager.getLastUsedUsername() != null)
+            loggedInUser = new User(preferenceManager.getLastUsedUsername());
     }
 
     public User getLoggedInUser() {

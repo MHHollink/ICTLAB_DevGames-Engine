@@ -2,13 +2,14 @@ package baecon.devgames.ui.activity;
 
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.view.Menu;
 
-import java.util.ArrayList;
 import java.util.Stack;
 
-import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
+import baecon.devgames.model.Project;
 import baecon.devgames.ui.fragment.ProfileFragment;
+import baecon.devgames.ui.fragment.ProjectsFragment;
 import baecon.devgames.ui.widget.SlidingTabLayout;
 import baecon.devgames.util.ViewPageAdapter;
 
@@ -17,23 +18,9 @@ public class MainActivity extends DevGamesActivity {
     /**
      * The class responsible for transitions between tab-fragments.
      */
-    private SlidingTabLayout tabStrip = null;
-    private ViewPager pager;
+    private SlidingTabLayout indicator = null;
+    private ViewPager adapter;
 
-    private ViewPager.SimpleOnPageChangeListener pageChangeListener = new ViewPager.SimpleOnPageChangeListener() {
-        @Override
-        public void onPageSelected(int position) {
-
-            previousFragmentPositions.push(position);
-
-            supportInvalidateOptionsMenu();
-        }
-    };
-
-    /**
-     * A stack keeping track of the position indexes of the tab-fragments.
-     */
-    private Stack<Integer> previousFragmentPositions = new Stack<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,17 +32,42 @@ public class MainActivity extends DevGamesActivity {
         ViewPageAdapter viewPageAdapter = new ViewPageAdapter(getSupportFragmentManager());
 
         viewPageAdapter.addTab(ProfileFragment.getInstance(this));
+        viewPageAdapter.addTab(ProjectsFragment.getInstance(this));
 
 
+        adapter = (ViewPager) findViewById(R.id.activity_main_viewpager);
+        adapter.setAdapter(viewPageAdapter);
 
+        indicator = (SlidingTabLayout) findViewById(R.id.tabs);
 
+        indicator.setSelectedIndicatorColors(getResources().getColor(R.color.cornflower_light));
+        indicator.setDistributeEvenly(true);
+        indicator.setViewPager(adapter);
+    }
 
-        pager = (ViewPager) findViewById(R.id.activity_main_viewpager);
-        pager.setAdapter(viewPageAdapter);
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
 
-        tabStrip = (SlidingTabLayout) findViewById(R.id.tabs);
-        tabStrip.setViewPager(pager);
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
+        }
+    }
 
+    @Override
+    protected void onDestroy() {
+        adapter = null;
+        indicator = null;
 
+        super.onDestroy();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        return true;
     }
 }

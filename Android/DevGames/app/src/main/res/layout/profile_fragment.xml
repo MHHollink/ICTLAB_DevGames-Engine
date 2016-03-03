@@ -21,7 +21,7 @@
                 android:layout_height="80dp"
                 android:contentDescription="@string/avatar"
                 android:id="@+id/avatar_view"
-                android:src="@mipmap/noPhoto" />
+                android:src="@drawable/no_photo" />
 
             <LinearLayout
                 android:orientation="vertical"
@@ -36,7 +36,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="@string/dummy_name"
-                    android:textColor="@color/granny_smith"
+                    android:textColor="@color/cornflower"
                     android:textStyle="bold"
                     android:textSize="18sp"/>
 
@@ -47,7 +47,7 @@
                     android:layout_gravity="center"
                     android:text="@string/dummy_score"
                     android:paddingTop="7dp"
-                    android:textColor="@color/shadow_green"
+                    android:textColor="@color/cornflower_dark"
                     android:textStyle="italic"
                     android:textSize="13sp"/>
 
@@ -58,7 +58,7 @@
                     android:layout_gravity="center"
                     android:text="@string/dummy_projects"
                     android:paddingTop="7dp"
-                    android:textColor="@color/shadow_green"
+                    android:textColor="@color/cornflower_dark"
                     android:textStyle="italic"
                     android:textSize="15sp"/>
 
@@ -69,7 +69,7 @@
                     android:layout_gravity="center"
                     android:text="@string/dummy_commits"
                     android:paddingTop="7dp"
-                    android:textColor="@color/shadow_green"
+                    android:textColor="@color/cornflower_dark"
                     android:textStyle="italic"
                     android:textSize="15sp"/>
 
@@ -81,7 +81,7 @@
             android:alpha="0.5"
             android:layout_width="fill_parent"
             android:layout_height="1px"
-            android:background="@color/shadow_green"/>
+            android:background="@color/cornflower_light"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -96,7 +96,7 @@
                 android:layout_gravity="center"
                 android:text="@string/issues"
                 android:paddingTop="7dp"
-                android:textColor="@color/shadow_green"
+                android:textColor="@color/cornflower_dark"
                 android:textStyle="italic"
                 android:textSize="15sp"/>
 

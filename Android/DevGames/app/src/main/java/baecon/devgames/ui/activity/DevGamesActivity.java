@@ -76,6 +76,12 @@ public class DevGamesActivity extends AppCompatActivity {
 
     private void doLogout() {
         logoutProgressDialog.show();
+
+        preferenceManager.setRememberPasswordEnabled(false);
+        preferenceManager.setLastUsedUsername(null);
+
+        startActivity(new Intent(this, LoginActivity.class));
+        finish();
     }
 
     protected void doLoginCheck() {

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:background="@color/cornflower">
+
+    <ImageView
+        android:layout_width="250dp"
+        android:layout_height="155dp"
+        android:id="@+id/logo"
+        android:layout_gravity="center"
+        android:src="@drawable/devgames_logo_full"
+        android:layout_marginTop="83dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/username"
+        android:hint="@string/username"
+        android:layout_marginTop="54dp"
+        android:layout_below="@+id/logo"
+        android:layout_alignEnd="@+id/logo"
+        android:layout_alignStart="@+id/logo" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:hint="@string/password"
+        android:ems="10"
+        android:id="@+id/password"
+        android:layout_below="@+id/username"
+        android:layout_alignStart="@+id/username"
+        android:layout_alignEnd="@+id/username" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login"
+        android:id="@+id/submit"
+        android:background="@null"
+        android:layout_below="@+id/password"
+        android:layout_alignEnd="@+id/password" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/remember"
+        android:id="@+id/checkBox"
+        android:checked="false"
+        android:layout_alignTop="@+id/submit"
+        android:layout_alignStart="@+id/password"
+        android:layout_alignBottom="@+id/submit" />
+</RelativeLayout>
