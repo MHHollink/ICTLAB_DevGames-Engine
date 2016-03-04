@@ -7,12 +7,12 @@ import android.support.v4.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import baecon.devgames.ui.fragment.TabFragment;
+import baecon.devgames.ui.fragment.DevGamesTab;
 
 
 public class ViewPageAdapter extends FragmentPagerAdapter {
 
-    List<TabFragment> tabs;
+    List<DevGamesTab> tabs;
 
     public ViewPageAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);
@@ -27,7 +27,7 @@ public class ViewPageAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return tabs.get(position);
+        return tabs.get(position).getFragmentFromTab();
     }
 
     @Override
@@ -35,7 +35,7 @@ public class ViewPageAdapter extends FragmentPagerAdapter {
         return tabs.get(position).getTitle();
     }
 
-    public void addTab(TabFragment tab) {
+    public void addTab(DevGamesTab tab) {
         if(tabs == null) tabs = new ArrayList<>();
         tabs.add(tab);
     }

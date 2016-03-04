@@ -4,30 +4,25 @@ package baecon.devgames.ui.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
 import baecon.devgames.model.Project;
 import baecon.devgames.util.DummyHelper;
 
-public class ProjectsFragment extends TabFragment {
+public class ProjectsFragment extends DevGamesFragment implements DevGamesTab{
 
-    public static ProjectsFragment getInstance(Context context) {
-        ProjectsFragment fragment = new ProjectsFragment();
-        title = context.getString(R.string.projects);
-
-        return fragment;
-    }
+    private String title = "";
 
     @Nullable
     @Override
@@ -45,6 +40,21 @@ public class ProjectsFragment extends TabFragment {
         return view;
     }
 
+    @Override
+    public String getTitle() {
+        return title;
+    }
+
+    @Override
+    public ProjectsFragment setTitle(String s) {
+        title = s;
+        return this;
+    }
+
+    @Override
+    public Fragment getFragmentFromTab() {
+        return getFragment();
+    }
 
 
     protected class ProjectsListAdapter extends BaseAdapter {

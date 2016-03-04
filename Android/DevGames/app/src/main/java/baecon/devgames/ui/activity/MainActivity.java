@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 
+import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
 import baecon.devgames.ui.fragment.ProfileFragment;
 import baecon.devgames.ui.fragment.ProjectsFragment;
@@ -28,8 +29,8 @@ public class MainActivity extends DevGamesActivity {
 
         ViewPageAdapter viewPageAdapter = new ViewPageAdapter(getSupportFragmentManager());
 
-        viewPageAdapter.addTab(ProfileFragment.getInstance(this));
-        viewPageAdapter.addTab(ProjectsFragment.getInstance(this));
+        viewPageAdapter.addTab(new ProfileFragment().setTitle(DevGamesApplication.get(this).getString(R.string.profile)));
+        viewPageAdapter.addTab(new ProjectsFragment().setTitle(DevGamesApplication.get(this).getString(R.string.project)));
 
 
         adapter = (ViewPager) findViewById(R.id.activity_main_viewpager);

@@ -15,7 +15,7 @@ import baecon.devgames.util.PreferenceManager;
 /**
  * The base Activity all other activities extend from.
  */
-public class DevGamesActivity extends AppCompatActivity {
+public abstract class DevGamesActivity extends AppCompatActivity {
 
     private PreferenceManager preferenceManager;
     private ProgressDialog logoutProgressDialog;

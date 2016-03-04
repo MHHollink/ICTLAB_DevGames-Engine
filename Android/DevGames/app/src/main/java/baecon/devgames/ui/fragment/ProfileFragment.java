@@ -3,21 +3,17 @@ package baecon.devgames.ui.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
 
-public class ProfileFragment extends TabFragment {
+public class ProfileFragment extends DevGamesFragment implements DevGamesTab {
 
-    public static ProfileFragment getInstance(Context context) {
-        ProfileFragment fragment = new ProfileFragment();
-        title = context.getString(R.string.profile);
-
-        return fragment;
-    }
-
+    private String title = "";
 
     @Nullable
     @Override
@@ -26,5 +22,21 @@ public class ProfileFragment extends TabFragment {
 
 
         return view;
+    }
+
+    @Override
+    public Fragment getFragmentFromTab() {
+        return getFragment();
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
+    }
+
+    @Override
+    public ProfileFragment setTitle(String s) {
+        title = s;
+        return this;
     }
 }
