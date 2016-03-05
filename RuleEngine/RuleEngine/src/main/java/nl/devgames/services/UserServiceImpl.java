@@ -1,9 +1,9 @@
 package nl.devgames.services;
 
-import devgames.entities.Commit;
-import devgames.entities.Project;
-import devgames.entities.User;
-import devgames.services.interfaces.UserService;
+import nl.devgames.entities.Commit;
+import nl.devgames.entities.Project;
+import nl.devgames.entities.User;
+import nl.devgames.services.interfaces.UserService;
 
 import java.util.List;
 

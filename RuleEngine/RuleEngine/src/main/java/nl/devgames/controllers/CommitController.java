@@ -1,6 +1,6 @@
 package nl.devgames.controllers;
 
-import devgames.entities.User;
+import nl.devgames.entities.User;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

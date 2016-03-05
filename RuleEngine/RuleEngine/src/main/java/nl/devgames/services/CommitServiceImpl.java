@@ -1,7 +1,7 @@
 package nl.devgames.services;
 
-import devgames.entities.Commit;
-import devgames.services.interfaces.CommitService;
+import nl.devgames.entities.Commit;
+import nl.devgames.services.interfaces.CommitService;
 
 /**
  * Created by Wouter on 3/5/2016.

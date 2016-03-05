@@ -1,7 +1,7 @@
 package nl.devgames.services;
 
-import devgames.entities.Entity;
-import devgames.factories.Neo4jSessionFactory;
+import nl.devgames.entities.Entity;
+import nl.devgames.factories.Neo4jSessionFactory;
 import org.neo4j.ogm.session.Session;
 
 /**

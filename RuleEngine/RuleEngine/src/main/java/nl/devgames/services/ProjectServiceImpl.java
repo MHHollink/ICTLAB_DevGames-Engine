@@ -1,7 +1,7 @@
 package nl.devgames.services;
 
-import devgames.entities.Project;
-import devgames.services.interfaces.ProjectService;
+import nl.devgames.entities.Project;
+import nl.devgames.services.interfaces.ProjectService;
 
 /**
  * Created by Wouter on 3/5/2016.
