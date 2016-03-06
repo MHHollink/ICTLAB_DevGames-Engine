@@ -1,38 +1,52 @@
 package baecon.devgames.model;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
+@DatabaseTable(tableName = "projects")
 public class Project {
 
-    private User owner;
-    private List<User> developers;
-    private List<Commit> commits;
-    private String name;
-    private String description;
-    private double score;
+    public static class Column {
+        public static final String OWNER = "owner";
+        public static final String DEVELOPERS = "developers";
+        public static final String COMMITS = "commits";
+        public static final String NAME = "name";
+        public static final String DESCRIPTION = "description";
+    }
 
-    public Project(User owner, List<User> developers, List<Commit> commits, String name, String description, double score) {
+    @DatabaseField(columnName = Column.OWNER)
+    private User owner;
+
+    @DatabaseField(columnName = Column.DEVELOPERS)
+    private List<User> developers;
+
+    @DatabaseField(columnName = Column.COMMITS)
+    private List<Commit> commits;
+
+    @DatabaseField(columnName = Column.NAME)
+    private String name;
+
+    @DatabaseField(columnName = Column.DESCRIPTION)
+    private String description;
+
+    public Project(User owner, List<User> developers, List<Commit> commits, String name, String description) {
         this.owner = owner;
         this.developers = developers;
         this.commits = commits;
         this.name = name;
         this.description = description;
-        this.score = score;
-    }
-
-    public Project(User owner, String name, String description, double score) {
-        this(owner, new ArrayList<User>(), new ArrayList<Commit>(), name, description, score);
     }
 
     public Project(User owner, String name, String description) {
-        this(owner, new ArrayList<User>(), new ArrayList<Commit>(), name, description, 0);
+        this(owner, new ArrayList<User>(), new ArrayList<Commit>(), name, description);
     }
 
     public Project(String name, String description) {
-        this(null, name, description, 0);
+        this(null, name, description);
     }
 
     public Project(String name) {
@@ -73,18 +87,7 @@ public class Project {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public double getScore() {
-        return score;
-    }
-
-    public void resetScore() {
-        this.score = 0;
-    }
-
-    public void addScore(double score){
-        this.score += score;
+        return this;
     }
 
     public void addDeveloper(User user) {

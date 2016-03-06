@@ -1,23 +1,42 @@
 package baecon.devgames.model;
 
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+@DatabaseTable(tableName = "users")
 public class User {
 
-    private String uuid;
+    public static class Column {
+        public static final String ID = "uuid";
+        public static final String USERNAME = "username";
+        public static final String GIT_USER = "git_username";
+        public static final String PROJECTS = "projects";
+        public static final String COMMITS = "commits";
+    }
+
+    @DatabaseField(columnName = Column.ID)
+    private long id;
+
+    @DatabaseField(columnName = Column.USERNAME)
     private String username;
 
+    @DatabaseField(columnName = Column.GIT_USER)
     private String gitUsername;
 
+    @DatabaseField(columnName = Column.PROJECTS)
     private List<Project> projects;
+
+    @DatabaseField(columnName = Column.COMMITS)
     private List<Commit> commits;
 
-    public User(String uuid, String username, String gitUsername, List<Project> projects, List<Commit> commits) {
-        this.uuid = uuid;
+    public User(Long uuid, String username, String gitUsername, List<Project> projects, List<Commit> commits) {
+        this.id = uuid;
         this.username = username;
         this.gitUsername = gitUsername;
         this.projects = projects;
@@ -25,7 +44,7 @@ public class User {
     }
 
     public User(String username, String gitUsername) {
-        this(UUID.randomUUID().toString(), username, gitUsername, new ArrayList<Project>(), new ArrayList<Commit>());
+        this(null, username, gitUsername, new ArrayList<Project>(), new ArrayList<Commit>());
     }
 
     public User(String username) {
@@ -40,8 +59,8 @@ public class User {
         this.gitUsername = gitUsername;
     }
 
-    public String getUuid() {
-        return uuid;
+    public long getId() {
+        return id;
     }
 
     public String getUsername() {
@@ -77,7 +96,7 @@ public class User {
 
     @Override
     public boolean equals(Object o) {
-        return uuid.equals(((User)o).getUuid());
+        return id == ((User) o).getId();
     }
 
     /**

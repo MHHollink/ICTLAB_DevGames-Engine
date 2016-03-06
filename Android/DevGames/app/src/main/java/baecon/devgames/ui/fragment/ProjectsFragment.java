@@ -139,7 +139,7 @@ public class ProjectsFragment extends DevGamesFragment implements DevGamesTab{
                 holder.description.setText(tempValues.getDescription());
                 holder.developers.setText(String.valueOf(tempValues.getDevelopers().size()));
                 holder.commits.setText(String.valueOf(tempValues.getCommits().size()));
-                holder.score.setText(String.valueOf(tempValues.getScore()));
+                holder.score.setText(String.valueOf(0));
             }
             return view;
         }
