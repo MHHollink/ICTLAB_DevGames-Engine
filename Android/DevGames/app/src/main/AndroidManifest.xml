@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="baecon.devgames" >
 
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 
     <application
         android:name=".DevGamesApplication"
@@ -21,9 +24,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".ui.activity.LoginActivity" />
 
+        <receiver android:name=".connection.gcm.GumBroadcastReceiver" android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="baecon.devgames.connection.gcm"/>
+            </intent-filter>
+        </receiver>
+
+        <service android:name="baecon.devgames.connection.gcm.GcmIntentService" />
     </application>
 
 </manifest>
