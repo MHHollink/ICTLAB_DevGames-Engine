@@ -26,7 +26,7 @@
         </activity>
         <activity android:name=".ui.activity.LoginActivity" />
 
-        <receiver android:name=".connection.gcm.GumBroadcastReceiver" android:permission="com.google.android.c2dm.permission.SEND" >
+        <receiver android:name=".connection.gcm.GcmBroadcastReceiver" android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <category android:name="baecon.devgames.connection.gcm"/>
