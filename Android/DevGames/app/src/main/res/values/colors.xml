@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="cornflower">#045350</color>
+    <color name="cornflower_light">#007E79</color>
+    <color name="cornflower_dark">#032827</color>
+    <color name="cornflower_disabled">#003533</color>
+
+    <color name="electric">#896B07</color>
+    <color name="electric_light">#CF9F00</color>
+    <color name="electric_dark">#423405</color>
+    <color name="electric_disabled">#574300</color>
+
+    <color name="seance">#760633</color>
+    <color name="seance_light">#B20048</color>
+    <color name="seance_dark">#39041A</color>
+    <color name="seance_disabled">#4A001E</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+</resources>
