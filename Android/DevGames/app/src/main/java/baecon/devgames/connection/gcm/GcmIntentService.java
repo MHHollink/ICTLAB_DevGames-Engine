@@ -15,13 +15,6 @@ import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
-
-import java.util.List;
-
 import baecon.devgames.R;
 import baecon.devgames.ui.activity.MainActivity;
 import baecon.devgames.util.PreferenceManager;
@@ -48,7 +41,7 @@ public class GcmIntentService extends IntentService{
 
             GcmMessageType type = GcmMessageType.valueOf(intent.getStringExtra("message"));
 
-            String notificationText = null;
+            String notificationText;
 
             switch (type) {
 
