@@ -2,6 +2,7 @@ package baecon.devgames.model;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,12 +64,26 @@ public class User {
         projects.add(project);
     }
 
+    public void addProject(Project... project) {
+        Collections.addAll(projects, project);
+    }
+
     public void addCommit(Commit commit) {
         commits.add(commit);
+    }
+    public void addCommit(Commit... commit) {
+        Collections.addAll(commits, commit);
     }
 
     @Override
     public boolean equals(Object o) {
         return uuid.equals(((User)o).getUuid());
+    }
+
+    /**
+     * TODO
+     */
+    public double getScore() {
+        return 60;
     }
 }

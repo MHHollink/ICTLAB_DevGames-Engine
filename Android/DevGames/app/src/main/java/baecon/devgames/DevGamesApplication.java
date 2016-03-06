@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 
 import baecon.devgames.model.User;
+import baecon.devgames.util.DummyHelper;
 import baecon.devgames.util.PreferenceManager;
 
 /**
@@ -23,7 +24,7 @@ public class DevGamesApplication extends Application {
 
         if( preferenceManager.isRememberPasswordEnabled() &&
                 preferenceManager.getLastUsedUsername() != null)
-            loggedInUser = new User(preferenceManager.getLastUsedUsername());
+            loggedInUser = DummyHelper.getInstance().marcel;
     }
 
     public User getLoggedInUser() {

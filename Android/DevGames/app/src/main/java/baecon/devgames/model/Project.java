@@ -1,6 +1,7 @@
 package baecon.devgames.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -62,41 +63,45 @@ public class Project {
         return name;
     }
 
-    public Project setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public Project setDescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
-        return this;
     }
 
     public double getScore() {
         return score;
     }
 
-    public Project resetScore() {
+    public void resetScore() {
         this.score = 0;
-        return this;
     }
 
-    public Project addScore(double score){
+    public void addScore(double score){
         this.score += score;
-        return this;
     }
 
-    public Project addDeveloper(User user) {
+    public void addDeveloper(User user) {
         developers.add(user);
-        return this;
     }
 
-    public Project addCommit(Commit commit) {
-        commits.add(commit);
-        return this;
+    public void addDeveloper(User... user) {
+        Collections.addAll(developers, user);
     }
+
+    public void addCommit(Commit commit) {
+        commits.add(commit);
+    }
+
+    public void addCommit(Commit... commit) {
+        Collections.addAll(commits, commit);
+    }
+
+
 }

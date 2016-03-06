@@ -11,6 +11,7 @@ import android.widget.EditText;
 import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
 import baecon.devgames.model.User;
+import baecon.devgames.util.DummyHelper;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -49,7 +50,9 @@ public class LoginActivity extends AppCompatActivity {
 
                     }
 
-                    DevGamesApplication.get(LoginActivity.this).setLoggedInUser(new User(username.getText().toString()));
+                    DevGamesApplication.get(LoginActivity.this).setLoggedInUser(
+                            DummyHelper.getInstance().marcel
+                    );
 
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();

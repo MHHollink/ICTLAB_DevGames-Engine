@@ -37,7 +37,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@string/dummy_name"
+                    android:text="@string/loading"
                     android:textColor="@color/cornflower_dark"
                     android:textStyle="bold"
                     android:textSize="18sp"/>
@@ -56,8 +56,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="24dp"
                     android:layout_gravity="center"
-
-                    android:text="@string/dummy_score"
+                    android:text="@string/loading"
                     android:textColor="@color/cornflower"
                     android:textStyle="italic"
                     android:textSize="13sp"
@@ -82,7 +81,7 @@
                     android:layout_alignBaseline="@+id/txt_score"
                     android:layout_alignBottom="@+id/txt_score"
                     android:layout_toEndOf="@+id/txt_score"
-                    android:layout_marginLeft="8dp" />
+                    android:layout_marginStart="8dp" />
 
                 <ImageView
                     android:layout_width="24dp"
@@ -99,8 +98,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="24dp"
                     android:layout_gravity="center"
-                    android:text="@string/dummy_projects"
-
+                    android:text="@string/loading"
                     android:textColor="@color/cornflower"
                     android:textStyle="italic"
                     android:textSize="15sp"
@@ -121,7 +119,7 @@
                     android:gravity="center_vertical|end"
                     android:layout_below="@+id/txt_score"
                     android:layout_toEndOf="@+id/txt_projects"
-                    android:layout_marginLeft="8dp" />
+                    android:layout_marginStart="8dp" />
 
                 <ImageView
                     android:layout_width="24dp"
@@ -138,7 +136,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="24dp"
                     android:layout_gravity="center"
-                    android:text="@string/dummy_commits"
+                    android:text="@string/loading"
                     android:textColor="@color/cornflower"
                     android:textStyle="italic"
                     android:textSize="15sp"
@@ -161,7 +159,7 @@
                     android:gravity="center_vertical|end"
                     android:layout_alignParentBottom="true"
                     android:layout_toEndOf="@+id/txt_commits"
-                    android:layout_marginLeft="8dp" />
+                    android:layout_marginStart="8dp" />
 
             </RelativeLayout>
 
