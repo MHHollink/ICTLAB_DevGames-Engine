@@ -26,5 +26,6 @@
     <string name="dummy_commits">87</string>
     <string name="dummy_score">1154</string>
     <string name="dummy_projects">7</string>
+    <string name="new_message">You recieved a new notification</string>
 
 </resources>

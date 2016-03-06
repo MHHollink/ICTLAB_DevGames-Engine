@@ -147,6 +147,64 @@ public class PreferenceManager {
         remove(PREF_LAST_USED_USERNAME);
     }
 
+    /**
+     * Boolean value. Indicating whether the user enabled notifications in the settings screen
+     */
+    public static final String PREF_KEY_NOTIFICATIONS_ENABLED = "pref_notifications_enabled";
+
+    /**
+     * @return Returns whether notifications are enabled for the whole app. This is a user setting.
+     */
+    public boolean isNotificationsEnabled() {
+        return sharedPreferences.getBoolean(PREF_KEY_NOTIFICATIONS_ENABLED, false);
+    }
+
+    /**
+     * @param notificationsEnabled Set whether notifications should be enabled in the whole app. This is a user setting.
+     */
+    public void setNotificationsEnabled(boolean notificationsEnabled) {
+        putBoolean(PREF_KEY_NOTIFICATIONS_ENABLED, notificationsEnabled);
+    }
+
+    /**
+     * Ringtone preference. The notification sound.
+     */
+    public static final String PREF_KEY_NOTIFICATION_SOUND = "pref_notification_sound";
+
+    /**
+     * @return The URI of the sound that should be used with a notification. Use with {@link android.net.Uri#parse(String)}. This is
+     * a user setting.
+     */
+    public String getNotificationRingtone() {
+        return sharedPreferences.getString(PREF_KEY_NOTIFICATION_SOUND, "");
+    }
+
+    /**
+     * @param notificationRingtone The URI of the sound that should be used with a notification. This is a user setting.
+     */
+    public void setNotificationRingtone(String notificationRingtone) {
+        putString(PREF_KEY_NOTIFICATION_SOUND, notificationRingtone);
+    }
+
+    /**
+     * Boolean value. Whether vibration is enabled with notifications
+     */
+    public static final String PREF_KEY_NOTIFICATION_VIBRATE = "pref_notification_vibrate";
+
+    /**
+     * @return Returns whether the device should vibrate when a notification is fired. This is a user setting.
+     */
+    public boolean isNotificationVibrationEnabled() {
+        return sharedPreferences.getBoolean(PREF_KEY_NOTIFICATION_VIBRATE, false);
+    }
+
+    /**
+     * @param notificationVibrationEnabled Set whether the device should vibrate when a notification is fired. This is a user setting.
+     */
+    public void setNotificationVibrationEnabled(boolean notificationVibrationEnabled) {
+        putBoolean(PREF_KEY_NOTIFICATION_VIBRATE, notificationVibrationEnabled);
+    }
+
 
 
 
@@ -229,4 +287,6 @@ public class PreferenceManager {
     private void remove(String key) {
         sharedPreferences.edit().remove(key).apply();
     }
+
+
 }
