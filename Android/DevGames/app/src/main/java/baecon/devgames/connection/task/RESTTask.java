@@ -202,7 +202,7 @@ public abstract class RESTTask<P, I, R> extends MultiThreadedAsyncTask<P, I, R> 
 
     protected User getLoggedInUser() {
         try {
-            Setting userUuid = DBHelper.getSettingDao(getDbHelper()).queryForId(Setting.USER_UUID);
+            Setting userUuid = DBHelper.getSettingDao(getDbHelper()).queryForId(Setting.USER_ID);
 
             if (userUuid == null) {
                 return null;

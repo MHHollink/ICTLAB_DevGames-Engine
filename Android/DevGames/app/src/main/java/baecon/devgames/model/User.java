@@ -1,13 +1,14 @@
 package baecon.devgames.model;
 
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @DatabaseTable(tableName = "users")
 public class User extends AbsSynchronizable implements Serializable {
@@ -25,13 +26,13 @@ public class User extends AbsSynchronizable implements Serializable {
     @DatabaseField(columnName = Column.GIT_USER)
     private String gitUsername;
 
-    @DatabaseField(columnName = Column.PROJECTS)
-    private List<Project> projects;
+    @DatabaseField(columnName = Column.PROJECTS, dataType = DataType.SERIALIZABLE)
+    private HashSet<Project> projects;
 
-    @DatabaseField(columnName = Column.COMMITS)
-    private List<Commit> commits;
+    @DatabaseField(columnName = Column.COMMITS, dataType = DataType.SERIALIZABLE)
+    private HashSet<Commit> commits;
 
-    public User(Long uuid, String username, String gitUsername, List<Project> projects, List<Commit> commits) {
+    public User(Long uuid, String username, String gitUsername, HashSet<Project> projects, HashSet<Commit> commits) {
         this.id = uuid;
         this.username = username;
         this.gitUsername = gitUsername;
@@ -40,7 +41,7 @@ public class User extends AbsSynchronizable implements Serializable {
     }
 
     public User(Long id, String username, String gitUsername) {
-        this(id, username, gitUsername, new ArrayList<Project>(), new ArrayList<Commit>());
+        this(id, username, gitUsername, new HashSet<Project>(), new HashSet<Commit>());
     }
 
     public User(Long id){
@@ -67,11 +68,11 @@ public class User extends AbsSynchronizable implements Serializable {
         return gitUsername;
     }
 
-    public List<Project> getProjects() {
+    public HashSet<Project> getProjects() {
         return projects;
     }
 
-    public List<Commit> getCommits() {
+    public HashSet<Commit> getCommits() {
         return commits;
     }
 

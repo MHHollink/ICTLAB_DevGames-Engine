@@ -1,5 +1,6 @@
 package baecon.devgames.model;
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -19,10 +20,10 @@ public class Commit extends AbsSynchronizable implements Serializable {
         public static final String SCORE = "score";
     }
 
-    @DatabaseField(columnName = Column.PROJECT)
+    @DatabaseField(columnName = Column.PROJECT, dataType = DataType.SERIALIZABLE)
     private Project project;
 
-    @DatabaseField(columnName = Column.COMMITTEE)
+    @DatabaseField(columnName = Column.COMMITTEE, dataType = DataType.SERIALIZABLE)
     private User committee;
 
     @DatabaseField(columnName = Column.TITLE)

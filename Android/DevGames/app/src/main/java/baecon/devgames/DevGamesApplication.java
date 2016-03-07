@@ -52,16 +52,12 @@ public class DevGamesApplication extends Application {
 
         preferenceManager = PreferenceManager.get(this);
 
-        if( preferenceManager.isRememberPasswordEnabled() &&
-                preferenceManager.getLastUsedUsername() != null)
-            loggedInUser = DummyHelper.getInstance().marcel;
-
         dbHelper = OpenHelperManager.getHelper(this, DBHelper.class);
         Dao<Setting, String> settingDao = DBHelper.getSettingDao(dbHelper);
 
         try {
 
-            String loggedInUserUuid = settingDao.queryForId(Setting.USERNAME).getValue();
+            Long loggedInUserUuid = Long.valueOf(settingDao.queryForId(Setting.USERNAME).getValue());
             loggedInUser = getUser(loggedInUserUuid);
 
             L.d("loaded app, loggedInUser={0}", loggedInUser);
@@ -74,6 +70,7 @@ public class DevGamesApplication extends Application {
         formatterDayMonthYear = new SimpleDateFormat(getString(R.string.date_dd_MM_yyyy));
         formatterDayMonthHourMinute = new SimpleDateFormat(getString(R.string.date_dd_MMM_HH_mm));
 
+        /*
         devGamesClient = new RestAdapter.Builder()
                 .setRequestInterceptor(new RequestInterceptor() {
                     @Override
@@ -100,7 +97,7 @@ public class DevGamesApplication extends Application {
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build()
                 .create(DevGamesClient.class);
-
+        */
     }
 
     @Override
@@ -145,18 +142,18 @@ public class DevGamesApplication extends Application {
     /**
      * Get a {@link User} by its uuid
      *
-     * @param uuid
-     *         The uuid of the User
+     * @param id
+     *         The id of the User
      *
      * @return The User, otherwise null if not found or when an error occurred
      */
-    private User getUser(String uuid) {
+    private User getUser(Long id) {
 
         try {
-            return DBHelper.getUserDao(dbHelper).queryBuilder().where().eq(ISynchronizable.Column.ID, uuid).queryForFirst();
+            return DBHelper.getUserDao(dbHelper).queryBuilder().where().eq(ISynchronizable.Column.ID, id).queryForFirst();
         }
         catch (Exception e) {
-            L.e(e, "could not get user with id {0} from the local DB", uuid);
+            L.e(e, "could not get user with id {0} from the local DB", id);
         }
         return null;
     }

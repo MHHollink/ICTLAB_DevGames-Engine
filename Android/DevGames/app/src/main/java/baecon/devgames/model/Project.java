@@ -1,12 +1,13 @@
 package baecon.devgames.model;
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @DatabaseTable(tableName = "projects")
 public class Project implements Serializable {
@@ -19,14 +20,14 @@ public class Project implements Serializable {
         public static final String DESCRIPTION = "description";
     }
 
-    @DatabaseField(columnName = Column.OWNER)
+    @DatabaseField(columnName = Column.OWNER, dataType = DataType.SERIALIZABLE)
     private User owner;
 
-    @DatabaseField(columnName = Column.DEVELOPERS)
-    private List<User> developers;
+    @DatabaseField(columnName = Column.DEVELOPERS, dataType = DataType.SERIALIZABLE)
+    private HashSet<User> developers;
 
-    @DatabaseField(columnName = Column.COMMITS)
-    private List<Commit> commits;
+    @DatabaseField(columnName = Column.COMMITS, dataType = DataType.SERIALIZABLE)
+    private HashSet<Commit> commits;
 
     @DatabaseField(columnName = Column.NAME)
     private String name;
@@ -34,7 +35,7 @@ public class Project implements Serializable {
     @DatabaseField(columnName = Column.DESCRIPTION)
     private String description;
 
-    public Project(User owner, List<User> developers, List<Commit> commits, String name, String description) {
+    public Project(User owner, HashSet<User> developers, HashSet<Commit> commits, String name, String description) {
         this.owner = owner;
         this.developers = developers;
         this.commits = commits;
@@ -43,7 +44,7 @@ public class Project implements Serializable {
     }
 
     public Project(User owner, String name, String description) {
-        this(owner, new ArrayList<User>(), new ArrayList<Commit>(), name, description);
+        this(owner, new HashSet<User>(), new HashSet<Commit>(), name, description);
     }
 
     public Project(String name, String description) {
@@ -66,11 +67,11 @@ public class Project implements Serializable {
         this.owner = owner;
     }
 
-    public List<User> getDevelopers() {
+    public HashSet<User> getDevelopers() {
         return developers;
     }
 
-    public List<Commit> getCommits() {
+    public HashSet<Commit> getCommits() {
         return commits;
     }
 

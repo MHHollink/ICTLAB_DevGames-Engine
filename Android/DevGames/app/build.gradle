@@ -17,6 +17,7 @@ android {
         debug {
             applicationIdSuffix '.core'
             buildConfigField "boolean", "IS_PRODUCTION", "false"
+            versionNameSuffix '-SNAPSHOT'
         }
         release {
             minifyEnabled false

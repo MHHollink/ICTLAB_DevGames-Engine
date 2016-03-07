@@ -29,7 +29,7 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
 
     private static final String DATABASE_NAME = "devgames.db";
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 8;
 
     private static int APP_VERSION_CODE;
 
@@ -59,7 +59,7 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
 
             // Add some default values.
             this.getDao(Setting.class, String.class).create(new Setting(Setting.USERNAME, ""));
-            this.getDao(Setting.class, String.class).create(new Setting(Setting.USER_UUID, ""));
+            this.getDao(Setting.class, String.class).create(new Setting(Setting.USER_ID, ""));
             this.getDao(Setting.class, String.class).create(new Setting(Setting.PASSWORD_HASH, ""));
             this.getDao(Setting.class, String.class).create(new Setting(Setting.SESSION_ID, ""));
         }
