@@ -15,7 +15,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
 import baecon.devgames.model.Project;
 import baecon.devgames.util.DummyHelper;

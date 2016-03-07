@@ -52,4 +52,14 @@
         android:layout_alignTop="@+id/submit"
         android:layout_alignStart="@+id/password"
         android:layout_alignBottom="@+id/submit" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:id="@+id/versionCode"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="6dp"
+        android:layout_marginEnd="6dp" />
 </RelativeLayout>

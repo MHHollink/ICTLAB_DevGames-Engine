@@ -3,12 +3,13 @@ package baecon.devgames.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @DatabaseTable(tableName = "projects")
-public class Project {
+public class Project implements Serializable {
 
     public static class Column {
         public static final String OWNER = "owner";
@@ -87,7 +88,6 @@ public class Project {
 
     public void setDescription(String description) {
         this.description = description;
-        return this;
     }
 
     public void addDeveloper(User user) {
@@ -106,5 +106,12 @@ public class Project {
         Collections.addAll(commits, commit);
     }
 
+    public double getScore() {
+        double score = 0;
+        for (Commit commit : commits) {
+            score += commit.getScore();
+        }
+        return score;
+    }
 
 }

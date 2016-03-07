@@ -4,24 +4,20 @@ package baecon.devgames.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 @DatabaseTable(tableName = "users")
-public class User {
+public class User extends AbsSynchronizable implements Serializable {
 
     public static class Column {
-        public static final String ID = "uuid";
         public static final String USERNAME = "username";
         public static final String GIT_USER = "git_username";
         public static final String PROJECTS = "projects";
         public static final String COMMITS = "commits";
     }
-
-    @DatabaseField(columnName = Column.ID)
-    private long id;
 
     @DatabaseField(columnName = Column.USERNAME)
     private String username;
@@ -43,12 +39,16 @@ public class User {
         this.commits = commits;
     }
 
-    public User(String username, String gitUsername) {
-        this(null, username, gitUsername, new ArrayList<Project>(), new ArrayList<Commit>());
+    public User(Long id, String username, String gitUsername) {
+        this(id, username, gitUsername, new ArrayList<Project>(), new ArrayList<Commit>());
     }
 
-    public User(String username) {
-        this(username, "");
+    public User(Long id){
+        this(id, "", "");
+    }
+
+    public User() {
+        this(0l);
     }
 
     public void setUsername(String username) {
@@ -57,10 +57,6 @@ public class User {
 
     public void setGitUsername(String gitUsername) {
         this.gitUsername = gitUsername;
-    }
-
-    public long getId() {
-        return id;
     }
 
     public String getUsername() {
@@ -103,6 +99,27 @@ public class User {
      * TODO
      */
     public double getScore() {
-        return 60;
+        double score=0;
+        for (Commit commit : commits) {
+            score += commit.getScore();
+        }
+
+        return score;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", gitUsername='" + gitUsername + '\'' +
+                ", projects=" + projects +
+                ", commits=" + commits +
+                '}';
+    }
+
+    @Override
+    public boolean contentEquals(Object other) {
+        return false;
     }
 }

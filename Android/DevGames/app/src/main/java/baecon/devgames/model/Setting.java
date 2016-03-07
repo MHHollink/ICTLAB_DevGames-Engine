@@ -3,8 +3,10 @@ package baecon.devgames.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.io.Serializable;
+
 @DatabaseTable(tableName = "settings")
-public class Setting {
+public class Setting implements Serializable {
 
     public static class Column {
         public static final String KEY = "key";
@@ -68,4 +70,11 @@ public class Setting {
         this.value = value;
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

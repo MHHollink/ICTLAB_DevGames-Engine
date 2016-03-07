@@ -1,5 +1,5 @@
 #
-# generated on 2016/03/07 12:38:40
+# generated on 2016/03/07 11:01:38
 #
 # --table-start--
 dataClass=baecon.devgames.model.User
@@ -86,6 +86,10 @@ columnName=filesChanges
 # --field-start--
 fieldName=timestamp
 columnName=timestamp
+# --field-end--
+# --field-start--
+fieldName=score
+columnName=score
 # --field-end--
 # --table-fields-end--
 # --table-end--
