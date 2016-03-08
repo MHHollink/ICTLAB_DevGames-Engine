@@ -1,4 +1,4 @@
-package baecon.devgames.connection.gcm;
+package baecon.devgames.connection.push.gcm;
 
 public enum GcmMessageType {
 

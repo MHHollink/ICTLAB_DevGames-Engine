@@ -1,4 +1,4 @@
-package baecon.devgames.connection.gcm;
+package baecon.devgames.connection.push.gcm;
 
 import android.app.IntentService;
 import android.app.Notification;
@@ -17,16 +17,16 @@ import android.util.Log;
 
 import baecon.devgames.R;
 import baecon.devgames.ui.activity.MainActivity;
+import baecon.devgames.util.L;
 import baecon.devgames.util.PreferenceManager;
 
 
 public class GcmIntentService extends IntentService{
 
-    private static final String TAG = GcmIntentService.class.getName();
     private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
 
     public GcmIntentService() {
-        super(TAG);
+        super("GCMIntentService");
     }
 
     @Override
@@ -35,7 +35,7 @@ public class GcmIntentService extends IntentService{
             Bundle extras = intent.getExtras();
 
             if (extras == null || extras.isEmpty()) {
-                Log.i(TAG, "onHandleIntent: Empty push message received");
+                L.v("Empty push message received");
                 return;
             }
 
@@ -66,7 +66,7 @@ public class GcmIntentService extends IntentService{
 
 
                 default:
-                    Log.w(TAG, "onHandleIntent: Type is not a known type in Message.Type: " + String.valueOf(type));
+                    L.w("Type is not a known type in Message.Type: " + String.valueOf(type));
             }
 
 
@@ -86,12 +86,12 @@ public class GcmIntentService extends IntentService{
 
             // Exit this function when the user does not like to get notifications
             if (!preferenceManager.isNotificationsEnabled()) {
-                Log.d(TAG, "showNotification: Showing notification skipped, disabled by user setting");
+                L.d("Showing notification skipped, disabled by user setting");
                 return;
             }
         }
         else {
-            Log.w(TAG, "showNotification: Forcing a notification, while the user preferred to have no notifications!");
+            L.w("showNotification: Forcing a notification, while the user preferred to have no notifications!");
         }
 
         // If the given title is null, use the app name

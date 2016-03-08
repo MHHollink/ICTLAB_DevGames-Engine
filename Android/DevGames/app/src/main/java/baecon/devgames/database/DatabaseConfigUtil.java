@@ -7,10 +7,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
-import baecon.devgames.model.Commit;
-import baecon.devgames.model.Project;
-import baecon.devgames.model.Setting;
-import baecon.devgames.model.User;
+import baecon.devgames.database.model.Commit;
+import baecon.devgames.database.model.Project;
+import baecon.devgames.database.model.Setting;
+import baecon.devgames.database.model.User;
 
 /**
  * A utility class to create ORMLite config files.

@@ -2,7 +2,7 @@ package baecon.devgames.database.dto;
 
 import java.util.Set;
 
-import baecon.devgames.model.User;
+import baecon.devgames.database.model.User;
 
 public class UserDTO implements ModelDTO<User> {
 

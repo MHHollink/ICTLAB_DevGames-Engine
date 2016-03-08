@@ -2,16 +2,17 @@ package baecon.devgames.connection.task;
 
 
 import android.content.Context;
+import android.content.Intent;
 
 import java.sql.SQLException;
-import java.util.Map;
 
 import baecon.devgames.DevGamesApplication;
 import baecon.devgames.connection.client.DevGamesClient;
 import baecon.devgames.database.DBHelper;
-import baecon.devgames.model.ISynchronizable;
-import baecon.devgames.model.Setting;
-import baecon.devgames.model.User;
+import baecon.devgames.database.model.ISynchronizable;
+import baecon.devgames.database.model.Setting;
+import baecon.devgames.database.model.User;
+import baecon.devgames.ui.activity.LoginActivity;
 import baecon.devgames.util.L;
 import baecon.devgames.util.MultiThreadedAsyncTask;
 import retrofit.RetrofitError;
@@ -122,69 +123,8 @@ public abstract class RESTTask<P, I, R> extends MultiThreadedAsyncTask<P, I, R> 
         return error.getResponse().getStatus();
     }
 
-    /**
-     * A method that tries to re-login and, if successful, stores the
-     * new session in the local DB.
-     *
-     * @return true iff the session was successfully refreshed AND this
-     * new session was successfully store in the local database.
-     */
-    public boolean refreshSession() {
-
-        if (this.triedToRefreshSession) {
-            // We already tried to refresh the session, but apparently failed.
-            return false;
-        }
-
-        this.triedToRefreshSession = true;
-
-        DevGamesApplication application = (DevGamesApplication) context.getApplicationContext();
-        User loggedInUser = getLoggedInUser();
-        String session;
-        String passwordHash;
-
-        try {
-            passwordHash = DBHelper.getSettingDao(getDbHelper())
-                    .queryBuilder()
-                    .where()
-                    .eq(Setting.Column.KEY, Setting.PASSWORD_HASH).queryForFirst()
-                    .getValue();
-
-            if (passwordHash == null) {
-                L.e("Password hash is null, cannot refresh login");
-                return false;
-            }
-
-            DevGamesClient client = this.createService();
-            Map<String, String> response = client.login(loggedInUser.getUsername(), passwordHash);
-
-            if (response == null || !response.containsKey(DevGamesApplication.SESSION_HEADER_KEY)) {
-                L.w("refreshSession, response={0}", response);
-                return false;
-            }
-
-            session = response.get(DevGamesApplication.SESSION_HEADER_KEY);
-        } catch (Exception e) {
-            L.e(e, "something went wrong trying to refresh the session");
-            return false;
-        }
-
-        // We got a session, store it in the local database.
-        try {
-            DBHelper.getSettingDao(getDbHelper()).createOrUpdate(new Setting(Setting.SESSION_ID, session));
-            application.setSession(session);
-        } catch (SQLException e) {
-            L.e(e, "something went wrong while saving data");
-            return false;
-        }
-
-        L.d("successfully refreshed session");
-
-        SESSION_REFRESH_COUNTER++;
-        L.v("{0} refreshed sessions in {1} seconds", SESSION_REFRESH_COUNTER,
-                ((System.currentTimeMillis() - LOADED) / 1000));
-
-        return true;
+    public void requestReLogin() {
+        context.startActivity(new Intent(context, LoginActivity.class));
     }
 
     /**

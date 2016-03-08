@@ -1,6 +1,8 @@
-package baecon.devgames.model;
+package baecon.devgames.database.model;
 
 import java.io.Serializable;
+
+import baecon.devgames.connection.synchronization.IModelManager;
 
 /**
  * <p>An object that is used in the back-end and on this device (probably on more devices as well).

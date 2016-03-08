@@ -1,4 +1,4 @@
-package baecon.devgames.model;
+package baecon.devgames.database.model;
 
 
 import com.j256.ormlite.field.DataType;
@@ -8,7 +8,6 @@ import com.j256.ormlite.table.DatabaseTable;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 
 @DatabaseTable(tableName = "users")
 public class User extends AbsSynchronizable implements Serializable {

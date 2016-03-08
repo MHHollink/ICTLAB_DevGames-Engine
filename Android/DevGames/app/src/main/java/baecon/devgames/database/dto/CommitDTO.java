@@ -1,6 +1,6 @@
 package baecon.devgames.database.dto;
 
-import baecon.devgames.model.Commit;
+import baecon.devgames.database.model.Commit;
 
 
 public class CommitDTO implements ModelDTO<Commit> {

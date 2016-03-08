@@ -1,6 +1,6 @@
 package baecon.devgames.database.dto;
 
-import baecon.devgames.model.Project;
+import baecon.devgames.database.model.Project;
 
 
 public class ProjectDTO implements ModelDTO<Project> {

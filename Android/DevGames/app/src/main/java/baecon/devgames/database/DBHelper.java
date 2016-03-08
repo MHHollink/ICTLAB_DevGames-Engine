@@ -17,10 +17,10 @@ import java.util.HashSet;
 import java.util.Map;
 
 import baecon.devgames.R;
-import baecon.devgames.model.Commit;
-import baecon.devgames.model.Project;
-import baecon.devgames.model.Setting;
-import baecon.devgames.model.User;
+import baecon.devgames.database.model.Commit;
+import baecon.devgames.database.model.Project;
+import baecon.devgames.database.model.Setting;
+import baecon.devgames.database.model.User;
 import baecon.devgames.util.Utils;
 
 public class DBHelper extends OrmLiteSqliteOpenHelper {
@@ -60,7 +60,6 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
             // Add some default values.
             this.getDao(Setting.class, String.class).create(new Setting(Setting.USERNAME, ""));
             this.getDao(Setting.class, String.class).create(new Setting(Setting.USER_ID, ""));
-            this.getDao(Setting.class, String.class).create(new Setting(Setting.PASSWORD_HASH, ""));
             this.getDao(Setting.class, String.class).create(new Setting(Setting.SESSION_ID, ""));
         }
         catch (SQLException e) {

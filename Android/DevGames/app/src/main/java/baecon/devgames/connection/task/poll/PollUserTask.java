@@ -9,13 +9,11 @@ import java.sql.SQLException;
 import baecon.devgames.connection.task.RESTTask;
 import baecon.devgames.database.DBHelper;
 import baecon.devgames.database.dto.UserDTO;
-import baecon.devgames.model.ISynchronizable;
-import baecon.devgames.model.User;
+import baecon.devgames.database.model.ISynchronizable;
+import baecon.devgames.database.model.User;
 import baecon.devgames.util.L;
 import baecon.devgames.util.Utils;
 import retrofit.RetrofitError;
-
-import static baecon.devgames.connection.task.RESTTask.*;
 
 public class PollUserTask extends RESTTask<Void, Void, Integer> {
 
@@ -43,13 +41,8 @@ public class PollUserTask extends RESTTask<Void, Void, Integer> {
             // Also check if the user is still logged in
             // Otherwise this check will login again, that is not a good idea :)
             if ((status == FORBIDDEN || status == UNAUTHORIZED) && getLoggedInUser() != null) {
-
-                boolean success = super.refreshSession();
-                L.d("session refresh was successful: {0}", success);
-
-                if (success) {
-                    return this.doInBackground(params);
-                }
+                super.requestReLogin();
+                L.d("user was requested to re-login: {0}", getLoggedInUser().getId());
             }
 
             L.e(error, "HTTP error: {0}", status);
@@ -70,7 +63,10 @@ public class PollUserTask extends RESTTask<Void, Void, Integer> {
         Dao<User, String> userDao = DBHelper.getUserDao(getDbHelper());
         try {
 
-            User user = userDao.queryBuilder().where().eq(ISynchronizable.Column.ID, userId).queryForFirst();
+            User user = userDao.queryBuilder()
+                    .where()
+                    .eq(ISynchronizable.Column.ID, userId)
+                    .queryForFirst();
 
             L.v("User was {0} in local database", user == null ? "not yet" : "already");
 

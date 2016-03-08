@@ -13,20 +13,14 @@ import baecon.devgames.connection.client.DevGamesClient;
 import baecon.devgames.database.DBHelper;
 import baecon.devgames.database.DatabaseConfigUtil;
 import baecon.devgames.database.dto.UserDTO;
-import baecon.devgames.model.ISynchronizable;
-import baecon.devgames.model.Setting;
-import baecon.devgames.model.User;
+import baecon.devgames.database.model.ISynchronizable;
+import baecon.devgames.database.model.Setting;
+import baecon.devgames.database.model.User;
 import baecon.devgames.util.L;
 import baecon.devgames.util.PreferenceManager;
 import retrofit.RetrofitError;
 
 public class LoginTask extends RESTTask< Void, Void, Integer> {
-
-    // The prefix of the message identifier (see onPostExecute(...))
-    private static final String ID_PREFIX = "login_";
-
-    // The resource type of the message identifier (see onPostExecute(...))
-    private static final String ID_TYPE = "string";
 
     // The username.
     private final String username;

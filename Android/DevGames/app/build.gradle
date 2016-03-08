@@ -9,7 +9,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
-        versionName "1.0"
+        versionName "0.0.1"
         buildConfigField "String", "GCM_SENDER_ID", "\"69868578367\""
         buildConfigField "String", "ENDPOINT_URL", "\"http://127.0.0.1\""
     }
