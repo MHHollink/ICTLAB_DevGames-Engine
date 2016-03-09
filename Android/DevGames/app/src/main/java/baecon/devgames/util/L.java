@@ -6,15 +6,17 @@ import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("PointlessBooleanExpression")
 public class L {
 
     private static final boolean DEBUG = true;
 
-    // The format of the automatically created tag.
+    // The format of the automatically created tag in each log line.
     private static final String TAG_FORMAT = "DEVGAMES: line=%d: %s#%s: ";
 
     private static final Pattern ANONYMOUS_CLASS_PATTERN = Pattern.compile("\\$\\d+$");
 
+    // Empty Instantiation of a args array in case of null
     private static final String[] NO_ARGS = {};
 
     public static int v(String message, Object... args) {
@@ -89,13 +91,6 @@ public class L {
         return Log.wtf(createTag(), form.format(args == null ? NO_ARGS : args), throwable);
     }
 
-    /**
-     * Creates a tag from the trace of the class from which
-     * the Log-call was called.
-     *
-     * @return a tag from the trace of the class from which
-     *         the Log-call was called.
-     */
     /**
      * Creates a tag from the trace of the class from which
      * the Log-call was called.

@@ -9,8 +9,6 @@ import android.util.Log;
 
 public class Utils {
 
-    private static final String TAG = Utils.class.getName();
-
     private Utils(){}
 
     /**
@@ -24,7 +22,7 @@ public class Utils {
             return pInfo.versionCode;
         }
         catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "getAppVersion: Could not retrieve versionName");
+            L.e("Could not retrieve versionName");
             return -1;
         }
     }
@@ -40,7 +38,7 @@ public class Utils {
             return pInfo.versionName;
         }
         catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "getAppVersionName: Could not retrieve versionName");
+            L.e("Could not retrieve versionName");
             return "";
         }
     }

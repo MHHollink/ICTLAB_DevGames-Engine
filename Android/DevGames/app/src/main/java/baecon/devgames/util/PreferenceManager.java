@@ -37,11 +37,14 @@ public class PreferenceManager {
 
     }
 
+    /**
+     * Clears all the shared preferences
+     *
+     * @param context
+     */
     public static void clearAllSettings(Context context) {
-
         PreferenceManager prefs = get(context);
         prefs.sharedPreferences.edit().clear().commit();
-
     }
 
     /**

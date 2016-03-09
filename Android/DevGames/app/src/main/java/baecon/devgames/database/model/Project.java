@@ -19,10 +19,10 @@ public class Project implements Serializable {
         public static final String DESCRIPTION = "description";
     }
 
-    @DatabaseField(columnName = Column.OWNER, dataType = DataType.SERIALIZABLE)
+    @DatabaseField(columnName = Column.OWNER, dataType = DataType.SERIALIZABLE, foreign = true, foreignAutoRefresh = true)
     private User owner;
 
-    @DatabaseField(columnName = Column.DEVELOPERS, dataType = DataType.SERIALIZABLE)
+    @DatabaseField(columnName = Column.DEVELOPERS, dataType = DataType.SERIALIZABLE, foreign = true, foreignAutoRefresh = true)
     private HashSet<User> developers;
 
     @DatabaseField(columnName = Column.COMMITS, dataType = DataType.SERIALIZABLE)

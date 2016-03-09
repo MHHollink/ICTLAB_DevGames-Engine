@@ -5,7 +5,6 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 
 import com.google.gson.GsonBuilder;
-import com.j256.ormlite.android.AndroidLog;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 import com.squareup.okhttp.OkHttpClient;
@@ -21,9 +20,11 @@ import baecon.devgames.database.model.User;
 import baecon.devgames.util.L;
 import baecon.devgames.util.PreferenceManager;
 
+import baecon.devgames.util.Utils;
 import retrofit.Endpoint;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
+import retrofit.android.AndroidLog;
 import retrofit.client.OkClient;
 import retrofit.converter.GsonConverter;
 
@@ -32,23 +33,30 @@ import retrofit.converter.GsonConverter;
  */
 public class DevGamesApplication extends Application {
 
-
+    /**
+     * The key point to the key-value pair for the session in each request header
+     */
     public static final String SESSION_HEADER_KEY = "SESSION_ID";
 
     private static final long DEFAULT_CONNECTION_TIMEOUT = 60 * 1000L;
     private static final long DEFAULT_READ_TIMEOUT = 60 * 1000L;
 
+    /**
+     * Date formats used throughout the entire app to keep it on a consistent basis
+     */
     public SimpleDateFormat formatterHourMinute, formatterDayMonthYear, formatterDayMonthHourMinute;
 
     private PreferenceManager preferenceManager;
-    private User loggedInUser;
     private DevGamesClient devGamesClient;
     private DBHelper dbHelper;
     private String session = null;
+    private User loggedInUser;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        L.v("Called");
 
         preferenceManager = PreferenceManager.get(this);
 
@@ -56,9 +64,11 @@ public class DevGamesApplication extends Application {
         Dao<Setting, String> settingDao = DBHelper.getSettingDao(dbHelper);
 
         try {
+            String loggedInUserUuid = settingDao.queryForId(Setting.USERNAME).getValue();
 
-            Long loggedInUserUuid = Long.valueOf(settingDao.queryForId(Setting.USERNAME).getValue());
-            loggedInUser = getUser(loggedInUserUuid);
+            loggedInUser = (loggedInUserUuid != null && !loggedInUserUuid.isEmpty()) ?
+                    getUser(Long.valueOf(loggedInUserUuid)) :
+                    getUser(0l);
 
             L.d("loaded app, loggedInUser={0}", loggedInUser);
         }
@@ -70,7 +80,6 @@ public class DevGamesApplication extends Application {
         formatterDayMonthYear = new SimpleDateFormat(getString(R.string.date_dd_MM_yyyy));
         formatterDayMonthHourMinute = new SimpleDateFormat(getString(R.string.date_dd_MMM_HH_mm));
 
-        /**
         devGamesClient = new RestAdapter.Builder()
                 .setRequestInterceptor(new RequestInterceptor() {
                     @Override
@@ -98,16 +107,16 @@ public class DevGamesApplication extends Application {
                     }
                 })
                 .setConverter(new GsonConverter(
-                        new GsonBuilder()
-                                .serializeNulls()
-                                .create()
+                                new GsonBuilder()
+                                        .serializeNulls()
+                                        .create()
                         )
                 )
-                .setLog((RestAdapter.Log) new AndroidLog("retrofit"))
+                .setLog(new AndroidLog("retrofit"))
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build()
                 .create(DevGamesClient.class);
-        **/
+
     }
 
     @Override
@@ -133,14 +142,6 @@ public class DevGamesApplication extends Application {
         return preferenceManager;
     }
 
-    public static DevGamesApplication get(Context context) {
-        return (DevGamesApplication) context.getApplicationContext();
-    }
-
-    public static DevGamesApplication get(Fragment context) {
-        return (DevGamesApplication) context.getActivity().getApplicationContext();
-    }
-
     public DevGamesClient getDevGamesClient() {
         return devGamesClient;
     }
@@ -150,7 +151,7 @@ public class DevGamesApplication extends Application {
     }
 
     /**
-     * Get a {@link User} by its uuid
+     * Get a {@link User} by its id
      *
      * @param id
      *         The id of the User
@@ -160,7 +161,12 @@ public class DevGamesApplication extends Application {
     private User getUser(Long id) {
 
         try {
-            return DBHelper.getUserDao(dbHelper).queryBuilder().where().eq(ISynchronizable.Column.ID, id).queryForFirst();
+            return DBHelper.getUserDao(dbHelper)
+                    .queryBuilder()
+                    .where()
+                    .eq(ISynchronizable.Column.ID, id)
+                    .queryForFirst();
+
         }
         catch (Exception e) {
             L.e(e, "could not get user with id {0} from the local DB", id);
@@ -182,5 +188,13 @@ public class DevGamesApplication extends Application {
         client.setConnectTimeout(connectTimeoutMillis, TimeUnit.MILLISECONDS);
         client.setReadTimeout(readTimeoutMillis, TimeUnit.MILLISECONDS);
         return client;
+    }
+
+    public static DevGamesApplication get(Context context) {
+        return (DevGamesApplication) context.getApplicationContext();
+    }
+
+    public static DevGamesApplication get(Fragment context) {
+        return (DevGamesApplication) context.getActivity().getApplicationContext();
     }
 }

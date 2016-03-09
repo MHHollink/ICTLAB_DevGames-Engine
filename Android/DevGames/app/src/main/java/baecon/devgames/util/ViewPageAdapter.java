@@ -36,6 +36,10 @@ public class ViewPageAdapter extends FragmentPagerAdapter {
         return tabs.get(position).getTitle();
     }
 
+    /**
+     * addTab is used to add a fragment (or multiple) to the current viewpager
+     * @param tab
+     */
     public void addTab(DevGamesTab... tab) {
         if(tabs == null) tabs = new ArrayList<>();
         Collections.addAll(tabs, tab);

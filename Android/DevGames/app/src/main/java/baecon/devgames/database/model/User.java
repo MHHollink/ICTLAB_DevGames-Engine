@@ -17,6 +17,7 @@ public class User extends AbsSynchronizable implements Serializable {
         public static final String GIT_USER = "git_username";
         public static final String PROJECTS = "projects";
         public static final String COMMITS = "commits";
+        public static final String GCM_KEY = "gcm_registration_key";
     }
 
     @DatabaseField(columnName = Column.USERNAME)
@@ -25,22 +26,26 @@ public class User extends AbsSynchronizable implements Serializable {
     @DatabaseField(columnName = Column.GIT_USER)
     private String gitUsername;
 
-    @DatabaseField(columnName = Column.PROJECTS, dataType = DataType.SERIALIZABLE)
+    @DatabaseField(columnName = Column.PROJECTS, dataType = DataType.SERIALIZABLE, foreign = true, foreignAutoRefresh = true)
     private HashSet<Project> projects;
 
-    @DatabaseField(columnName = Column.COMMITS, dataType = DataType.SERIALIZABLE)
+    @DatabaseField(columnName = Column.COMMITS, dataType = DataType.SERIALIZABLE, foreign = true, foreignAutoRefresh = true)
     private HashSet<Commit> commits;
 
-    public User(Long uuid, String username, String gitUsername, HashSet<Project> projects, HashSet<Commit> commits) {
+    @DatabaseField(columnName = Column.GCM_KEY)
+    private String gcmKey;
+
+    public User(Long uuid, String username, String gitUsername, HashSet<Project> projects, HashSet<Commit> commits, String gcmKey) {
         this.id = uuid;
         this.username = username;
         this.gitUsername = gitUsername;
         this.projects = projects;
         this.commits = commits;
+        this.gcmKey = gcmKey;
     }
 
     public User(Long id, String username, String gitUsername) {
-        this(id, username, gitUsername, new HashSet<Project>(), new HashSet<Commit>());
+        this(id, username, gitUsername, new HashSet<Project>(), new HashSet<Commit>(), null);
     }
 
     public User(Long id){
@@ -110,11 +115,11 @@ public class User extends AbsSynchronizable implements Serializable {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
+                "username='" + username + '\'' +
                 ", gitUsername='" + gitUsername + '\'' +
                 ", projects=" + projects +
                 ", commits=" + commits +
+                ", gcmKey='" + gcmKey + '\'' +
                 '}';
     }
 

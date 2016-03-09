@@ -3,6 +3,8 @@
     <string name="app_version_code">App version: %d</string>
     <string name="app_version_name">App version: %s</string>
 
+    <string name="google_app_id">69868578367</string>
+
     <string name="date_HH_mm">HH_mm</string>
     <string name="date_dd_MM_yyyy">dd_MM_yyyy</string>
     <string name="date_dd_MMM_HH_mm">dd_MMM_HH_mm</string>
