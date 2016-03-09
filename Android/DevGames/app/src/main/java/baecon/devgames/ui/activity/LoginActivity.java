@@ -7,10 +7,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
-import baecon.devgames.model.User;
+import baecon.devgames.util.DummyHelper;
+import baecon.devgames.util.Utils;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -49,7 +51,9 @@ public class LoginActivity extends AppCompatActivity {
 
                     }
 
-                    DevGamesApplication.get(LoginActivity.this).setLoggedInUser(new User(username.getText().toString()));
+                    DevGamesApplication.get(LoginActivity.this).setLoggedInUser(
+                            DummyHelper.getInstance().marcel
+                    );
 
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();
@@ -57,5 +61,13 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+
+        TextView version = (TextView) findViewById(R.id.versionCode);
+        version.setText(
+                String.format(
+                        getString(R.string.app_version_name),
+                        Utils.getAppVersionName(this)
+                )
+        );
     }
 }

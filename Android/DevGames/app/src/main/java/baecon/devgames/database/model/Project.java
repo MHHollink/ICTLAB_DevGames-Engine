@@ -1,13 +1,15 @@
-package baecon.devgames.model;
+package baecon.devgames.database.model;
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
 
 @DatabaseTable(tableName = "projects")
-public class Project {
+public class Project implements Serializable {
 
     public static class Column {
         public static final String OWNER = "owner";
@@ -17,14 +19,14 @@ public class Project {
         public static final String DESCRIPTION = "description";
     }
 
-    @DatabaseField(columnName = Column.OWNER)
+    @DatabaseField(columnName = Column.OWNER, dataType = DataType.SERIALIZABLE, foreign = true, foreignAutoRefresh = true)
     private User owner;
 
-    @DatabaseField(columnName = Column.DEVELOPERS)
-    private List<User> developers;
+    @DatabaseField(columnName = Column.DEVELOPERS, dataType = DataType.SERIALIZABLE, foreign = true, foreignAutoRefresh = true)
+    private HashSet<User> developers;
 
-    @DatabaseField(columnName = Column.COMMITS)
-    private List<Commit> commits;
+    @DatabaseField(columnName = Column.COMMITS, dataType = DataType.SERIALIZABLE)
+    private HashSet<Commit> commits;
 
     @DatabaseField(columnName = Column.NAME)
     private String name;
@@ -32,7 +34,7 @@ public class Project {
     @DatabaseField(columnName = Column.DESCRIPTION)
     private String description;
 
-    public Project(User owner, List<User> developers, List<Commit> commits, String name, String description) {
+    public Project(User owner, HashSet<User> developers, HashSet<Commit> commits, String name, String description) {
         this.owner = owner;
         this.developers = developers;
         this.commits = commits;
@@ -41,7 +43,7 @@ public class Project {
     }
 
     public Project(User owner, String name, String description) {
-        this(owner, new ArrayList<User>(), new ArrayList<Commit>(), name, description);
+        this(owner, new HashSet<User>(), new HashSet<Commit>(), name, description);
     }
 
     public Project(String name, String description) {
@@ -64,11 +66,11 @@ public class Project {
         this.owner = owner;
     }
 
-    public List<User> getDevelopers() {
+    public HashSet<User> getDevelopers() {
         return developers;
     }
 
-    public List<Commit> getCommits() {
+    public HashSet<Commit> getCommits() {
         return commits;
     }
 
@@ -76,27 +78,40 @@ public class Project {
         return name;
     }
 
-    public Project setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public Project setDescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
-        return this;
     }
 
-    public Project addDeveloper(User user) {
+    public void addDeveloper(User user) {
         developers.add(user);
-        return this;
     }
 
-    public Project addCommit(Commit commit) {
-        commits.add(commit);
-        return this;
+    public void addDeveloper(User... user) {
+        Collections.addAll(developers, user);
     }
+
+    public void addCommit(Commit commit) {
+        commits.add(commit);
+    }
+
+    public void addCommit(Commit... commit) {
+        Collections.addAll(commits, commit);
+    }
+
+    public double getScore() {
+        double score = 0;
+        for (Commit commit : commits) {
+            score += commit.getScore();
+        }
+        return score;
+    }
+
 }

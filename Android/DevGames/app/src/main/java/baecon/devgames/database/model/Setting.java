@@ -1,10 +1,12 @@
-package baecon.devgames.model;
+package baecon.devgames.database.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.io.Serializable;
+
 @DatabaseTable(tableName = "settings")
-public class Setting {
+public class Setting implements Serializable {
 
     public static class Column {
         public static final String KEY = "key";
@@ -18,16 +20,10 @@ public class Setting {
     public static final String USERNAME = "username";
 
     /**
-     * The key that is pointing to the user uuid, or the empty string when
+     * The key that is pointing to the user id, or the empty string when
      * the user is not logged in.
      */
-    public static final String USER_UUID = "user_uuid";
-
-    /**
-     * The key that is pointing to the ... hash of the user's password, or
-     * the empty string when the user is not logged in.
-     */
-    public static final String PASSWORD_HASH = "password_hash";
+    public static final String USER_ID = "user_id";
 
     /**
      * The key that is pointing to a boolean flag indicating if the user is
@@ -68,4 +64,11 @@ public class Setting {
         this.value = value;
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

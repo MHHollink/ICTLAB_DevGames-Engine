@@ -1,14 +1,14 @@
 package baecon.devgames.util;
 
-import baecon.devgames.model.Commit;
-import baecon.devgames.model.Project;
-import baecon.devgames.model.User;
+import baecon.devgames.database.model.Commit;
+import baecon.devgames.database.model.Project;
+import baecon.devgames.database.model.User;
 
 public class DummyHelper {
 
-    public Project project;
-    public User user;
-    public Commit commit;
+    public Project clarity, devgames, adventuretrack;
+    public User marcel, evert, jorik, jelle, wouter;
+    public Commit init, android, gcm, rest;
 
     private static DummyHelper instance;
 
@@ -18,21 +18,34 @@ public class DummyHelper {
     }
 
     private DummyHelper() {
-        user = new User("Mjollnir94", "Mjollnir94");
+        marcel = new User(5l, "Marcel", "Mjollnir94");
+        evert = new User(1l, "Evert-Jan", "Evestar");
+        jorik = new User(2l, "Jorik", "Jorikito");
+        wouter = new User(3l, "Wouter", "0868307");
+        jelle = new User(4l, "Jelle", "draikos");
 
-        project = new Project(
-                user, "DevGames",
-                "Programming gamification");
+        clarity = new Project(evert, "Clarity", "VR for Port of Rotterdam");
+        devgames = new Project(marcel, "DevGames", "Gamification for Developers");
+        adventuretrack = new Project(evert, "Adventure Track", "");
 
-        user.addProject(project);
+        init = new Commit(devgames, marcel, "Inital Commit", "", "master", 12, 1457288402, 104);
+        android = new Commit(devgames, marcel, "First work in Android", "", "android_develop", 67, 1457288466, 87);
+        gcm = new Commit(devgames, jorik, "Added some files for Google Cloud Messaging", "", "android_develop", 2, 1457288527, 32);
+        rest = new Commit(devgames, wouter, "Server setup and Initial REST files", "", "webapp_develop", 51, 1457288630, 93);
 
-        commit = new Commit(
-                project, user,
-                "Initial Commit",
-                "4bfeac7f9d9cd23bf7bf282831223b232c8a21d7",
-                "Feature_android", 31, 1457014531);
+        marcel.addProject(devgames, clarity, adventuretrack);
+        evert.addProject(devgames, clarity, adventuretrack);
+        jorik.addProject(devgames, clarity);
+        jelle.addProject(devgames);
+        wouter.addProject(devgames);
 
-        user.addCommit(commit);
-        project.addCommit(commit);
+        marcel.addCommit(init, android);
+        jorik.addCommit(gcm);
+        wouter.addCommit(rest);
+
+        devgames.addCommit(init, android, gcm, rest);
+        devgames.addDeveloper(evert, marcel, jorik, jelle, wouter);
+        adventuretrack.addDeveloper(evert, marcel);
+        clarity.addDeveloper(evert, jorik, marcel);
     }
 }

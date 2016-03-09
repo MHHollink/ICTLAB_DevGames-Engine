@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import baecon.devgames.ui.fragment.DevGamesTab;
@@ -35,8 +36,12 @@ public class ViewPageAdapter extends FragmentPagerAdapter {
         return tabs.get(position).getTitle();
     }
 
-    public void addTab(DevGamesTab tab) {
+    /**
+     * addTab is used to add a fragment (or multiple) to the current viewpager
+     * @param tab
+     */
+    public void addTab(DevGamesTab... tab) {
         if(tabs == null) tabs = new ArrayList<>();
-        tabs.add(tab);
+        Collections.addAll(tabs, tab);
     }
 }

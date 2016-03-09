@@ -1,14 +1,10 @@
 #
-# generated on 2016/03/07 12:38:40
+# generated on 2016/03/09 01:15:47
 #
 # --table-start--
-dataClass=baecon.devgames.model.User
+dataClass=baecon.devgames.database.model.User
 tableName=users
 # --table-fields-start--
-# --field-start--
-fieldName=id
-columnName=uuid
-# --field-end--
 # --field-start--
 fieldName=username
 columnName=username
@@ -20,29 +16,55 @@ columnName=git_username
 # --field-start--
 fieldName=projects
 columnName=projects
+dataPersister=SERIALIZABLE
+foreign=true
+foreignAutoRefresh=true
 # --field-end--
 # --field-start--
 fieldName=commits
 columnName=commits
+dataPersister=SERIALIZABLE
+foreign=true
+foreignAutoRefresh=true
+# --field-end--
+# --field-start--
+fieldName=gcmKey
+columnName=gcm_registration_key
+# --field-end--
+# --field-start--
+fieldName=id
+columnName=id
+id=true
+# --field-end--
+# --field-start--
+fieldName=state
+columnName=state
 # --field-end--
 # --table-fields-end--
 # --table-end--
 #################################
 # --table-start--
-dataClass=baecon.devgames.model.Project
+dataClass=baecon.devgames.database.model.Project
 tableName=projects
 # --table-fields-start--
 # --field-start--
 fieldName=owner
 columnName=owner
+dataPersister=SERIALIZABLE
+foreign=true
+foreignAutoRefresh=true
 # --field-end--
 # --field-start--
 fieldName=developers
 columnName=developers
+dataPersister=SERIALIZABLE
+foreign=true
+foreignAutoRefresh=true
 # --field-end--
 # --field-start--
 fieldName=commits
 columnName=commits
+dataPersister=SERIALIZABLE
 # --field-end--
 # --field-start--
 fieldName=name
@@ -56,16 +78,18 @@ columnName=description
 # --table-end--
 #################################
 # --table-start--
-dataClass=baecon.devgames.model.Commit
+dataClass=baecon.devgames.database.model.Commit
 tableName=commits
 # --table-fields-start--
 # --field-start--
 fieldName=project
 columnName=project
+dataPersister=SERIALIZABLE
 # --field-end--
 # --field-start--
 fieldName=committee
 columnName=committee
+dataPersister=SERIALIZABLE
 # --field-end--
 # --field-start--
 fieldName=title
@@ -87,11 +111,24 @@ columnName=filesChanges
 fieldName=timestamp
 columnName=timestamp
 # --field-end--
+# --field-start--
+fieldName=score
+columnName=score
+# --field-end--
+# --field-start--
+fieldName=id
+columnName=id
+id=true
+# --field-end--
+# --field-start--
+fieldName=state
+columnName=state
+# --field-end--
 # --table-fields-end--
 # --table-end--
 #################################
 # --table-start--
-dataClass=baecon.devgames.model.Setting
+dataClass=baecon.devgames.database.model.Setting
 tableName=settings
 # --table-fields-start--
 # --field-start--

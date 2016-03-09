@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">DevGames</string>
+    <string name="app_version_code">App versie: %d</string>
+    <string name="app_version_name">App versie: %s</string>
+
+    <string name="date_HH_mm">HH_mm</string>
+    <string name="date_dd_MM_yyyy">dd_MM_yyyy</string>
+    <string name="date_dd_MMM_HH_mm">dd_MMM_HH_mm</string>
+
+    <string name="settings">Opties</string>
+    <string name="loading">laden…</string>
+
+    <string name="password">wachtword</string>
+    <string name="username">gebruikersnaam</string>
+    <string name="login">Login</string>
+    <string name="remember">Onthouden</string>
+
+    <string name="logging_in">Bezig met inloggen&#8230;</string>
+    <string name="logging_out">Bezig met uitloggen&#8230;</string>
+    <string name="logout">Uitloggen</string>
+
+    <string name="profile">profiel</string>
+    <string name="projects">projecten</string>
+
+    <string name="avatar">avatar</string>
+    <string name="issues">problemen</string>
+    <string name="project">projecten</string>
+    <string name="commits">commits</string>
+    <string name="score">punten</string>
+    <string name="list_view_explanation">developers met een totaal van</string>
+
+    <string name="new_message">U heeft een nieiuwe melding ontvangen</string>
+
+</resources>

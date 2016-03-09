@@ -15,9 +15,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
-import baecon.devgames.model.Project;
+import baecon.devgames.database.model.Project;
 import baecon.devgames.util.DummyHelper;
 
 public class ProjectsFragment extends DevGamesFragment implements DevGamesTab{
@@ -30,9 +29,9 @@ public class ProjectsFragment extends DevGamesFragment implements DevGamesTab{
         View view = inflater.inflate(R.layout.projects_fragment, container, false);
 
         List<Project> projects = new ArrayList<>();
-        projects.add(DummyHelper.getInstance().project);
-        projects.add(DummyHelper.getInstance().project);
-        projects.add(DummyHelper.getInstance().project);
+        projects.add(DummyHelper.getInstance().devgames);
+        projects.add(DummyHelper.getInstance().clarity);
+        projects.add(DummyHelper.getInstance().adventuretrack);
 
         ListView listView = (ListView) view.findViewById(R.id.listView);
         listView.setAdapter(new ProjectsListAdapter(projects));
