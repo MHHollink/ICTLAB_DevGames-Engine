@@ -1,5 +1,5 @@
 #
-# generated on 2016/03/07 07:09:06
+# generated on 2016/03/09 01:15:47
 #
 # --table-start--
 dataClass=baecon.devgames.database.model.User
@@ -17,11 +17,19 @@ columnName=git_username
 fieldName=projects
 columnName=projects
 dataPersister=SERIALIZABLE
+foreign=true
+foreignAutoRefresh=true
 # --field-end--
 # --field-start--
 fieldName=commits
 columnName=commits
 dataPersister=SERIALIZABLE
+foreign=true
+foreignAutoRefresh=true
+# --field-end--
+# --field-start--
+fieldName=gcmKey
+columnName=gcm_registration_key
 # --field-end--
 # --field-start--
 fieldName=id
@@ -43,11 +51,15 @@ tableName=projects
 fieldName=owner
 columnName=owner
 dataPersister=SERIALIZABLE
+foreign=true
+foreignAutoRefresh=true
 # --field-end--
 # --field-start--
 fieldName=developers
 columnName=developers
 dataPersister=SERIALIZABLE
+foreign=true
+foreignAutoRefresh=true
 # --field-end--
 # --field-start--
 fieldName=commits
