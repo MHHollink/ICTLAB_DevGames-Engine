@@ -124,7 +124,9 @@ public abstract class RESTTask<P, I, R> extends MultiThreadedAsyncTask<P, I, R> 
     }
 
     public void requestReLogin() {
-        context.startActivity(new Intent(context, LoginActivity.class));
+        Intent intent = new Intent(context, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        context.startActivity(intent);
     }
 
     /**
