@@ -14,13 +14,12 @@ import java.util.concurrent.TimeUnit;
 
 import baecon.devgames.connection.client.DevGamesClient;
 import baecon.devgames.database.DBHelper;
-import baecon.devgames.database.model.ISynchronizable;
-import baecon.devgames.database.model.Setting;
-import baecon.devgames.database.model.User;
+import baecon.devgames.model.ISynchronizable;
+import baecon.devgames.model.Setting;
+import baecon.devgames.model.User;
 import baecon.devgames.util.L;
 import baecon.devgames.util.PreferenceManager;
 
-import baecon.devgames.util.Utils;
 import retrofit.Endpoint;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;

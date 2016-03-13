@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
-import baecon.devgames.database.model.User;
+import baecon.devgames.model.User;
 
 public class ProfileFragment extends DevGamesFragment implements DevGamesTab {
 

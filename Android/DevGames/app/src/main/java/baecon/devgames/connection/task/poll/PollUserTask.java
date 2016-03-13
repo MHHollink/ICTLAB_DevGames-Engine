@@ -8,9 +8,9 @@ import java.sql.SQLException;
 
 import baecon.devgames.connection.task.RESTTask;
 import baecon.devgames.database.DBHelper;
-import baecon.devgames.database.dto.UserDTO;
-import baecon.devgames.database.model.ISynchronizable;
-import baecon.devgames.database.model.User;
+import baecon.devgames.connection.client.dto.UserDTO;
+import baecon.devgames.model.ISynchronizable;
+import baecon.devgames.model.User;
 import baecon.devgames.util.L;
 import baecon.devgames.util.Utils;
 import retrofit.RetrofitError;

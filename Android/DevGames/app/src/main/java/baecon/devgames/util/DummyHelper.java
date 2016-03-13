@@ -1,8 +1,8 @@
 package baecon.devgames.util;
 
-import baecon.devgames.database.model.Commit;
-import baecon.devgames.database.model.Project;
-import baecon.devgames.database.model.User;
+import baecon.devgames.model.Commit;
+import baecon.devgames.model.Project;
+import baecon.devgames.model.User;
 
 public class DummyHelper {
 

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import baecon.devgames.R;
-import baecon.devgames.database.model.Project;
+import baecon.devgames.model.Project;
 import baecon.devgames.util.DummyHelper;
 
 public class ProjectsFragment extends DevGamesFragment implements DevGamesTab{

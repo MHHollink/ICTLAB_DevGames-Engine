@@ -1,4 +1,4 @@
-package baecon.devgames.database.model;
+package baecon.devgames.model;
 
 
 import com.j256.ormlite.field.DataType;
@@ -70,6 +70,14 @@ public class User extends AbsSynchronizable implements Serializable {
 
     public String getGitUsername() {
         return gitUsername;
+    }
+
+    public String getGcmKey() {
+        return gcmKey;
+    }
+
+    public void setGcmKey(String gcmKey) {
+        this.gcmKey = gcmKey;
     }
 
     public HashSet<Project> getProjects() {

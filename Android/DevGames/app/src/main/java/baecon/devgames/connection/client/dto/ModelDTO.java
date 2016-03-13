@@ -1,4 +1,4 @@
-package baecon.devgames.database.dto;
+package baecon.devgames.connection.client.dto;
 
 /**
  * A class definition that is identical to the structure of the JSON document that is returned by the back-end. This
@@ -7,9 +7,9 @@ package baecon.devgames.database.dto;
 public interface ModelDTO<Model> {
 
     /**
-     * Returns the UUID. A UUID is <strong>ALWAYS</strong> assigned by the back-end.
+     * Returns the LOCAL_ID. A LOCAL_ID is <strong>ALWAYS</strong> assigned by the back-end.
      *
-     * @return The UUID.
+     * @return The LOCAL_ID.
      */
     Long getId();
 

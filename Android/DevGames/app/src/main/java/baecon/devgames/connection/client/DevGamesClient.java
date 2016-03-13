@@ -3,9 +3,9 @@ package baecon.devgames.connection.client;
 import java.util.List;
 import java.util.Map;
 
-import baecon.devgames.database.dto.CommitDTO;
-import baecon.devgames.database.dto.ProjectDTO;
-import baecon.devgames.database.dto.UserDTO;
+import baecon.devgames.connection.client.dto.CommitDTO;
+import baecon.devgames.connection.client.dto.ProjectDTO;
+import baecon.devgames.connection.client.dto.UserDTO;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Path;

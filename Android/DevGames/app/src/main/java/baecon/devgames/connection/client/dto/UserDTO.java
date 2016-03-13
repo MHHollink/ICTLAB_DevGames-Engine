@@ -1,8 +1,8 @@
-package baecon.devgames.database.dto;
+package baecon.devgames.connection.client.dto;
 
 import java.util.Set;
 
-import baecon.devgames.database.model.User;
+import baecon.devgames.model.User;
 
 public class UserDTO implements ModelDTO<User> {
 
@@ -11,6 +11,16 @@ public class UserDTO implements ModelDTO<User> {
     private String gitUsername;
     private Set<ProjectDTO> projectDTOs;
     private Set<CommitDTO> commitDTOs;
+
+    public UserDTO(User user){
+        id = user.getId();
+        username = user.getUsername();
+        gitUsername = user.getGitUsername();
+
+    }
+
+    public UserDTO() {
+    }
 
     @Override
     public User toModel() {

@@ -5,6 +5,11 @@
 
     <string name="google_app_id">69868578367</string>
 
+    <string name="blocking_error_known_with_status_code_known">Error: %1$s \nStatus code: %2$s</string>
+    <string name="blocking_error_known_with_status_code_unknown">Error: %1$s \nStatus code: unknown (0).</string>
+    <string name="blocking_error_unknown_with_status_code_known">Error: unknown. \nStatus code: %1$s</string>
+    <string name="blocking_error_unknown_with_status_code_unknown">Error: unknown. \nStatus code: unknown (0).</string>
+
     <string name="date_HH_mm">HH_mm</string>
     <string name="date_dd_MM_yyyy">dd_MM_yyyy</string>
     <string name="date_dd_MMM_HH_mm">dd_MMM_HH_mm</string>

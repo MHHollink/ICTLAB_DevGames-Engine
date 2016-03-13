@@ -4,7 +4,7 @@ import android.app.Application;
 
 import java.io.Serializable;
 
-import baecon.devgames.database.model.ISynchronizable;
+import baecon.devgames.model.ISynchronizable;
 import baecon.devgames.database.modelupdate.IModelUpdate;
 
 /**

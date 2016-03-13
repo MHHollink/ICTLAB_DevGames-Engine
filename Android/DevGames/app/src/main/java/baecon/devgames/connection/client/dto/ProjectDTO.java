@@ -1,16 +1,16 @@
-package baecon.devgames.database.dto;
+package baecon.devgames.connection.client.dto;
 
-import baecon.devgames.database.model.Commit;
+import baecon.devgames.model.Project;
 
 
-public class CommitDTO implements ModelDTO<Commit> {
+public class ProjectDTO implements ModelDTO<Project> {
     @Override
     public Long getId() {
         return null;
     }
 
     @Override
-    public Commit toModel() {
+    public Project toModel() {
         return null;
     }
 

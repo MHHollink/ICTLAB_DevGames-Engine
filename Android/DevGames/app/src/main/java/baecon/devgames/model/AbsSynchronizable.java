@@ -1,4 +1,4 @@
-package baecon.devgames.database.model;
+package baecon.devgames.model;
 
 import com.j256.ormlite.field.DatabaseField;
 
