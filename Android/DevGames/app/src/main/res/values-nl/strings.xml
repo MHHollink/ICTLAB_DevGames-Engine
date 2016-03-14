@@ -5,6 +5,11 @@
 
     <string name="google_app_id">69868578367</string>
 
+    <string name="play_services_continue_without_installing">Zonder Play Services verder gaan</string>
+    <string name="play_services_install">Play Services installeren</string>
+    <string name="play_services_user_recoverable">Het lijkt erop dat Google Play Services niet geïnstalleerd is op uw apparaat. TeamUp gebruik Google Play Services voor real time chat, Google maps en het vertalen van locatie coördinaten naar adressen.\n\nGoogle Play Services is niet vereist TeamUp, maar zonder werken de volgende functionaliteiten niet:\n\n- chat berichten worden niet real time afgeleverd. TeamUp checkt in plaats daarvan eens in de aantal minuten of nieuwe berichten klaar staan.\n- Google Maps worden niet getoond\n- Sommige adressen en locatie gerelateerde data zal niet worden getoond\n\nWilt u proberen Google Play Services te installeren op uw apparaat?</string>
+    <string name="play_services_non_user_recoverable">Het lijkt erop dat Google Play Services niet wordt ondersteund op uw apparaat. TeamUp gebruik Google Play Services voor real time chat, Google maps en het vertalen van locatie coördinaten naar adressen.\n\nGoogle Play Services is niet vereist TeamUp, maar zonder werken de volgende functionaliteiten niet:\n\n- chat berichten worden niet real time afgeleverd. TeamUp checkt in plaats daarvan eens in de aantal minuten of nieuwe berichten klaar staan.\n- Google Maps worden niet getoond\n- Sommige adressen en locatie gerelateerde data zal niet worden getoond</string>
+
     <string name="blocking_error_known_with_status_code_known">Fout: %1$s \nStatus code: %2$s</string>
     <string name="blocking_error_known_with_status_code_unknown">Fout: %1$s \nStatus code: onbekend (0).</string>
     <string name="blocking_error_unknown_with_status_code_known">Fout: onbekend. \nStatus code: %1$s</string>
@@ -13,6 +18,8 @@
     <string name="date_HH_mm">HH_mm</string>
     <string name="date_dd_MM_yyyy">dd_MM_yyyy</string>
     <string name="date_dd_MMM_HH_mm">dd_MMM_HH_mm</string>
+
+    <string name="ok">OK</string>
 
     <string name="settings">Opties</string>
     <string name="loading">laden…</string>

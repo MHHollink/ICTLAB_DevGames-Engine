@@ -5,6 +5,11 @@
 
     <string name="google_app_id">69868578367</string>
 
+    <string name="play_services_continue_without_installing">Continue without Play Services</string>
+    <string name="play_services_install">Install Play Services</string>
+    <string name="play_services_user_recoverable">It looks like Google Play Services is not installed on this device. TeamUp uses Google Play Services for real time chat, Google Maps and translating location coordinates to addresses. \n\nGoogle Play Services is not required for TeamUp, but without it:\n\n- chat messages will not be real time. TeamUp will check the server every couple of minutes if new messages have arrived\n- Google Maps will not be shown\n- Some addresses and location related data will not be shown in the app.\n\nWould you like to try to install Google Play Services?</string>
+    <string name="play_services_non_user_recoverable">It looks like Google Play Services is not supported on this device. TeamUp uses Google Play Services for real time chat, Google Maps and translating location coordinates to addresses. \n\nGoogle Play Services is not required for TeamUp, but without it:\n\n- chat messages will not be real time. TeamUp will check the server every couple of minutes if new messages have arrived\n- Google Maps will not be shown\n- Some addresses and location related data will not be shown in the app.</string>
+
     <string name="blocking_error_known_with_status_code_known">Error: %1$s \nStatus code: %2$s</string>
     <string name="blocking_error_known_with_status_code_unknown">Error: %1$s \nStatus code: unknown (0).</string>
     <string name="blocking_error_unknown_with_status_code_known">Error: unknown. \nStatus code: %1$s</string>
@@ -13,6 +18,8 @@
     <string name="date_HH_mm">HH_mm</string>
     <string name="date_dd_MM_yyyy">dd_MM_yyyy</string>
     <string name="date_dd_MMM_HH_mm">dd_MMM_HH_mm</string>
+
+    <string name="ok">OK</string>
 
     <string name="settings">Settings</string>
     <string name="loading">loading…</string>

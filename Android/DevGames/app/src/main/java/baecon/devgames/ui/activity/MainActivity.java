@@ -1,14 +1,21 @@
 package baecon.devgames.ui.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
+import baecon.devgames.connection.task.GcmRegistrationTask;
 import baecon.devgames.ui.fragment.ProfileFragment;
 import baecon.devgames.ui.fragment.ProjectsFragment;
 import baecon.devgames.ui.widget.SlidingTabLayout;
+import baecon.devgames.util.L;
+import baecon.devgames.util.Utils;
 import baecon.devgames.util.ViewPageAdapter;
 
 public class MainActivity extends DevGamesActivity {
@@ -69,5 +76,74 @@ public class MainActivity extends DevGamesActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (Utils.playServicesAvailable(this)) {
+
+            // Check registration id
+            new GcmRegistrationTask(this).executeThreaded();
+
+        }
+        else {
+
+            L.w("Google Play Services is not available on this device! Showing dialog = {0}",
+                    getPreferenceManager().getShowPlayServicesDialog());
+
+            // Don't display the dialog again if the user already dismissed it earlier
+            if (!getPreferenceManager().getShowPlayServicesDialog()) {
+                return;
+            }
+
+            final int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(MainActivity.this);
+
+            if (GooglePlayServicesUtil.isUserRecoverableError(result)) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.common_google_play_services_unsupported_title)
+                        .setMessage(R.string.play_services_user_recoverable)
+                        .setPositiveButton(R.string.play_services_install, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                GooglePlayServicesUtil.getErrorDialog(result, MainActivity.this, 0);
+
+                                // Hide this dialog next time
+                                getPreferenceManager().setShowPlayServicesDialog(false);
+
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton(R.string.play_services_continue_without_installing, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                // Hide this dialog next time
+                                getPreferenceManager().setShowPlayServicesDialog(false);
+
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+            }
+            else {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.common_google_play_services_unsupported_title)
+                        .setMessage(R.string.play_services_non_user_recoverable)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                // Hide this dialog next time
+                                getPreferenceManager().setShowPlayServicesDialog(false);
+
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+            }
+        }
     }
 }

@@ -208,6 +208,34 @@ public class PreferenceManager {
         putBoolean(PREF_KEY_NOTIFICATION_VIBRATE, notificationVibrationEnabled);
     }
 
+    /**
+     * Boolean value. Indicates whether an informational dialog about Google Play Services should be shown to the user.
+     * This preference should be set to false when the user dismisses the dialog.
+     */
+    public static final String PREF_KEY_SHOW_PLAY_SERVICES_DIALOG = "pref_key_show_play_services_dialog";
+
+    /**
+     * Returns whether an informational dialog about Google Play Services should be shown to the user. This preference
+     * should be set to false when the user dismisses the dialog.
+     *
+     * @return True if the dialog should be shown, false otherwise
+     */
+    public boolean getShowPlayServicesDialog() {
+        return sharedPreferences.getBoolean(PREF_KEY_SHOW_PLAY_SERVICES_DIALOG, true);
+    }
+
+    /**
+     * Sets whether an informational dialog about Google Play Services should be shown to the user. This preference
+     * should be set to false when the user dismisses the dialog.
+     *
+     * @param shouldBeShownNextTime Whether the dialog should be shown next time {@link #getShowPlayServicesDialog()}
+     *                              is called
+     */
+    public void setShowPlayServicesDialog(boolean shouldBeShownNextTime) {
+        putBoolean(PREF_KEY_SHOW_PLAY_SERVICES_DIALOG, shouldBeShownNextTime);
+    }
+
+
 
 
 
