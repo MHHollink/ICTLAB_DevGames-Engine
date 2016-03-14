@@ -21,13 +21,13 @@
 
     <string name="ok">OK</string>
 
-    <string name="enter_password">Please enter a valid password.</string>
-    <string name="enter_username">Please enter a valid username.</string>
+    <string name="enter_password">Voer a.u.b. een geldig wachtwoord in.</string>
+    <string name="enter_username">Voer a.u.b. een geldige gebruikersnaam in.</string>
 
     <string name="settings">Opties</string>
     <string name="loading">laden…</string>
 
-    <string name="password">wachtword</string>
+    <string name="password">wachtwoord</string>
     <string name="username">gebruikersnaam</string>
     <string name="login">Login</string>
     <string name="remember">Onthouden</string>
