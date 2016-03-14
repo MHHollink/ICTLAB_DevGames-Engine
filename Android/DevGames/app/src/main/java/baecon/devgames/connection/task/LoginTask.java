@@ -116,7 +116,7 @@ public class LoginTask extends RESTTask< Void, Void, Integer> {
 
                     User loggedInUser = dto.toModel();
 
-                    Dao<User, String> userDao = DBHelper.getUserDao(getDbHelper());
+                    Dao<User, Long> userDao = DBHelper.getUserDao(getDbHelper());
 
                     User existingLoggedInUser = userDao.queryBuilder().where().eq(ISynchronizable.Column.ID, loggedInUser.getId()).queryForFirst();
                     if (existingLoggedInUser != null) {

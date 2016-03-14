@@ -11,6 +11,7 @@ import baecon.devgames.model.Commit;
 import baecon.devgames.model.Project;
 import baecon.devgames.model.Setting;
 import baecon.devgames.model.User;
+import baecon.devgames.model.update.UserUpdate;
 
 /**
  * A utility class to create ORMLite config files.
@@ -52,9 +53,16 @@ public class DatabaseConfigUtil extends OrmLiteConfigUtil {
      * to be re-run!
      */
     public static final Class<?>[] CLASSES = new Class[]{
+
             User.class,
+            UserUpdate.class,
+
             Project.class,
+
+
             Commit.class,
+
+
             Setting.class
     };
 

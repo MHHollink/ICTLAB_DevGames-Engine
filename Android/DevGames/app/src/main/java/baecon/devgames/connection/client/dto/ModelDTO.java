@@ -7,9 +7,9 @@ package baecon.devgames.connection.client.dto;
 public interface ModelDTO<Model> {
 
     /**
-     * Returns the LOCAL_ID. A LOCAL_ID is <strong>ALWAYS</strong> assigned by the back-end.
+     * Returns the ID. A ID is <strong>ALWAYS</strong> assigned by the back-end.
      *
-     * @return The LOCAL_ID.
+     * @return The ID.
      */
     Long getId();
 
@@ -20,9 +20,4 @@ public interface ModelDTO<Model> {
      * @return A {@link Model} with as much fields populated as possible
      */
     Model toModel();
-
-    /**
-     * @return Whether the variables set are valid to be converted to the {@link Model}
-     */
-    boolean isValid();
 }

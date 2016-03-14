@@ -1,5 +1,7 @@
 package baecon.devgames.connection.client.dto;
 
+import android.text.TextUtils;
+
 import java.util.Set;
 
 import baecon.devgames.model.User;
@@ -11,6 +13,7 @@ public class UserDTO implements ModelDTO<User> {
     private String gitUsername;
     private Set<ProjectDTO> projectDTOs;
     private Set<CommitDTO> commitDTOs;
+    private String gcmkey;
 
     public UserDTO(User user){
         id = user.getId();
@@ -30,6 +33,7 @@ public class UserDTO implements ModelDTO<User> {
         user.setId(id);
         user.setUsername(username);
         user.setGitUsername(gitUsername);
+        user.setGcmKey(gcmkey);
 
         for (ProjectDTO dto : projectDTOs) {
             user.addProject(dto.toModel());
@@ -39,11 +43,6 @@ public class UserDTO implements ModelDTO<User> {
         }
 
         return user;
-    }
-
-    @Override
-    public boolean isValid() {
-        return false;
     }
 
     public Long getId() {
@@ -84,5 +83,25 @@ public class UserDTO implements ModelDTO<User> {
 
     public void setCommitDTOs(Set<CommitDTO> commitDTOs) {
         this.commitDTOs = commitDTOs;
+    }
+
+    public String getGcmkey() {
+        return gcmkey;
+    }
+
+    public void setGcmkey(String gcmkey) {
+        this.gcmkey = gcmkey;
+    }
+
+    @Override
+    public String toString() {
+        return "UserDTO{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", gitUsername='" + gitUsername + '\'' +
+                ", projectDTOs=" + projectDTOs +
+                ", commitDTOs=" + commitDTOs +
+                ", gcmkey='" + gcmkey + '\'' +
+                '}';
     }
 }

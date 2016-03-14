@@ -60,7 +60,7 @@ public class PollUserTask extends RESTTask<Void, Void, Integer> {
             return RESTTask.FORBIDDEN;
         }
 
-        Dao<User, String> userDao = DBHelper.getUserDao(getDbHelper());
+        Dao<User, Long> userDao = DBHelper.getUserDao(getDbHelper());
         try {
 
             User user = userDao.queryBuilder()

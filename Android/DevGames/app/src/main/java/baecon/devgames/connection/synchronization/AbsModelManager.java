@@ -6,10 +6,13 @@ import android.os.Handler;
 import android.os.Looper;
 
 import baecon.devgames.DevGamesApplication;
+import baecon.devgames.connection.task.poll.ModelPollTask;
 import baecon.devgames.connection.task.push.ModelPushTask;
 import baecon.devgames.connection.client.dto.ModelDTO;
+import baecon.devgames.events.PushTaskDoneEvent;
 import baecon.devgames.model.AbsSynchronizable;
 import baecon.devgames.database.modelupdate.IModelUpdate;
+import baecon.devgames.model.update.AbsModelUpdate;
 import baecon.devgames.util.L;
 import baecon.devgames.util.Utils;
 
@@ -39,7 +42,7 @@ public abstract class AbsModelManager
      * The async tasks that run to synchronize the {@link IModelUpdate}s. There's 1 async task available per model
      * instance. The key is the {@link IModelUpdate#getId()}
      */
-    private HashMap<String, ModelPushTask<Model, ModelUpdateClass>> modelUpdateTasks;
+    private HashMap<Long, ModelPushTask<Model, ModelUpdateClass>> modelUpdateTasks;
 
     private Handler handler;
 
@@ -71,13 +74,13 @@ public abstract class AbsModelManager
     }
 
     @Override
-    public void offerUpdate(final String uuid) {
-        L.v("{0}", uuid);
+    public void offerUpdate(final Long id) {
+        L.v("{0}", id);
 
         handler.post(new Runnable() {
             public void run() {
                 // And fire up the AsyncTask to push it to the back-end
-                launchAsyncTask(uuid);
+                launchAsyncTask(id);
             }
         });
     }
@@ -87,7 +90,7 @@ public abstract class AbsModelManager
         L.v("{0}", modelUpdate);
 
         // And fire up the AsyncTask to push it to the back-end
-        launchAsyncTask(modelUpdate.getUuid());
+        launchAsyncTask(modelUpdate.getId());
     }
 
     /**
@@ -162,11 +165,11 @@ public abstract class AbsModelManager
      * Launches an AsyncTask that takes care of synchronization to the back-end. Only one task per model instance is
      * executed. If the task is already running, the task will pick-up the {@link IModelUpdate} in its while loop.
      *
-     * @param uuid
+     * @param id
      *         The local id of the model
      */
-    protected void launchAsyncTask(String uuid) {
-        L.v("{1}, localModelId {0}", uuid, getClass().getSimpleName());
+    protected void launchAsyncTask(long id) {
+        L.v("{1}, localModelId {0}", id, getClass().getSimpleName());
 
         // TODO: check if local model id is > 0
 
@@ -174,12 +177,12 @@ public abstract class AbsModelManager
             modelUpdateTasks = new HashMap<>();
         }
 
-        ModelPushTask<Model, ModelUpdateClass> syncTask = modelUpdateTasks.get(uuid);
+        ModelPushTask<Model, ModelUpdateClass> syncTask = modelUpdateTasks.get(id);
 
         if (syncTask == null || syncTask.getStatus().equals(AsyncTask.Status.FINISHED)) {
             L.d("syncTask was null or getStatus==FINISHED. Creating new ModelUpdateTask");
-            syncTask = newUpdateTask(app, uuid);
-            modelUpdateTasks.put(uuid, syncTask);
+            syncTask = newUpdateTask(app, id);
+            modelUpdateTasks.put(id, syncTask);
         }
 
         switch (syncTask.getStatus()) {
@@ -234,7 +237,7 @@ public abstract class AbsModelManager
         L.d("Goodbye world!");
         stopSchedulePolling();
         if (modelUpdateTasks != null) {
-            for (Map.Entry<String, ModelPushTask<Model, ModelUpdateClass>> entry : modelUpdateTasks.entrySet()) {
+            for (Map.Entry<Long, ModelPushTask<Model, ModelUpdateClass>> entry : modelUpdateTasks.entrySet()) {
                 if (entry.getValue() != null) {
                     entry.getValue().cancel(true);
                 }
@@ -246,7 +249,7 @@ public abstract class AbsModelManager
         inited = false;
     }
 
-    public void startUpdateTasks(List<String> localModelIds) {
+    public void startUpdateTasks(List<Long> localModelIds) {
 
         L.v("localModelIds={0}", Utils.collectionToString(localModelIds));
 
@@ -254,7 +257,7 @@ public abstract class AbsModelManager
             L.d("No local model ids given for waiting updates to the back-end");
         }
         else {
-            for (String localModelId : localModelIds) {
+            for (Long localModelId : localModelIds) {
                 if (localModelId != null) {
                     launchAsyncTask(localModelId);
                 }
@@ -286,7 +289,7 @@ public abstract class AbsModelManager
         return app;
     }
 
-    protected abstract ModelPushTask<Model, ModelUpdateClass> newUpdateTask(DevGamesApplication app, String uuid);
+    protected abstract ModelPushTask<Model, ModelUpdateClass> newUpdateTask(DevGamesApplication app, Long id);
 
     protected abstract ModelPollTask<Model, ModelUpdateClass, DTOClass> newPollTask(Context context);
 

@@ -26,7 +26,7 @@ import baecon.devgames.database.modelupdate.IModelUpdate;
  * Pushing happens on request. A push is sending the changed value(s) from a model to the back-end. The changes values
  * are captured in an {@link IModelUpdate}. Once a create, update or (flag for) delete operation has succeeded, an
  * IModelUpdate has to be generated and offered to this manager through {@link #offerUpdate(IModelUpdate)} or
- * {@link #offerUpdate(String)}.
+ * {@link #offerUpdate(Long)}.
  */
 public interface IModelManager<Model extends ISynchronizable> {
 
@@ -34,10 +34,10 @@ public interface IModelManager<Model extends ISynchronizable> {
      * Offer an update to a model from the local database. These updates have to be synchronized asynchronously, so they
      * are queued and synchronized sequentially.
      *
-     * @param uuid
+     * @param id
      *         The local model id
      */
-    void offerUpdate(String uuid);
+    void offerUpdate(Long id);
 
     /**
      * Offer an update to a model from the local database. These updates have to be synchronized asynchronously, so they
@@ -67,9 +67,9 @@ public interface IModelManager<Model extends ISynchronizable> {
     void stopSchedulePolling();
 
     /**
-     * Returns the {@link android.app.Application} to provide a {@link android.content.Context} to execute the {@link ModelPushTask}s.
+     * Returns the {@link android.app.Application} to provide a {@link android.content.Context} to execute the {@link baecon.devgames.connection.task.push.ModelPushTask}s.
      *
-     * @return The {@link android.app.Application} to provide a {@link android.content.Context} to execute the {@link com.askcs.teamup.connection.task.push.ModelPushTask}s.
+     * @return The {@link android.app.Application} to provide a {@link android.content.Context} to execute the {@link baecon.devgames.connection.task.push.ModelPushTask}s.
      */
     Application getApplication();
 
@@ -125,7 +125,7 @@ public interface IModelManager<Model extends ISynchronizable> {
     boolean isAllowedToSyncInBackground();
 
     /**
-     * Creates this model in the local database. If that succeeds, a {@link com.askcs.teamup.database.modelupdate.IModelUpdate} is should be offered to this
+     * Creates this model in the local database. If that succeeds, a {@link IModelUpdate} is should be offered to this
      * class. Next, this class is responsible for pushing the new model to the back-end.
      *
      * @param model The instance of a model that has to be created
@@ -133,13 +133,13 @@ public interface IModelManager<Model extends ISynchronizable> {
     void create(Model model);
 
     /**
-     * Updates the whole model in the local database. If that succeeds, a {@link com.askcs.teamup.database.modelupdate.IModelUpdate} should be offered to this
+     * Updates the whole model in the local database. If that succeeds, a {@link IModelUpdate} should be offered to this
      * class, so it can push the changes to the back-end.
      *
      * @param model The instance of a model that has to be updated. Keep in mind that this completely overrides the
      *              model
      *
-     * @see #update(String, String, java.io.Serializable)
+     * @see #update(Long, String, java.io.Serializable)
      */
     void update(Model model);
 
@@ -147,11 +147,11 @@ public interface IModelManager<Model extends ISynchronizable> {
      * Updates one field of the model with {@code localModelId} in the local database. If that succeeds, a
      * {@link IModelUpdate} should be offered to this class, so it can push the changes to the back-end.
      *
-     * @param uuid
+     * @param id
      * @param field The name of the column that is used in the local database. See {@link ISynchronizable.Column}
      * @param value The new value for the field
      */
-    void update(String uuid, String field, Serializable value);
+    void update(Long id, String field, Serializable value);
 
     /**
      * Flags a model for deletion by setting the state to {@link ISynchronizable.State#FLAGGED_FOR_DELETE}. Only the

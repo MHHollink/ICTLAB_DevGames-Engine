@@ -38,7 +38,7 @@ public abstract class ModelPushTask<ModelClass extends ISynchronizable, ModelUpd
     /**
      * The id of the model where all the updates are related to
      */
-    protected String uuid;
+    protected Long id;
 
     /**
      * The queue of ids of {@linkplain IModelUpdate}s. The {@link #doInBackground(Void...)} goes through this queue by
@@ -56,11 +56,11 @@ public abstract class ModelPushTask<ModelClass extends ISynchronizable, ModelUpd
      * Create a new ModelUpdateTask that will synchronize a queue of updates of a model to the back-end.
      *  @param context
      *         The context
-     * @param uuid
+     * @param id
      */
-    public ModelPushTask(Context context, String uuid) {
+    public ModelPushTask(Context context, Long id) {
         super(context);
-        this.uuid = uuid;
+        this.id = id;
         this.modelUpdateQueue = new LinkedList<>();
     }
 
@@ -75,15 +75,15 @@ public abstract class ModelPushTask<ModelClass extends ISynchronizable, ModelUpd
             List<ModelUpdate> list = modelUpdateDao.queryBuilder()
                     .orderBy(AbsModelUpdate.Column.LOCAL_ID, true)
                     .where()
-                    .eq(AbsModelUpdate.Column.LOCAL_ID, uuid)
+                    .eq(AbsModelUpdate.Column.LOCAL_ID, id)
                     .query();
 
             // If there are no updates in the database, end this task.
             // Else put all updates in the queue to be processed
             if (list == null) {
 
-                L.i("No updates found for model with local model id {0}", uuid);
-                return getModelPushEventFactory().pushTaskDoneEvent(uuid, true);
+                L.i("No updates found for model with local model id {0}", id);
+                return getModelPushEventFactory().pushTaskDoneEvent(id, true);
             }
             else {
                 // Add all updates to a queue
@@ -98,7 +98,7 @@ public abstract class ModelPushTask<ModelClass extends ISynchronizable, ModelUpd
         }
         catch (SQLException e) {
             L.e(e, "Something went wrong with retrieving ModelUpdates, uuid={0}", currentModelUpdate);
-            return getModelPushEventFactory().pushTaskDoneEvent(uuid, false, LOCAL_DB_ERROR);
+            return getModelPushEventFactory().pushTaskDoneEvent(id, false, LOCAL_DB_ERROR);
         }
 
         // Set up the interface between the app and the back-end
@@ -145,16 +145,8 @@ public abstract class ModelPushTask<ModelClass extends ISynchronizable, ModelUpd
 
                     if (statusCode == 403) {
 
-                        // Authentication failed. Try refreshing the session.
-                        // Note that the super class permits us to refresh the session ONCE.
-                        boolean sessionRefreshed = refreshSession();
-
-                        if (sessionRefreshed) {
-                            L.i("Successfully refreshed session!");
-                            return doInBackground();
-                        } else {
-                            L.w("Could not refresh session");
-                        }
+                        // Authentication failed. request re-login for a new session the session.
+                        requestReLogin();
                     }
 
                     // Convert the body to a String as it will contain valuable error message
@@ -205,13 +197,13 @@ public abstract class ModelPushTask<ModelClass extends ISynchronizable, ModelUpd
                 }
 
                 // The update failed and will be retried the next sync cycle
-                return getModelPushEventFactory().pushTaskDoneEvent(uuid, false, getStatus(error),
+                return getModelPushEventFactory().pushTaskDoneEvent(id, false, getStatus(error),
                         currentModelUpdate, response);
 
             }
             catch (Exception e) {
                 L.e(e, "Something went wrong while synchronizing a update");
-                return getModelPushEventFactory().pushTaskDoneEvent(uuid, false);
+                return getModelPushEventFactory().pushTaskDoneEvent(id, false);
             }
 
             // Call to the back-end succeeded, delete the Update record from the database
@@ -221,7 +213,7 @@ public abstract class ModelPushTask<ModelClass extends ISynchronizable, ModelUpd
             catch (SQLException e) {
                 L.e(e, "Could not delete update from database! But synchronization to back-end was successful");
                 return getModelPushEventFactory()
-                        .pushTaskDoneEvent(currentModelUpdate.getUuid(), false, LOCAL_DB_ERROR);
+                        .pushTaskDoneEvent(currentModelUpdate.getId(), false, LOCAL_DB_ERROR);
             }
 
             L.v("Model={0}, removed update record", getClass().getSimpleName());
@@ -236,7 +228,7 @@ public abstract class ModelPushTask<ModelClass extends ISynchronizable, ModelUpd
             List<ModelUpdate> list = modelUpdateDao.queryBuilder()
                     .orderBy(AbsModelUpdate.Column.LOCAL_ID, true)
                     .where()
-                    .eq(AbsModelUpdate.Column.LOCAL_ID, uuid)
+                    .eq(AbsModelUpdate.Column.LOCAL_ID, id)
                     .query();
 
             L.v("ModelUpdates left after ModelPushTask: (count={0})", modelUpdateQueue.size());
@@ -252,7 +244,7 @@ public abstract class ModelPushTask<ModelClass extends ISynchronizable, ModelUpd
         updateModelState();
 
         // Pass event that will be fired in onPostExecute
-        return getModelPushEventFactory().pushTaskDoneEvent(uuid, true);
+        return getModelPushEventFactory().pushTaskDoneEvent(id, true);
     }
 
     @Override
@@ -302,14 +294,14 @@ public abstract class ModelPushTask<ModelClass extends ISynchronizable, ModelUpd
     protected void updateModelState() {
 
         try {
-            long leftOverUpdates = getModelUpdateDao().queryBuilder().where().eq(AbsModelUpdate.Column.LOCAL_ID, uuid).countOf();
+            long leftOverUpdates = getModelUpdateDao().queryBuilder().where().eq(AbsModelUpdate.Column.LOCAL_ID, id).countOf();
 
             L.v("Updates left over: {0}", leftOverUpdates);
 
             // If we do not have updates left over, update the state of the model to UP_TO_DATE
-            if (getModelUpdateDao().queryBuilder().where().eq(AbsModelUpdate.Column.LOCAL_ID, uuid).countOf() == 0L) {
+            if (getModelUpdateDao().queryBuilder().where().eq(AbsModelUpdate.Column.LOCAL_ID, id).countOf() == 0L) {
 
-                ModelClass model = getModelDao().queryForId(uuid);
+                ModelClass model = getModelDao().queryForId(id);
 
                 if (model != null) {
                     model.setState(ISynchronizable.State.UP_TO_DATE);
@@ -325,7 +317,7 @@ public abstract class ModelPushTask<ModelClass extends ISynchronizable, ModelUpd
         }
     }
 
-    protected abstract Dao<ModelClass, String> getModelDao();
+    protected abstract Dao<ModelClass, Long> getModelDao();
 
     /**
      * Override to return the Dao for this sub class of {@link IModelUpdate}. This could not be generified, because a Class
@@ -356,21 +348,21 @@ public abstract class ModelPushTask<ModelClass extends ISynchronizable, ModelUpd
          *
          * @return Returns a fresh instance of a {@link PushTaskDoneEvent}.
          */
-        abstract PushTaskDoneEvent pushTaskDoneEvent(String uuid, boolean success);
+        abstract PushTaskDoneEvent pushTaskDoneEvent(Long id, boolean success);
 
         /**
          * Returns a fresh instance of a {@link PushTaskDoneEvent}.
          *
          * @return Returns a fresh instance of a {@link PushTaskDoneEvent}.
          */
-        abstract PushTaskDoneEvent pushTaskDoneEvent(String uuid, boolean success, int statusCode);
+        abstract PushTaskDoneEvent pushTaskDoneEvent(Long id, boolean success, int statusCode);
 
         /**
          * Returns a fresh instance of a {@link PushTaskDoneEvent}.
          *
          * @return A fresh instance of an {@link PushTaskDoneEvent}.
          */
-        abstract PushTaskDoneEvent pushTaskDoneEvent(String uuid, boolean success, int statusCode,
+        abstract PushTaskDoneEvent pushTaskDoneEvent(Long id, boolean success, int statusCode,
                                                      IModelUpdate lastUnsuccessfulUpdate,
                                                      Response lastUnsuccessfulUpdateResponse);
 

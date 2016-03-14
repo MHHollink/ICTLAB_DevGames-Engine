@@ -1,5 +1,5 @@
 #
-# generated on 2016/03/09 01:15:47
+# generated on 2016/03/14 07:06:52
 #
 # --table-start--
 dataClass=baecon.devgames.model.User
@@ -17,15 +17,11 @@ columnName=git_username
 fieldName=projects
 columnName=projects
 dataPersister=SERIALIZABLE
-foreign=true
-foreignAutoRefresh=true
 # --field-end--
 # --field-start--
 fieldName=commits
 columnName=commits
 dataPersister=SERIALIZABLE
-foreign=true
-foreignAutoRefresh=true
 # --field-end--
 # --field-start--
 fieldName=gcmKey
@@ -39,6 +35,56 @@ id=true
 # --field-start--
 fieldName=state
 columnName=state
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=baecon.devgames.model.update.UserUpdate
+tableName=userupdate
+# --table-fields-start--
+# --field-start--
+fieldName=id
+columnName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=timestamp
+columnName=timestamp
+# --field-end--
+# --field-start--
+fieldName=uuid
+columnName=local_id
+# --field-end--
+# --field-start--
+fieldName=model
+columnName=model
+dataPersister=SERIALIZABLE
+# --field-end--
+# --field-start--
+fieldName=field
+columnName=field
+# --field-end--
+# --field-start--
+fieldName=value
+columnName=value
+dataPersister=SERIALIZABLE
+# --field-end--
+# --field-start--
+fieldName=numberOfRetries
+columnName=number_of_retries
+# --field-end--
+# --field-start--
+fieldName=blockingErrorHttpStatusCode
+columnName=blocking_error_http_status_code
+# --field-end--
+# --field-start--
+fieldName=blockingErrorReason
+columnName=blocking_error_reason
+# --field-end--
+# --field-start--
+fieldName=operation
+columnName=operation
 # --field-end--
 # --table-fields-end--
 # --table-end--
@@ -58,8 +104,6 @@ foreignAutoRefresh=true
 fieldName=developers
 columnName=developers
 dataPersister=SERIALIZABLE
-foreign=true
-foreignAutoRefresh=true
 # --field-end--
 # --field-start--
 fieldName=commits
@@ -73,6 +117,15 @@ columnName=name
 # --field-start--
 fieldName=description
 columnName=description
+# --field-end--
+# --field-start--
+fieldName=id
+columnName=id
+id=true
+# --field-end--
+# --field-start--
+fieldName=state
+columnName=state
 # --field-end--
 # --table-fields-end--
 # --table-end--

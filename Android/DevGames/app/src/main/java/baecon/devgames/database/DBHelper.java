@@ -29,7 +29,7 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
 
     private static final String DATABASE_NAME = "devgames.db";
 
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
 
     private static int APP_VERSION_CODE;
 
@@ -151,16 +151,16 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
 
 
 
-    public static Dao<User, String> getUserDao(DBHelper dbHelper) {
-        return dbHelper.getDao(User.class, String.class);
+    public static Dao<User, Long> getUserDao(DBHelper dbHelper) {
+        return dbHelper.getDao(User.class, Long.class);
     }
 
-    public static Dao<Project, String> getProjectDao(DBHelper dbHelper) {
-        return dbHelper.getDao(Project.class, String.class);
+    public static Dao<Project, Long> getProjectDao(DBHelper dbHelper) {
+        return dbHelper.getDao(Project.class, Long.class);
     }
 
-    public static Dao<Commit, String> getCommit(DBHelper dbHelper) {
-        return dbHelper.getDao(Commit.class, String.class);
+    public static Dao<Commit, Long> getCommit(DBHelper dbHelper) {
+        return dbHelper.getDao(Commit.class, Long.class);
     }
 
     public static Dao<Setting, String> getSettingDao(DBHelper dbHelper) {

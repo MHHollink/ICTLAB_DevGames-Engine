@@ -6,27 +6,28 @@ import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 
 @DatabaseTable(tableName = "projects")
-public class Project implements Serializable {
+public class Project extends AbsSynchronizable implements Serializable {
 
     public static class Column {
+
         public static final String OWNER = "owner";
         public static final String DEVELOPERS = "developers";
         public static final String COMMITS = "commits";
         public static final String NAME = "name";
         public static final String DESCRIPTION = "description";
     }
-
     @DatabaseField(columnName = Column.OWNER, dataType = DataType.SERIALIZABLE, foreign = true, foreignAutoRefresh = true)
     private User owner;
 
-    @DatabaseField(columnName = Column.DEVELOPERS, dataType = DataType.SERIALIZABLE, foreign = true, foreignAutoRefresh = true)
-    private HashSet<User> developers;
+    @DatabaseField(columnName = Column.DEVELOPERS, dataType = DataType.SERIALIZABLE)
+    private HashMap<Long, User> developers;
 
     @DatabaseField(columnName = Column.COMMITS, dataType = DataType.SERIALIZABLE)
-    private HashSet<Commit> commits;
+    private HashMap<Long, Commit> commits;
 
     @DatabaseField(columnName = Column.NAME)
     private String name;
@@ -34,7 +35,7 @@ public class Project implements Serializable {
     @DatabaseField(columnName = Column.DESCRIPTION)
     private String description;
 
-    public Project(User owner, HashSet<User> developers, HashSet<Commit> commits, String name, String description) {
+    public Project(User owner, HashMap<Long, User> developers, HashMap<Long, Commit> commits, String name, String description) {
         this.owner = owner;
         this.developers = developers;
         this.commits = commits;
@@ -43,7 +44,7 @@ public class Project implements Serializable {
     }
 
     public Project(User owner, String name, String description) {
-        this(owner, new HashSet<User>(), new HashSet<Commit>(), name, description);
+        this(owner, new HashMap<Long, User>(), new HashMap<Long, Commit>(), name, description);
     }
 
     public Project(String name, String description) {
@@ -66,11 +67,11 @@ public class Project implements Serializable {
         this.owner = owner;
     }
 
-    public HashSet<User> getDevelopers() {
+    public HashMap<Long, User> getDevelopers() {
         return developers;
     }
 
-    public HashSet<Commit> getCommits() {
+    public HashMap<Long, Commit> getCommits() {
         return commits;
     }
 
@@ -91,27 +92,36 @@ public class Project implements Serializable {
     }
 
     public void addDeveloper(User user) {
-        developers.add(user);
+        developers.put(user.getId(), user);
     }
 
     public void addDeveloper(User... user) {
-        Collections.addAll(developers, user);
+        for (User aUser : user) {
+            developers.put(aUser.getId(), aUser);
+        }
     }
 
     public void addCommit(Commit commit) {
-        commits.add(commit);
+        commits.put(commit.getId(), commit);
     }
 
     public void addCommit(Commit... commit) {
-        Collections.addAll(commits, commit);
+        for (Commit aCommit : commit) {
+            commits.put(aCommit.getId(), aCommit);
+        }
     }
 
     public double getScore() {
         double score = 0;
-        for (Commit commit : commits) {
-            score += commit.getScore();
-        }
+//        for (Commit commit : commits) {
+//            score += commit.getScore();
+//        }
         return score;
+    }
+
+    @Override
+    public boolean contentEquals(Object other) {
+        return false;
     }
 
 }

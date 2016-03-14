@@ -6,8 +6,12 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @DatabaseTable(tableName = "users")
 public class User extends AbsSynchronizable implements Serializable {
@@ -26,16 +30,16 @@ public class User extends AbsSynchronizable implements Serializable {
     @DatabaseField(columnName = Column.GIT_USER)
     private String gitUsername;
 
-    @DatabaseField(columnName = Column.PROJECTS, dataType = DataType.SERIALIZABLE, foreign = true, foreignAutoRefresh = true)
-    private HashSet<Project> projects;
+    @DatabaseField(columnName = Column.PROJECTS, dataType = DataType.SERIALIZABLE)
+    private HashMap<Long, Project> projects;
 
-    @DatabaseField(columnName = Column.COMMITS, dataType = DataType.SERIALIZABLE, foreign = true, foreignAutoRefresh = true)
-    private HashSet<Commit> commits;
+    @DatabaseField(columnName = Column.COMMITS, dataType = DataType.SERIALIZABLE)
+    private HashMap<Long, Commit> commits;
 
     @DatabaseField(columnName = Column.GCM_KEY)
     private String gcmKey;
 
-    public User(Long uuid, String username, String gitUsername, HashSet<Project> projects, HashSet<Commit> commits, String gcmKey) {
+    public User(Long uuid, String username, String gitUsername, HashMap<Long, Project> projects, HashMap<Long, Commit> commits, String gcmKey) {
         this.id = uuid;
         this.username = username;
         this.gitUsername = gitUsername;
@@ -45,7 +49,7 @@ public class User extends AbsSynchronizable implements Serializable {
     }
 
     public User(Long id, String username, String gitUsername) {
-        this(id, username, gitUsername, new HashSet<Project>(), new HashSet<Commit>(), null);
+        this(id, username, gitUsername, new HashMap<Long, Project>(), new HashMap<Long, Commit>(), null);
     }
 
     public User(Long id){
@@ -80,27 +84,31 @@ public class User extends AbsSynchronizable implements Serializable {
         this.gcmKey = gcmKey;
     }
 
-    public HashSet<Project> getProjects() {
+    public HashMap<Long, Project> getProjects() {
         return projects;
     }
 
-    public HashSet<Commit> getCommits() {
+    public HashMap<Long, Commit> getCommits() {
         return commits;
     }
 
     public void addProject(Project project) {
-        projects.add(project);
+        projects.put(project.getId(), project);
     }
 
     public void addProject(Project... project) {
-        Collections.addAll(projects, project);
+        for (Project aProject : project) {
+            projects.put(aProject.getId(), aProject);
+        }
     }
 
     public void addCommit(Commit commit) {
-        commits.add(commit);
+        commits.put(commit.getId(), commit);
     }
     public void addCommit(Commit... commit) {
-        Collections.addAll(commits, commit);
+        for (Commit aCommit : commit) {
+            commits.put(aCommit.getId(), aCommit);
+        }
     }
 
     @Override
@@ -113,9 +121,9 @@ public class User extends AbsSynchronizable implements Serializable {
      */
     public double getScore() {
         double score=0;
-        for (Commit commit : commits) {
-            score += commit.getScore();
-        }
+//        for (Commit commit : commits) {
+//            score += commit.getScore();
+//        }
 
         return score;
     }

@@ -59,4 +59,60 @@ public abstract class AbsSynchronizable implements ISynchronizable {
                 ", state='" + state + '\'' +
                 '}';
     }
+
+    /**
+     * Checks whether the content of two objects (of the same type) did change.
+     *
+     * <p>Compares as follows:</p>
+     * <ul>
+     * <li>{@code a == null && b == null} &rarr; {@code false}</li>
+     * <li>{@code a != null && b == null} &rarr; {@code false}</li>
+     * <li>{@code a == null && b != null} &rarr; {@code false}</li>
+     * <li>{@code a != null && b != null} &rarr; {@code a.contentChanged(b)}</li>
+     * </ul>
+     *
+     * @param a
+     *         Object A, will be compared to object B
+     * @param b
+     *         Object b, will be compared to object A
+     *
+     * @return {@code a.contentEquals(b)}, or false if {@code a} or {@code b} is null
+     */
+    public static <T extends AbsSynchronizable> boolean contentEquals(T a, T b) {
+        return a != null && b != null && a.contentEquals(b);
+    }
+
+    /**
+     * A null safe equals check.
+     *
+     * <p>Compares as follows:</p>
+     * <ul>
+     * <li>{@code a == null && b == null} &rarr; {@code true}</li>
+     * <li>{@code a != null && b == null} &rarr; {@code false}</li>
+     * <li>{@code a == null && b != null} &rarr; {@code false}</li>
+     * <li>{@code a != null && b != null} &rarr; {@code a.equals(b)}</li>
+     * </ul>
+     *
+     * @param a
+     *         Object A, will be compared to object B
+     * @param b
+     *         Object b, will be compared to object A
+     *
+     * @return See comparison table
+     */
+    public static <T> boolean equals(T a, T b) {
+        boolean equal;
+        if (a == null && b == null) {
+            equal = true;
+        }
+        else if (a == null || b == null) {
+            equal = false;
+        }
+        else {
+            equal = a.equals(b);
+        }
+
+        return equal;
+    }
+
 }

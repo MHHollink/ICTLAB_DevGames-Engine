@@ -29,7 +29,7 @@ public class UserUpdate extends AbsModelUpdate<User> {
      *
      * @param localModelId
      * @param user
-     *         The user, where ONLY the fields are populated that you'd like to update. The uuid is populated
+     *         The user, where ONLY the fields are populated that you'd like to update. The id is populated
      *         for you.
      */
     public UserUpdate(long localModelId, User user) {
@@ -49,10 +49,8 @@ public class UserUpdate extends AbsModelUpdate<User> {
 
                 UserDTO dto = new UserDTO(getModel());
 
-                L.v("dto.states={0}", dto.getDtoStates());
-                L.v("model.states={0}", getModel().getStates().values());
-
                 response = client.changeOwnUser(dto);
+
                 break;
 
             case UPDATE_FIELD:

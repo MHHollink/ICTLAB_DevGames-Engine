@@ -63,7 +63,7 @@ public class GcmRegistrationTask extends RESTTask<Void, Void, String> {
             return ERROR_NOT_LOGGED_IN;
         }
 
-        Dao<User, String> userDao = DBHelper.getUserDao(getDbHelper());
+        Dao<User, Long> userDao = DBHelper.getUserDao(getDbHelper());
         loggedInUser = getLoggedInUser();
 
         if (loggedInUser == null) {
