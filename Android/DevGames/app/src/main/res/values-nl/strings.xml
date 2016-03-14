@@ -21,6 +21,9 @@
 
     <string name="ok">OK</string>
 
+    <string name="enter_password">Please enter a valid password.</string>
+    <string name="enter_username">Please enter a valid username.</string>
+
     <string name="settings">Opties</string>
     <string name="loading">laden…</string>
 
@@ -28,6 +31,10 @@
     <string name="username">gebruikersnaam</string>
     <string name="login">Login</string>
     <string name="remember">Onthouden</string>
+
+    <string name="login_200">Succesvol ingelogd</string>
+    <string name="login_403">Gebruikersnaam en wachtwoord komen niet overeen. Probeer a.u.b. opnieuw.</string>
+    <string name="login_500">Inloggen niet gelukt, probeer het later opnieuw.</string>
 
     <string name="logging_in">Bezig met inloggen&#8230;</string>
     <string name="logging_out">Bezig met uitloggen&#8230;</string>

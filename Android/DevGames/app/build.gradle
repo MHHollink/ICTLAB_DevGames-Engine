@@ -11,7 +11,7 @@ android {
         versionCode 4
         versionName "0.0.4"
         buildConfigField "String", "GCM_SENDER_ID", "\"69868578367\""
-        buildConfigField "String", "ENDPOINT_URL", "\"http://127.0.0.1\""
+        buildConfigField "String", "ENDPOINT_URL", "\"https://127.0.0.1\""
     }
     buildTypes {
         debug {
@@ -36,6 +36,8 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.0.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
     compile 'com.squareup:otto:1.3.3'
+
+    compile 'com.nineoldandroids:library:2.4.0'
 
     compile 'com.google.android.gms:play-services:8.4.0'
     compile 'com.google.code.gson:gson:2.4'

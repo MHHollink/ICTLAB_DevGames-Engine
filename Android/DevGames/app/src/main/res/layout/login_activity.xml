@@ -1,65 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:background="@color/cornflower">
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/cornflower">
 
-    <ImageView
-        android:layout_width="250dp"
-        android:layout_height="155dp"
-        android:id="@+id/logo"
-        android:layout_gravity="center"
-        android:src="@drawable/devgames_logo_full"
-        android:layout_marginTop="83dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
-
-    <EditText
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/username"
-        android:hint="@string/username"
-        android:layout_marginTop="54dp"
-        android:layout_below="@+id/logo"
-        android:layout_alignEnd="@+id/logo"
-        android:layout_alignStart="@+id/logo" />
+        android:padding="30dp">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:hint="@string/password"
-        android:ems="10"
-        android:id="@+id/password"
-        android:layout_below="@+id/username"
-        android:layout_alignStart="@+id/username"
-        android:layout_alignEnd="@+id/username" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingTop="30dp"
+            android:src="@drawable/devgames_logo_full"
+            android:contentDescription="@string/app_name"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/login"
-        android:id="@+id/submit"
-        android:background="@null"
-        android:layout_below="@+id/password"
-        android:layout_alignEnd="@+id/password" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rectangle_rounded_corners_white">
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/remember"
-        android:id="@+id/checkBox"
-        android:checked="false"
-        android:layout_alignTop="@+id/submit"
-        android:layout_alignStart="@+id/password"
-        android:layout_alignBottom="@+id/submit" />
+            <LinearLayout
+                android:id="@+id/login_credentials_container"
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="30dp"
+                android:paddingBottom="20dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:focusableInTouchMode="true">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:id="@+id/versionCode"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="6dp"
-        android:layout_marginEnd="6dp" />
-</RelativeLayout>
+                <EditText
+                    android:id="@+id/edit_username"
+                    android:singleLine="true"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:textColor="@color/cornflower"
+                    android:textColorHint="@color/cornflower_light"
+                    android:imeOptions="actionNext"
+                    android:hint="@string/username" />
+
+                <EditText
+                    android:id="@+id/edit_password"
+                    android:inputType="textPassword"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:textColor="@color/cornflower"
+                    android:textColorHint="@color/cornflower_light"
+                    android:imeActionLabel="@string/login"
+                    android:imeActionId="1234"
+                    android:hint="@string/password" />
+
+                <CheckBox
+                    android:id="@+id/remember_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/remember"
+                    android:textColor="@color/cornflower"
+                    android:layout_marginBottom="15dp" />
+
+                <Button
+                    android:id="@+id/button_login"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/login"
+                    android:background="@color/cornflower"
+                    android:minHeight="40dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/login_waiting_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:background="@color/cornflower_light"
+                android:padding="16dp"
+                android:orientation="horizontal">
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/logging_in"
+                    android:layout_gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="0dp"
+                    />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/login_ok_check_mark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_vertical"
+                android:drawableStart="@drawable/ic_action_accept"
+                android:text="@string/login_200"
+                android:textColor="@color/white"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:drawablePadding="16dp"/>
+
+        </FrameLayout>
+
+        <!--    <TextView
+              android:id="@id/current_endpoint"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_margin="8dp"
+              android:gravity="center_horizontal"
+              android:textColor="@color/tu_java_light"
+              />-->
+
+        <TextView
+            android:id="@+id/version_information"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:gravity="center_horizontal"
+            android:textColor="@color/cornflower_light"
+            />
+
+    </LinearLayout>
+
+</ScrollView>
