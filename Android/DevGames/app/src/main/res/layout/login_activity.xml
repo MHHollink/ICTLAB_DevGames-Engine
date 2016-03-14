@@ -14,6 +14,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
             android:paddingTop="30dp"
             android:layout_gravity="center"
             android:src="@drawable/devgames_logo_full_login"
