@@ -1,6 +1,7 @@
 package baecon.devgames.connection.task;
 
 import android.content.Context;
+import android.content.res.Resources;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.table.TableUtils;
@@ -13,6 +14,8 @@ import baecon.devgames.connection.client.DevGamesClient;
 import baecon.devgames.database.DBHelper;
 import baecon.devgames.database.DatabaseConfigUtil;
 import baecon.devgames.connection.client.dto.UserDTO;
+import baecon.devgames.events.BusProvider;
+import baecon.devgames.events.LoginEvent;
 import baecon.devgames.model.ISynchronizable;
 import baecon.devgames.model.Setting;
 import baecon.devgames.model.User;
@@ -21,6 +24,12 @@ import baecon.devgames.util.PreferenceManager;
 import retrofit.RetrofitError;
 
 public class LoginTask extends RESTTask< Void, Void, Integer> {
+
+    // The prefix of the message identifier (see onPostExecute(...))
+    private static final String ID_PREFIX = "login_";
+
+    // The resource type of the message identifier (see onPostExecute(...))
+    private static final String ID_TYPE = "string";
 
     // The username.
     private final String username;
@@ -162,5 +171,19 @@ public class LoginTask extends RESTTask< Void, Void, Integer> {
     protected void onPostExecute(Integer httpStatus) {
         super.onPostExecute(httpStatus);
         L.d("onPostExecute, httpStatus={0}", httpStatus);
+
+        Resources resources = this.context.getResources();
+        boolean success = (httpStatus == OK);
+        String message = null;
+
+        // See if there's a predefined message for `httpStatus`.
+        int messageId = resources.getIdentifier(ID_PREFIX + httpStatus,
+                ID_TYPE, context.getPackageName());
+
+        if (!success && messageId > 0) {
+            message = resources.getString(messageId);
+        }
+
+        BusProvider.getBus().post(new LoginEvent(success, message));
     }
 }

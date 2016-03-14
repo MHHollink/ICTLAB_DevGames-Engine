@@ -10,6 +10,8 @@ import android.view.MenuItem;
 
 import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
+import baecon.devgames.events.BusProvider;
+import baecon.devgames.util.L;
 import baecon.devgames.util.PreferenceManager;
 
 /**
@@ -36,11 +38,32 @@ public abstract class DevGamesActivity extends AppCompatActivity {
         logoutProgressDialog.setCancelable(false);
     }
 
+    /**
+     * Called when Android resumes this Activity.
+     */
     @Override
     protected void onResume() {
+
         super.onResume();
 
+        L.d("* onResume");
+
         doLoginCheck();
+
+        BusProvider.getBus().register(this);
+    }
+
+    /**
+     * Called when Android pauses this Activity.
+     */
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+
+        L.d("* onPause");
+
+        BusProvider.getBus().unregister(this);
     }
 
     @Override

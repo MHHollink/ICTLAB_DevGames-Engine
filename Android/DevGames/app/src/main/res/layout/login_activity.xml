@@ -44,6 +44,7 @@
                     android:layout_marginBottom="10dp"
                     android:textColor="@color/cornflower"
                     android:textColorHint="@color/cornflower_light"
+                    android:backgroundTint="@color/cornflower"
                     android:imeOptions="actionNext"
                     android:hint="@string/username" />
 
@@ -55,6 +56,7 @@
                     android:layout_marginBottom="15dp"
                     android:textColor="@color/cornflower"
                     android:textColorHint="@color/cornflower_light"
+                    android:backgroundTint="@color/cornflower"
                     android:imeActionLabel="@string/login"
                     android:imeActionId="1234"
                     android:hint="@string/password" />
@@ -64,6 +66,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/remember"
+                    android:buttonTint="@color/cornflower"
                     android:textColor="@color/cornflower"
                     android:layout_marginBottom="15dp" />
 

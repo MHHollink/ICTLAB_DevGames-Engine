@@ -39,6 +39,8 @@
     <string name="logging_in">Bezig met inloggen&#8230;</string>
     <string name="logging_out">Bezig met uitloggen&#8230;</string>
     <string name="logout">Uitloggen</string>
+    <string name="unsuccessful_login">Inloggen niet gelukt, probeer a.u.b. opnieuw</string>
+    <string name="unsuccessful_logout">Uitloggen niet gelukt, probeer a.u.b. opnieuw</string>
 
     <string name="profile">profiel</string>
     <string name="projects">projecten</string>
