@@ -50,13 +50,13 @@ public class LoginActivity extends DevGamesActivity {
                 final String passwordText = password.getText().toString().trim();
 
                 if (usernameText.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, R.string.enter_username, Toast.LENGTH_SHORT).show();
+                    Utils.createToast(LoginActivity.this, R.string.enter_username, Toast.LENGTH_SHORT);
                     username.requestFocus();
                     return;
                 }
 
                 if (passwordText.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, R.string.enter_password, Toast.LENGTH_SHORT).show();
+                    Utils.createToast(LoginActivity.this, R.string.enter_password, Toast.LENGTH_SHORT);
                     password.requestFocus();
                     return;
                 }
@@ -96,7 +96,7 @@ public class LoginActivity extends DevGamesActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        
+
         if (performingLoginTask) {
             super.findViewById(R.id.button_login).performClick();
         }
@@ -274,12 +274,12 @@ public class LoginActivity extends DevGamesActivity {
                     .start();
 
             if (event.message == null) {
-                Toast.makeText(LoginActivity.this, R.string.unsuccessful_login, Toast.LENGTH_SHORT).show();
+                Utils.createToast(LoginActivity.this, R.string.unsuccessful_login, Toast.LENGTH_SHORT);
             }
             else {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(LoginActivity.this, event.message, Toast.LENGTH_SHORT).show();
+                        Utils.createToast(LoginActivity.this, event.message, Toast.LENGTH_SHORT);
                     }
                 });
             }

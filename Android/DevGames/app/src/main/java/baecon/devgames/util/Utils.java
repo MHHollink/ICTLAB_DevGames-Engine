@@ -6,21 +6,17 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.Signature;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v4.app.Fragment;
 import android.util.Base64;
+import android.view.Gravity;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -28,9 +24,6 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Array;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -41,8 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.x500.X500Principal;
-
-import baecon.devgames.R;
 
 /**
  * Some static utility methods.
@@ -430,5 +421,25 @@ public final class Utils {
 
     public static Uri getDefaultRingtone() {
         return RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+    }
+
+    public static void createToast(Context context, int resId, int duration){
+        Toast toast = Toast.makeText(context, resId, duration);
+        toast.setGravity(Gravity.TOP, 0, 30);
+        toast.show();
+    }
+
+    public static void createToast(Context context, String message, int duration){
+        Toast toast = Toast.makeText(context, message, duration);
+        toast.setGravity(Gravity.TOP, 0, 30);
+        toast.show();
+    }
+
+    public static void createToast(Fragment fragment, String message, int duration){
+        createToast(fragment.getContext(), message, duration);
+    }
+
+    public static void createToast(Fragment fragment, int resId, int duration){
+        createToast(fragment.getContext(), resId, duration);
     }
 }
