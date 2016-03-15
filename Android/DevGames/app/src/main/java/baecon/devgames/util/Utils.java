@@ -423,16 +423,14 @@ public final class Utils {
         return RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     }
 
-    public static void createToast(Context context, int resId, int duration){
-        Toast toast = Toast.makeText(context, resId, duration);
-        toast.setGravity(Gravity.TOP, 0, 30);
-        toast.show();
-    }
-
     public static void createToast(Context context, String message, int duration){
         Toast toast = Toast.makeText(context, message, duration);
         toast.setGravity(Gravity.TOP, 0, 30);
         toast.show();
+    }
+
+    public static void createToast(Context context, int resId, int duration){
+        createToast(context, context.getString(resId), duration);
     }
 
     public static void createToast(Fragment fragment, String message, int duration){
