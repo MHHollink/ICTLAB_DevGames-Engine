@@ -6,7 +6,6 @@ import java.util.Map;
 import baecon.devgames.connection.client.dto.CommitDTO;
 import baecon.devgames.connection.client.dto.ProjectDTO;
 import baecon.devgames.connection.client.dto.UserDTO;
-import baecon.devgames.connection.client.dto.UserWithPasswordDTO;
 import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.Field;
@@ -15,12 +14,12 @@ import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.PUT;
 import retrofit.http.Path;
-import retrofit.http.Query;
 
 public interface DevGamesClient {
 
+    @FormUrlEncoded
     @POST("/login")
-    Map<String, String> login(@Body UserWithPasswordDTO user);
+    Map<String, String> login(@Field("username") String user, @Field("password") String pass);
 
     @GET("/user")
     UserDTO getCurrentUser();

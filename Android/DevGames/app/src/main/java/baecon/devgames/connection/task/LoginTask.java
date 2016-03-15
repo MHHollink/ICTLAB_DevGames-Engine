@@ -11,10 +11,9 @@ import java.util.Map;
 
 import baecon.devgames.DevGamesApplication;
 import baecon.devgames.connection.client.DevGamesClient;
-import baecon.devgames.connection.client.dto.UserWithPasswordDTO;
+import baecon.devgames.connection.client.dto.UserDTO;
 import baecon.devgames.database.DBHelper;
 import baecon.devgames.database.DatabaseConfigUtil;
-import baecon.devgames.connection.client.dto.UserDTO;
 import baecon.devgames.events.BusProvider;
 import baecon.devgames.events.LoginEvent;
 import baecon.devgames.model.ISynchronizable;
@@ -69,7 +68,7 @@ public class LoginTask extends RESTTask< Void, Void, Integer> {
 
         // First try to get the session ID from Ask.
         try {
-            Map<String, String> map = client.login(new UserWithPasswordDTO(username, password));
+            Map<String, String> map = client.login(username, password);
             session = map.get(DevGamesApplication.SESSION_HEADER_KEY);
 
             if (session == null) {

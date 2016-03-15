@@ -35,7 +35,7 @@ public class DevGamesApplication extends Application {
     /**
      * The key point to the key-value pair for the session in each request header
      */
-    public static final String SESSION_HEADER_KEY = "r";
+    public static final String SESSION_HEADER_KEY = "SESSION_ID";
 
     private static final long DEFAULT_CONNECTION_TIMEOUT = 60 * 1000L;
     private static final long DEFAULT_READ_TIMEOUT = 60 * 1000L;
