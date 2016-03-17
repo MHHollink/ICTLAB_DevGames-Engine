@@ -55,6 +55,7 @@
 
     <string name="new_message">You received a new notification</string>
     <string name="cancel">cancel</string>
+    <string name="new_device_registerd">Your account has been loggedin on another device!</string>
 
 
 </resources>

@@ -15,7 +15,11 @@ import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
+import baecon.devgames.connection.task.LogoutTask;
+import baecon.devgames.ui.activity.DevGamesActivity;
+import baecon.devgames.ui.activity.LoginActivity;
 import baecon.devgames.ui.activity.MainActivity;
 import baecon.devgames.util.L;
 import baecon.devgames.util.PreferenceManager;
@@ -39,7 +43,7 @@ public class GcmIntentService extends IntentService{
                 return;
             }
 
-            GcmMessageType type = GcmMessageType.valueOf(intent.getStringExtra("message"));
+            GcmMessageType type = GcmMessageType.valueOf(intent.getStringExtra("type"));
 
             String notificationText;
 
@@ -64,7 +68,24 @@ public class GcmIntentService extends IntentService{
                     break;
 
 
+                case NEW_DEVICE_REGISTERED:
 
+                    notificationText = getString(R.string.new_device_registerd);
+
+                    showNotification(
+                            this,
+                            GcmMessageType.NEW_DEVICE_REGISTERED.ordinal(),
+                            getString(R.string.app_name),
+                            notificationText,
+                            notificationText,
+                            true
+                    );
+
+                    new LogoutTask(this, false).executeThreaded();
+                    PreferenceManager.applyDefaultPreferences(this);
+                    DevGamesApplication.get(this).setLoggedInUser(null);
+
+                    break;
                 default:
                     L.w("Type is not a known type in Message.Type: " + String.valueOf(type));
             }
@@ -112,10 +133,13 @@ public class GcmIntentService extends IntentService{
         Notification notification;
 
         // Build the intent that will be fired when the user clicks the notification
-        Intent notificationIntent = new Intent(context, MainActivity.class)
+        Intent notificationIntent =
+                id != GcmMessageType.NEW_DEVICE_REGISTERED.ordinal() ?
+                        new Intent(context, MainActivity.class) :
+                        new Intent(context, LoginActivity.class);
 
-                // We don't like to have the same activity alive twice
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        // We don't like to have the same activity alive twice
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         notificationIntent.putExtra("random", System.currentTimeMillis());
 

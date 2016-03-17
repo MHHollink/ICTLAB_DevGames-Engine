@@ -54,5 +54,6 @@
     <string name="list_view_explanation">developers met een totaal van</string>
 
     <string name="new_message">U heeft een nieuwe melding ontvangen</string>
+    <string name="new_device_registerd">U bent ingelogd op een ander apparaat!</string>
 
 </resources>
