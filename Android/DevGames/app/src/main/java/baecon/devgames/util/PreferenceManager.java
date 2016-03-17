@@ -159,7 +159,7 @@ public class PreferenceManager {
      * @return Returns whether notifications are enabled for the whole app. This is a user setting.
      */
     public boolean isNotificationsEnabled() {
-        return sharedPreferences.getBoolean(PREF_KEY_NOTIFICATIONS_ENABLED, false);
+        return sharedPreferences.getBoolean(PREF_KEY_NOTIFICATIONS_ENABLED, true);
     }
 
     /**
@@ -198,7 +198,7 @@ public class PreferenceManager {
      * @return Returns whether the device should vibrate when a notification is fired. This is a user setting.
      */
     public boolean isNotificationVibrationEnabled() {
-        return sharedPreferences.getBoolean(PREF_KEY_NOTIFICATION_VIBRATE, false);
+        return sharedPreferences.getBoolean(PREF_KEY_NOTIFICATION_VIBRATE, true);
     }
 
     /**

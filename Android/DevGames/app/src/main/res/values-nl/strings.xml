@@ -20,6 +20,7 @@
     <string name="date_dd_MMM_HH_mm">dd_MMM_HH_mm</string>
 
     <string name="ok">OK</string>
+    <string name="cancel">anuleren</string>
 
     <string name="enter_password">Voer a.u.b. een geldig wachtwoord in.</string>
     <string name="enter_username">Voer a.u.b. een geldige gebruikersnaam in.</string>
@@ -52,6 +53,6 @@
     <string name="score">punten</string>
     <string name="list_view_explanation">developers met een totaal van</string>
 
-    <string name="new_message">U heeft een nieiuwe melding ontvangen</string>
+    <string name="new_message">U heeft een nieuwe melding ontvangen</string>
 
 </resources>

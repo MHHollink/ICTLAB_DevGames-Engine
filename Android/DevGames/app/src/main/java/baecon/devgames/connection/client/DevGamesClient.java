@@ -1,5 +1,6 @@
 package baecon.devgames.connection.client;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ import retrofit.http.Path;
 public interface DevGamesClient {
 
     @FormUrlEncoded
-    @POST("/login")
+    @POST("/login/index.php")
     Map<String, String> login(@Field("username") String user, @Field("password") String pass);
 
     @GET("/user")
@@ -43,7 +44,8 @@ public interface DevGamesClient {
      *
      * @return an HTTP response of the request.
      */
-    @PUT("/team/member")
+    @PUT("/user")
     Response changeOwnUser(@Body UserDTO user);
 
+    List<UserDTO> getUsers(Long projectId);
 }

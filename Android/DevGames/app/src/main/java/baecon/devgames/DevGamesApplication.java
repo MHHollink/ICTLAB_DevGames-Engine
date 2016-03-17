@@ -63,7 +63,7 @@ public class DevGamesApplication extends Application {
         Dao<Setting, String> settingDao = DBHelper.getSettingDao(dbHelper);
 
         try {
-            String loggedInUserUuid = settingDao.queryForId(Setting.USERNAME).getValue();
+            String loggedInUserUuid = settingDao.queryForId(Setting.USER_ID).getValue();
 
             loggedInUser = (loggedInUserUuid != null && !loggedInUserUuid.isEmpty()) ?
                     getUser(Long.valueOf(loggedInUserUuid)) :

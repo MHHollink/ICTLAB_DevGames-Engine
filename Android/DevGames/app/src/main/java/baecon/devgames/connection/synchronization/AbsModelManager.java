@@ -183,6 +183,7 @@ public abstract class AbsModelManager
             L.d("syncTask was null or getStatus==FINISHED. Creating new ModelUpdateTask");
             syncTask = newUpdateTask(app, id);
             modelUpdateTasks.put(id, syncTask);
+            return;
         }
 
         switch (syncTask.getStatus()) {

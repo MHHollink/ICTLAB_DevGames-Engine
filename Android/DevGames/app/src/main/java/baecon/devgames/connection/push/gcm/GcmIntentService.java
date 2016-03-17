@@ -45,7 +45,7 @@ public class GcmIntentService extends IntentService{
 
             switch (type) {
 
-                case HIGH_SCORE_CHANGED:
+                case PLAIN_NOTIFICATION:
 
                         notificationText = intent.getStringExtra("text");
                         if ((notificationText == null || notificationText.isEmpty())) {
@@ -54,7 +54,7 @@ public class GcmIntentService extends IntentService{
 
                         showNotification(
                                 this,
-                                GcmMessageType.HIGH_SCORE_CHANGED.ordinal(),
+                                GcmMessageType.PLAIN_NOTIFICATION.ordinal(),
                                 getString(R.string.app_name),
                                 notificationText,
                                 notificationText,
@@ -129,7 +129,7 @@ public class GcmIntentService extends IntentService{
                 .setContentTitle(title) // The title of the notification
                 .setContentText(content) // The second line of the notification
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.devgames_logo_icon))
-                .setSmallIcon(R.drawable.devgames_logo_icon)
+                .setSmallIcon(R.drawable.devgames_logo_icon_sword)
                 .setWhen(System.currentTimeMillis()) // The time when the event for this notification happened
                 .build();
 

@@ -53,7 +53,8 @@
     <string name="score">points</string>
     <string name="list_view_explanation">developers with a total of</string>
 
-    <string name="new_message">You recieved a new notification</string>
+    <string name="new_message">You received a new notification</string>
+    <string name="cancel">cancel</string>
 
 
 </resources>
