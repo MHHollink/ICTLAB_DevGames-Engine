@@ -38,6 +38,7 @@ import javax.security.auth.x500.X500Principal;
 /**
  * Some static utility methods.
  */
+@SuppressWarnings("unused")
 public final class Utils {
 
     private static Boolean isInDevelopment = null;
@@ -423,20 +424,38 @@ public final class Utils {
         return RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     }
 
+    /**
+     * Create and shows a toast on the given fragment/activity with the given String for the given Duration
+     *
+     * @param context the contact of the activity that will show the Toast
+     * @param message the message inside the toast
+     * @param duration the duration from Toast. Either {@link Toast#LENGTH_SHORT} OR {@link Toast#LENGTH_LONG}
+     */
     public static void createToast(Context context, String message, int duration){
         Toast toast = Toast.makeText(context, message, duration);
         toast.setGravity(Gravity.TOP, 0, 30);
         toast.show();
     }
 
+
+    /**
+     * see {@link #createToast(Context, String, int)}
+     */
     public static void createToast(Context context, int resId, int duration){
         createToast(context, context.getString(resId), duration);
     }
 
+
+    /**
+     * see {@link #createToast(Context, String, int)}
+     */
     public static void createToast(Fragment fragment, String message, int duration){
         createToast(fragment.getContext(), message, duration);
     }
 
+    /**
+     * see {@link #createToast(Context, String, int)}
+     */
     public static void createToast(Fragment fragment, int resId, int duration){
         createToast(fragment.getContext(), resId, duration);
     }

@@ -1,5 +1,6 @@
 package baecon.devgames;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.support.v4.app.Fragment;
@@ -36,6 +37,7 @@ public class DevGamesApplication extends Application {
      * The key point to the key-value pair for the session in each request header
      */
     public static final String SESSION_HEADER_KEY = "SESSION_ID";
+    private String session = null;
 
     private static final long DEFAULT_CONNECTION_TIMEOUT = 60 * 1000L;
     private static final long DEFAULT_READ_TIMEOUT = 60 * 1000L;
@@ -48,9 +50,9 @@ public class DevGamesApplication extends Application {
     private PreferenceManager preferenceManager;
     private DevGamesClient devGamesClient;
     private DBHelper dbHelper;
-    private String session = null;
     private User loggedInUser;
 
+    @SuppressLint("SimpleDateFormat")
     @Override
     public void onCreate() {
         super.onCreate();
@@ -118,6 +120,9 @@ public class DevGamesApplication extends Application {
 
     }
 
+    /**
+     * Cleans the object cache in the database when the app is running on low memory
+     */
     @Override
     public void onLowMemory() {
         super.onLowMemory();
@@ -128,19 +133,40 @@ public class DevGamesApplication extends Application {
     }
 
 
+    /**
+     * Gets the loggedInUser as {@link User} object from the app context
+     *
+     * @return currently logged in user
+     */
     public User getLoggedInUser() {
         return loggedInUser;
     }
 
+    /**
+     * Sets the loggedInUser as object in the app context for easier usage
+     *
+     * @param loggedInUser the new loggedInUser
+     */
     public void setLoggedInUser(User loggedInUser) {
         L.v("loggedInUser={0}", loggedInUser != null ? loggedInUser.toString() : "null");
         this.loggedInUser = loggedInUser;
     }
 
+    /**
+     * Gets in instance of the PreferenceManager used in the app.
+     * This preference manager contains calls used to and from the preferences and handles the tags used.
+     *
+     * @return Instance of the PreferenceManager
+     */
     public PreferenceManager getPreferenceManager() {
         return preferenceManager;
     }
 
+    /**
+     * Gets an instance of the DevGamesClient where all the REST calls are declared.
+     *
+     * @return instance of the DevGamesClient
+     */
     public DevGamesClient getDevGamesClient() {
         return devGamesClient;
     }
@@ -173,15 +199,29 @@ public class DevGamesApplication extends Application {
         return null;
     }
 
+    /**
+     * Gets the current session for the REST calls.
+     *
+     * @return String value of Session Token
+     */
     public String getSession() {
         return session;
     }
 
+    /**
+     * Sets the session which was returned from the server after login
+     * Each request (expect /login) uses this session token for identification and authentication for the call
+     *
+     * @param session String value of the Session token
+     */
     public void setSession(String session) {
         L.v("session={0}", session);
         this.session = session;
     }
 
+    /**
+     * Creates and returns an instance of the OkHttpClient used for the REST calls
+     */
     private static OkHttpClient getOkHttpClient(long connectTimeoutMillis, long readTimeoutMillis) {
         OkHttpClient client = new OkHttpClient();
         client.setConnectTimeout(connectTimeoutMillis, TimeUnit.MILLISECONDS);
@@ -189,10 +229,22 @@ public class DevGamesApplication extends Application {
         return client;
     }
 
+    /**
+     * Gets the instance of the DevGamesApplication by using the Context of the running activity/task.
+     *
+     * @param context Fragment which calls the method
+     * @return instance of DevGamesApplication
+     */
     public static DevGamesApplication get(Context context) {
         return (DevGamesApplication) context.getApplicationContext();
     }
 
+    /**
+     * Gets the instance of the DevGamesApplication by using the parent activity of the running fragment.
+     *
+     * @param context Fragment which calls the method
+     * @return instance of DevGamesApplication
+     */
     public static DevGamesApplication get(Fragment context) {
         return (DevGamesApplication) context.getActivity().getApplicationContext();
     }

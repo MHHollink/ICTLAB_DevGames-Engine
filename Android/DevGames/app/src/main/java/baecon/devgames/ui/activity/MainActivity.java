@@ -7,10 +7,12 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.squareup.otto.Subscribe;
 
 import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
 import baecon.devgames.connection.task.GcmRegistrationTask;
+import baecon.devgames.events.LogoutEvent;
 import baecon.devgames.ui.fragment.ProfileFragment;
 import baecon.devgames.ui.fragment.ProjectsFragment;
 import baecon.devgames.ui.widget.SlidingTabLayout;
@@ -145,5 +147,11 @@ public class MainActivity extends DevGamesActivity {
                         .show();
             }
         }
+    }
+
+    @Subscribe
+    @Override
+    public void onLogoutEvent(LogoutEvent event) {
+        super.onLogoutEvent(event);
     }
 }

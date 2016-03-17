@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 
 import baecon.devgames.connection.client.DevGamesClient;
@@ -32,7 +33,7 @@ public class UserUpdate extends AbsModelUpdate<User> {
      *         The user, where ONLY the fields are populated that you'd like to update. The id is populated
      *         for you.
      */
-    public UserUpdate(long localModelId, User user) {
+    public UserUpdate(Long localModelId, User user) {
         super(localModelId, user);
     }
 
@@ -49,7 +50,11 @@ public class UserUpdate extends AbsModelUpdate<User> {
 
                 UserDTO dto = new UserDTO(getModel());
 
+                L.d("Update for {0}", dto.toString());
+
                 response = client.changeOwnUser(dto);
+
+                L.d("Update response status : {0}, reason : {1}", response.getStatus(), response.getReason());
 
                 break;
 

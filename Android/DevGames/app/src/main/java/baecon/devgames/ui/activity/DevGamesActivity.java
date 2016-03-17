@@ -171,7 +171,7 @@ public abstract class DevGamesActivity extends AppCompatActivity {
             L.i("LogoutEvent received, but their is still un synchronized work in the database. Logout cancelled");
             new AlertDialog.Builder(this)
                     .setTitle(R.string.logout)
-                    .setMessage("Er zijn nog items op dit apparaat in taken, rapporten of berichten die niet geschynchroniseerd zijn met de server. \n" +
+                    .setMessage("Er zijn nog items op dit apparaat die niet geschynchroniseerd zijn met de server. \n" +
                             "Als u uitlogt, worden de gegevens niet op de achtergrond gesynchroniseerd, tenzij u opnieuw inlogt.\n" +
                             "Als een andere gebruiker ondertussen inlogt, gaan uw gesynchroniseerde gegevens verloren. \n\nNu uitloggen?")
                     .setPositiveButton(R.string.logout, new DialogInterface.OnClickListener() {
