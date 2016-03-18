@@ -2,8 +2,7 @@ package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
 import nl.devgames.model.User;
-import nl.devgames.rest.RestError;
-import nl.devgames.rest.RestResponse;
+import nl.devgames.rest.errors.InvalidSessionException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,11 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 public class UserController {
 
     @RequestMapping(value = "/user", method = RequestMethod.GET)
-    public RestResponse getOwnUser(HttpServletRequest request) {
+    public User getOwnUser(HttpServletRequest request) {
         String session = request.getHeader(Application.SESSION_HEADER_KEY);
 
         if(session == null || session.isEmpty()) {
-            return RestResponse.error(RestError.INVALID_SESSION);
+            throw new InvalidSessionException("Request without session");
         }
 
         /**
@@ -36,11 +35,11 @@ public class UserController {
         user.setUsername("admin");
         user.setGitUsername("admin");
 
-        return new RestResponse<>(user);
+        return user;
     }
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
-    public boolean getUser(HttpServletRequest request, @PathVariable Long id) {
+    public User getUser(HttpServletRequest request, @PathVariable Long id) {
         throw new UnsupportedOperationException("This will return a user with id : " + id);
     }
 

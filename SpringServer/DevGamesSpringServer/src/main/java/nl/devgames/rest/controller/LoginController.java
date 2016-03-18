@@ -1,7 +1,7 @@
 package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
-import nl.devgames.rest.RestResponse;
+import nl.devgames.rest.errors.BadRequestException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,9 +14,9 @@ import java.util.UUID;
 public class LoginController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public RestResponse<Map<String,String>> login(@RequestParam(value="username") String username, @RequestParam(value="password") String password) {
+    public Map<String,String> login(@RequestParam(value="username") String username, @RequestParam(value="password") String password) {
         if (password == null || password.isEmpty() || username == null || username.isEmpty())
-            return new RestResponse<java.util.Map<String,String>>().status(400, "BAD REQUEST" );
+            throw new BadRequestException("Username or password was missing");
 
         username = username.toLowerCase();
 
@@ -30,10 +30,10 @@ public class LoginController {
 
             result.put(Application.SESSION_HEADER_KEY, sessionID );
 
-            return RestResponse.entity(result);
+            return result;
 
         } else {
-            return new RestResponse<java.util.Map<String,String>>().status(403,"This username-password combination is not found");
+            throw new BadRequestException("This username-password combination is not found");
         }
     }
 
