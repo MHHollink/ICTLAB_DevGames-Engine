@@ -1,10 +1,6 @@
 package nl.devgames.rest;
 
-import java.util.logging.Logger;
-
 public class RestResponse<E> {
-
-    private static Logger logger = Logger.getLogger(RestResponse.class.toString());
 
     public E entity;
     public String contentType;
@@ -49,14 +45,4 @@ public class RestResponse<E> {
     public static <G> RestResponse<G> error(RestError error, String... messageFormatArgs) {
         return new RestErrorResponse<>(error, messageFormatArgs);
     }
-
-/*
-    public RestResponse withKV (String k, String v) {
-	//is there a native javatype for a KV ?
-        java.util.Map<String,String> res = new java.util.HashMap<String,String>();
-	res.put( k,v );
-        this.entity = (E)res;
-        return this;
-    }
-*/
 }

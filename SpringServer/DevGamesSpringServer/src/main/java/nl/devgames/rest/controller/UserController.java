@@ -35,7 +35,6 @@ public class UserController {
         user.setId(1L);
         user.setUsername("admin");
         user.setGitUsername("admin");
-        user.setPoints(0);
 
         return new RestResponse<>(user);
     }

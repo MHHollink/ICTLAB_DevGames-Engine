@@ -10,7 +10,6 @@ public class User extends AbsModel {
 
     private String username;
     private String gitUsername;
-    private long points;
 
     @Relationship(type = "isDeveloperBy", direction = Relationship.OUTGOING)
     private List projects;
@@ -34,14 +33,6 @@ public class User extends AbsModel {
         this.gitUsername = gitUsername;
     }
 
-    public long getPoints() {
-        return points;
-    }
-
-    public void setPoints(long points) {
-        this.points = points;
-    }
-
     public List getProjects() {
         return projects;
     }
@@ -49,4 +40,6 @@ public class User extends AbsModel {
     public void setProjects(List projects) {
         this.projects = projects;
     }
+
+
 }
