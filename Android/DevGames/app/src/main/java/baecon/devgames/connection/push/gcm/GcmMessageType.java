@@ -1,6 +1,6 @@
 package baecon.devgames.connection.push.gcm;
 
 public enum GcmMessageType {
-
-    HIGH_SCORE_CHANGED
+    PLAIN_NOTIFICATION,
+    NEW_DEVICE_REGISTERED
 }

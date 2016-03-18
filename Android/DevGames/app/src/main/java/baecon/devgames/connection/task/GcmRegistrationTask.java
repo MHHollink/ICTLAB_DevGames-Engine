@@ -83,6 +83,7 @@ public class GcmRegistrationTask extends RESTTask<Void, Void, String> {
 
         try {
             newGCMKey = gcm.register(BuildConfig.GCM_SENDER_ID);
+            L.d("Registered to GCM, GCMKey : {0}", newGCMKey);
             return REGISTERED;
         }
         catch (IOException e) {

@@ -1,5 +1,6 @@
 package baecon.devgames.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,9 +13,11 @@ import android.widget.Toast;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
+import com.squareup.otto.Subscribe;
 
 import baecon.devgames.R;
 import baecon.devgames.connection.task.LoginTask;
+import baecon.devgames.events.LoginEvent;
 import baecon.devgames.util.L;
 import baecon.devgames.util.Utils;
 
@@ -47,13 +50,13 @@ public class LoginActivity extends DevGamesActivity {
                 final String passwordText = password.getText().toString().trim();
 
                 if (usernameText.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, R.string.enter_username, Toast.LENGTH_SHORT).show();
+                    Utils.createToast(LoginActivity.this, R.string.enter_username, Toast.LENGTH_SHORT);
                     username.requestFocus();
                     return;
                 }
 
                 if (passwordText.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, R.string.enter_password, Toast.LENGTH_SHORT).show();
+                    Utils.createToast(LoginActivity.this, R.string.enter_password, Toast.LENGTH_SHORT);
                     password.requestFocus();
                     return;
                 }
@@ -159,5 +162,127 @@ public class LoginActivity extends DevGamesActivity {
                     }
                 })
                 .start();
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onLoginEvent(final LoginEvent event) {
+
+        L.d("onLoginEvent, event: {0}", event);
+
+        if (event.success) {
+
+            if (getPreferenceManager().isRememberPasswordEnabled()) {
+                L.v("Remember password enabled, storing in preferences...");
+                getPreferenceManager().setLastUsedUsername(username.getText().toString().trim());
+            }
+
+            ViewHelper.setAlpha(loginSuccess, 0L);
+
+            ViewPropertyAnimator busyContainerAnimator = ViewPropertyAnimator.animate(busyContainer);
+            busyContainerAnimator
+                    .alpha(0f)
+                    .setStartDelay(200L)
+                    .setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            busyContainer.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+                        }
+                    }).start();
+
+            ViewPropertyAnimator.animate(loginSuccess)
+                    .alpha(1L)
+                    .setStartDelay(100L)
+                    .setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            loginSuccess.setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            finish();
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {}
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {}
+                    })
+                    .start();
+        }
+        else {
+            L.w("unsuccessful login attempt: {0}", event.message);
+
+            ViewPropertyAnimator.animate(credentialsContainer)
+                    .alpha(1f)
+                    .setStartDelay(100L)
+                    .setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            credentialsContainer.setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+                        }
+                    })
+                    .start();
+            ViewPropertyAnimator.animate(busyContainer)
+                    .alpha(0f)
+                    .setStartDelay(200L)
+                    .setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            busyContainer.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+                        }
+                    })
+                    .start();
+
+            if (event.message == null) {
+                Utils.createToast(LoginActivity.this, R.string.unsuccessful_login, Toast.LENGTH_SHORT);
+            }
+            else {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        Utils.createToast(LoginActivity.this, event.message, Toast.LENGTH_SHORT);
+                    }
+                });
+            }
+        }
     }
 }

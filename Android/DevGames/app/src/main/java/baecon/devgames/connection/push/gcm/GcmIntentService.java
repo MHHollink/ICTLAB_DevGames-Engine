@@ -15,7 +15,11 @@ import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
+import baecon.devgames.connection.task.LogoutTask;
+import baecon.devgames.ui.activity.DevGamesActivity;
+import baecon.devgames.ui.activity.LoginActivity;
 import baecon.devgames.ui.activity.MainActivity;
 import baecon.devgames.util.L;
 import baecon.devgames.util.PreferenceManager;
@@ -39,13 +43,13 @@ public class GcmIntentService extends IntentService{
                 return;
             }
 
-            GcmMessageType type = GcmMessageType.valueOf(intent.getStringExtra("message"));
+            GcmMessageType type = GcmMessageType.valueOf(intent.getStringExtra("type"));
 
             String notificationText;
 
             switch (type) {
 
-                case HIGH_SCORE_CHANGED:
+                case PLAIN_NOTIFICATION:
 
                         notificationText = intent.getStringExtra("text");
                         if ((notificationText == null || notificationText.isEmpty())) {
@@ -54,7 +58,7 @@ public class GcmIntentService extends IntentService{
 
                         showNotification(
                                 this,
-                                GcmMessageType.HIGH_SCORE_CHANGED.ordinal(),
+                                GcmMessageType.PLAIN_NOTIFICATION.ordinal(),
                                 getString(R.string.app_name),
                                 notificationText,
                                 notificationText,
@@ -64,7 +68,24 @@ public class GcmIntentService extends IntentService{
                     break;
 
 
+                case NEW_DEVICE_REGISTERED:
 
+                    notificationText = getString(R.string.new_device_registerd);
+
+                    showNotification(
+                            this,
+                            GcmMessageType.NEW_DEVICE_REGISTERED.ordinal(),
+                            getString(R.string.app_name),
+                            notificationText,
+                            notificationText,
+                            true
+                    );
+
+                    new LogoutTask(this, false).executeThreaded();
+                    PreferenceManager.applyDefaultPreferences(this);
+                    DevGamesApplication.get(this).setLoggedInUser(null);
+
+                    break;
                 default:
                     L.w("Type is not a known type in Message.Type: " + String.valueOf(type));
             }
@@ -112,10 +133,13 @@ public class GcmIntentService extends IntentService{
         Notification notification;
 
         // Build the intent that will be fired when the user clicks the notification
-        Intent notificationIntent = new Intent(context, MainActivity.class)
+        Intent notificationIntent =
+                id != GcmMessageType.NEW_DEVICE_REGISTERED.ordinal() ?
+                        new Intent(context, MainActivity.class) :
+                        new Intent(context, LoginActivity.class);
 
-                // We don't like to have the same activity alive twice
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        // We don't like to have the same activity alive twice
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         notificationIntent.putExtra("random", System.currentTimeMillis());
 
@@ -129,7 +153,7 @@ public class GcmIntentService extends IntentService{
                 .setContentTitle(title) // The title of the notification
                 .setContentText(content) // The second line of the notification
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.devgames_logo_icon))
-                .setSmallIcon(R.drawable.devgames_logo_icon)
+                .setSmallIcon(R.drawable.devgames_logo_icon_sword)
                 .setWhen(System.currentTimeMillis()) // The time when the event for this notification happened
                 .build();
 

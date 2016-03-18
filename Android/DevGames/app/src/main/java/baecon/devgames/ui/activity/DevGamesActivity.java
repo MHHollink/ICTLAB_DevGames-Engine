@@ -1,6 +1,8 @@
 package baecon.devgames.ui.activity;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -8,8 +10,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.squareup.otto.Subscribe;
+
 import baecon.devgames.DevGamesApplication;
 import baecon.devgames.R;
+import baecon.devgames.connection.task.LogoutTask;
+import baecon.devgames.events.BusProvider;
+import baecon.devgames.events.LogoutEvent;
+import baecon.devgames.util.L;
 import baecon.devgames.util.PreferenceManager;
 
 /**
@@ -36,11 +44,32 @@ public abstract class DevGamesActivity extends AppCompatActivity {
         logoutProgressDialog.setCancelable(false);
     }
 
+    /**
+     * Called when Android resumes this Activity.
+     */
     @Override
     protected void onResume() {
+
         super.onResume();
 
+        L.d("* onResume");
+
         doLoginCheck();
+
+        BusProvider.getBus().register(this);
+    }
+
+    /**
+     * Called when Android pauses this Activity.
+     */
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+
+        L.d("* onPause");
+
+        BusProvider.getBus().unregister(this);
     }
 
     @Override
@@ -62,7 +91,7 @@ public abstract class DevGamesActivity extends AppCompatActivity {
 
         int i = item.getItemId();
         if (i == R.id.menu_logout) {
-            doLogout();
+            doLogout(true);
         }
         else if (i == android.R.id.home) {
             onBackPressed();
@@ -74,14 +103,13 @@ public abstract class DevGamesActivity extends AppCompatActivity {
         return true;
     }
 
-    private void doLogout() {
+    private void doLogout(boolean checkUnSyncedWork) {
         logoutProgressDialog.show();
 
         preferenceManager.setRememberPasswordEnabled(false);
         preferenceManager.setLastUsedUsername(null);
 
-        startActivity(new Intent(this, LoginActivity.class));
-        finish();
+        new LogoutTask(this, checkUnSyncedWork).executeThreaded();
     }
 
     protected void doLoginCheck() {
@@ -132,5 +160,41 @@ public abstract class DevGamesActivity extends AppCompatActivity {
 
     public Toolbar getToolbar() {
         return toolbar;
+    }
+
+    @Subscribe
+    public void onLogoutEvent(LogoutEvent event) {
+
+        logoutProgressDialog.dismiss();
+
+        if (event.hasUnSynchronizedWork) {
+            L.i("LogoutEvent received, but their is still un synchronized work in the database. Logout cancelled");
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.logout)
+                    .setMessage("Er zijn nog items op dit apparaat die niet geschynchroniseerd zijn met de server. \n" +
+                            "Als u uitlogt, worden de gegevens niet op de achtergrond gesynchroniseerd, tenzij u opnieuw inlogt.\n" +
+                            "Als een andere gebruiker ondertussen inlogt, gaan uw gesynchroniseerde gegevens verloren. \n\nNu uitloggen?")
+                    .setPositiveButton(R.string.logout, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            doLogout(false);
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .create().show();
+        }
+        else {
+            L.i("LogoutEvent received. Goodbye!");
+            DevGamesApplication.get(this).setLoggedInUser(null);
+
+            finish();
+            startActivity(new Intent(this, LoginActivity.class));
+        }
     }
 }

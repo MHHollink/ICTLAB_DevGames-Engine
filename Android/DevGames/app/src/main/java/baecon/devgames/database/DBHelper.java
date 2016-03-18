@@ -21,6 +21,7 @@ import baecon.devgames.model.Commit;
 import baecon.devgames.model.Project;
 import baecon.devgames.model.Setting;
 import baecon.devgames.model.User;
+import baecon.devgames.model.update.UserUpdate;
 import baecon.devgames.util.Utils;
 
 public class DBHelper extends OrmLiteSqliteOpenHelper {
@@ -146,13 +147,14 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
         public DevGamesReferenceObjectCache(boolean useWeak) {
             super(useWeak);
         }
+
     }
-
-
-
-
     public static Dao<User, Long> getUserDao(DBHelper dbHelper) {
         return dbHelper.getDao(User.class, Long.class);
+    }
+
+    public static Dao<UserUpdate,Long> getUserUpdateDao(DBHelper dbHelper) {
+        return dbHelper.getDao(UserUpdate.class, Long.class);
     }
 
     public static Dao<Project, Long> getProjectDao(DBHelper dbHelper) {

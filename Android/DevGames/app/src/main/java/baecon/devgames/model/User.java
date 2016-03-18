@@ -4,6 +4,7 @@ package baecon.devgames.model;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.squareup.okhttp.internal.Util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,17 +14,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import baecon.devgames.util.Utils;
+
 @DatabaseTable(tableName = "users")
 public class User extends AbsSynchronizable implements Serializable {
 
     public static class Column {
+
         public static final String USERNAME = "username";
         public static final String GIT_USER = "git_username";
         public static final String PROJECTS = "projects";
         public static final String COMMITS = "commits";
         public static final String GCM_KEY = "gcm_registration_key";
     }
-
     @DatabaseField(columnName = Column.USERNAME)
     private String username;
 
@@ -105,9 +108,28 @@ public class User extends AbsSynchronizable implements Serializable {
     public void addCommit(Commit commit) {
         commits.put(commit.getId(), commit);
     }
+
     public void addCommit(Commit... commit) {
         for (Commit aCommit : commit) {
             commits.put(aCommit.getId(), aCommit);
+        }
+    }
+
+    public void merge(User user) {
+        if(!Utils.isEmpty(user.getUsername())) {
+            username = user.getUsername();
+        }
+        if(!Utils.isEmpty(user.getGitUsername())) {
+            gitUsername = user.getGitUsername();
+        }
+        if(!Utils.isEmpty(user.getCommits())) {
+            commits = user.getCommits();
+        }
+        if(!Utils.isEmpty(user.getProjects())) {
+            projects = user.getProjects();
+        }
+        if(!Utils.isEmpty(user.getGcmKey())) {
+            gcmKey = user.getGcmKey();
         }
     }
 
@@ -142,5 +164,9 @@ public class User extends AbsSynchronizable implements Serializable {
     @Override
     public boolean contentEquals(Object other) {
         return false;
+    }
+
+    public void logout() {
+        setGcmKey(null);
     }
 }

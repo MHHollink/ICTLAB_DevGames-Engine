@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 
 /**
- * A manager class that is responsible for all preferences that are stored in the {@link
+ * A manager cl`s that is responsible for all preferences that are stored in the {@link
  * android.content.SharedPreferences}. Each setting has a get/set function and a {@code public static final String}
  * declaration with the key, prefixed with PREF_. For example:
  * <p/>
@@ -28,12 +28,24 @@ public class PreferenceManager {
         sharedPreferences = android.preference.PreferenceManager.getDefaultSharedPreferences(context);
     }
 
+    /**
+     * Clears all current sharedPreferences and replaces them with our default ones.
+     *
+     * @param context the context of the application that uses the method
+     */
     public static void applyDefaultPreferences(Context context) {
+
+        clearAllSettings(context);
 
         PreferenceManager preferenceManager = get(context);
 
-        // RESET ALL PREFERENCES
-        // ...
+        preferenceManager.setLastUsedUsername(null);
+        preferenceManager.setRememberPasswordEnabled(false);
+        preferenceManager.setNotificationRingtone(null);
+        preferenceManager.setNotificationsEnabled(true);
+        preferenceManager.setNotificationVibrationEnabled(true);
+        preferenceManager.setShowPlayServicesDialog(true);
+
 
     }
 
@@ -159,7 +171,7 @@ public class PreferenceManager {
      * @return Returns whether notifications are enabled for the whole app. This is a user setting.
      */
     public boolean isNotificationsEnabled() {
-        return sharedPreferences.getBoolean(PREF_KEY_NOTIFICATIONS_ENABLED, false);
+        return sharedPreferences.getBoolean(PREF_KEY_NOTIFICATIONS_ENABLED, true);
     }
 
     /**
@@ -198,7 +210,7 @@ public class PreferenceManager {
      * @return Returns whether the device should vibrate when a notification is fired. This is a user setting.
      */
     public boolean isNotificationVibrationEnabled() {
-        return sharedPreferences.getBoolean(PREF_KEY_NOTIFICATION_VIBRATE, false);
+        return sharedPreferences.getBoolean(PREF_KEY_NOTIFICATION_VIBRATE, true);
     }
 
     /**
