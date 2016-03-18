@@ -51,6 +51,7 @@ Temporary Items
 # =========================
 
 .idea
+*.jks
 Android/DevGames/.idea
 Jenkins/*/.idea
 Maven/*/.idea
