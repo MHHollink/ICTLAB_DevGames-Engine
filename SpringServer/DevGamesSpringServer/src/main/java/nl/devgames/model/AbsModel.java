@@ -17,4 +17,20 @@ public abstract class AbsModel {
     public void setId(Long id) {
         this.id = id;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || id == null || getClass() != o.getClass()) return false;
+
+        AbsModel entity = (AbsModel) o;
+
+        return id.equals(entity.id);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return (id == null) ? -1 : id.hashCode();
+    }
 }

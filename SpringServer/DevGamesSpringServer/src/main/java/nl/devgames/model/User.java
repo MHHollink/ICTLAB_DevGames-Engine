@@ -3,16 +3,20 @@ package nl.devgames.model;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import java.util.List;
+import java.util.Set;
 
-@NodeEntity
+
+@NodeEntity(label = "User")
 public class User extends AbsModel {
 
     private String username;
     private String gitUsername;
 
-    @Relationship(type = "isDeveloperBy", direction = Relationship.OUTGOING)
-    private List projects;
+    @Relationship(type = "isDeveloperBy")
+    private Set<Project> projects;
+
+    @Relationship(type = "isCommittedBy", direction = Relationship.INCOMING)
+    private Set<Commit> commits;
 
     public User() {
     }
@@ -33,13 +37,29 @@ public class User extends AbsModel {
         this.gitUsername = gitUsername;
     }
 
-    public List getProjects() {
+    public Set<Project> getProjects() {
         return projects;
     }
 
-    public void setProjects(List projects) {
+    public void setProjects(Set<Project> projects) {
         this.projects = projects;
     }
 
+    public Set<Commit> getCommits() {
+        return commits;
+    }
 
+    public void setCommits(Set<Commit> commits) {
+        this.commits = commits;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", gitUsername='" + gitUsername + '\'' +
+                ", projects=" + projects +
+                ", commits=" + commits +
+                '}';
+    }
 }
