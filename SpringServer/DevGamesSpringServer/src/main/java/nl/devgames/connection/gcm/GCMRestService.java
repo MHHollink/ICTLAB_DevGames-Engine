@@ -1,7 +1,9 @@
 package nl.devgames.connection.gcm;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.devgames.connection.AbsRestService;
-import nl.devgames.connection.RequestProperty;
+import nl.devgames.connection.Tuple;
 
 import java.io.IOException;
 
@@ -25,10 +27,28 @@ public class GCMRestService extends AbsRestService {
     public void post(String json) {
         try {
             super.post(json,
-                    new RequestProperty("Authorization", API_TOKEN)
+                    new Tuple<>("Authorization", API_TOKEN)
             );
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String messageToJson(GCMMessage message) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(message);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void postMessage(GCMMessage message) {
+        post(
+                messageToJson(
+                        message
+                )
+        );
     }
 }

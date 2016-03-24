@@ -1,13 +1,19 @@
 package nl.devgames;
 
 import nl.devgames.connection.database.Neo4JRestService;
+import nl.devgames.connection.gcm.GCMMessage;
+import nl.devgames.connection.gcm.GCMRestService;
 
 public class TestMain {
 
     public static void main(String[] args) {
 
-        Neo4JRestService.getInstance().postQuery(
-                "match (n:User) where n.username = 'Mjollnir94' return n"
+        GCMMessage message = new GCMMessage();
+
+        // TODO create message.
+
+        GCMRestService.getInstance().postMessage(
+            message
         );
     }
 }

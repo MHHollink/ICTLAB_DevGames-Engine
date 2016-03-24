@@ -24,15 +24,15 @@ public abstract class AbsRestService {
 
     }
 
-    protected void post(String jsonString, RequestProperty... properties) throws IOException {
+    protected void post(String jsonString, Tuple... properties) throws IOException {
 
         HttpURLConnection connection =
                 (HttpURLConnection) url.openConnection();
 
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
-        for (RequestProperty property : properties) {
-            connection.setRequestProperty(property.getK(), property.getV());
+        for (Tuple property : properties) {
+            connection.setRequestProperty(String.valueOf(property.getK()), String.valueOf(property.getV()));
         }
         connection.setDoOutput(true);
         connection.connect();
