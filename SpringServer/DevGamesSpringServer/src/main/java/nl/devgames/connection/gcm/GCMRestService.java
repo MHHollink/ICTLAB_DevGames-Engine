@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class GCMRestService extends AbsRestService {
 
-    private static final String API_TOKEN = "AIzaSyAYYJpgR6yk4AePQioLiMKVNsOVyMrcKVU";
+    private static final String API_TOKEN = "AIzaSyC9G357o3fykQPsbANNtn6KXOkHJi6_kwA";
 
     private static GCMRestService instance;
 
@@ -27,7 +27,7 @@ public class GCMRestService extends AbsRestService {
     public void post(String json) {
         try {
             super.post(json,
-                    new Tuple<>("Authorization", API_TOKEN)
+                    new Tuple<>("Authorization", "key="+API_TOKEN)
             );
         } catch (IOException e) {
             e.printStackTrace();

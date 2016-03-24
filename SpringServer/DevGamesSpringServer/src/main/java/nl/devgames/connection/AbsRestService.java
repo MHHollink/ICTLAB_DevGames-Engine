@@ -1,5 +1,7 @@
 package nl.devgames.connection;
 
+import nl.devgames.utils.L;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -24,8 +26,7 @@ public abstract class AbsRestService {
 
     }
 
-    protected void post(String jsonString, Tuple... properties) throws IOException {
-
+    protected String post(String jsonString, Tuple... properties) throws IOException {
         HttpURLConnection connection =
                 (HttpURLConnection) url.openConnection();
 
@@ -48,8 +49,10 @@ public abstract class AbsRestService {
 
         //get response
         int responseCode = connection.getResponseCode();
-        System.out.println("\nSending 'POST' request to URL : " + url);
-        System.out.println("Response Code was: " + responseCode);
+        String responseMessage = connection.getResponseMessage();
+        L.og("Sending 'POST' request to URL : %s", url);
+        L.og("Response Message: %s", responseMessage);
+        L.og("Response Code: %d", responseCode);
 
         BufferedReader in;
             in = new BufferedReader(
@@ -62,8 +65,7 @@ public abstract class AbsRestService {
         }
         in.close();
 
-        //result
-        System.out.println(response.toString());
+        return response.toString();
     }
 
     protected void put() {

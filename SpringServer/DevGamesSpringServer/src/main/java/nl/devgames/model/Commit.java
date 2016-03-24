@@ -1,9 +1,5 @@
 package nl.devgames.model;
 
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
-
-@NodeEntity(label = "Commit")
 public class Commit extends AbsModel {
 
     private String hash;
@@ -11,7 +7,6 @@ public class Commit extends AbsModel {
     private int filesChanged;
     private long timeStamp;
 
-    @Relationship(type = "CommitTo")
     private Project project;
 
     public Commit() {

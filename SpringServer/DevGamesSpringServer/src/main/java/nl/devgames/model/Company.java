@@ -1,19 +1,12 @@
 package nl.devgames.model;
 
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
-
 import java.util.Set;
 
-@NodeEntity(label = "Company")
 public class Company extends AbsModel{
 
     private String name;
 
-    @Relationship(type = "isEmployedBy", direction = Relationship.INCOMING)
     Set<User> employees;
-
-    @Relationship(type = "hasProject")
     Set<Project> projects;
 
 

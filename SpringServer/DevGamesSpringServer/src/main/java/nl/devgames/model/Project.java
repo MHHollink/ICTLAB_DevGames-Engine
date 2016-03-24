@@ -1,9 +1,5 @@
 package nl.devgames.model;
 
-import org.neo4j.ogm.annotation.NodeEntity;
-
-
-@NodeEntity(label = "Project")
 public class Project extends AbsModel {
 
     private String name;

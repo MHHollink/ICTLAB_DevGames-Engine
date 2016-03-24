@@ -1,12 +1,20 @@
 package nl.devgames.rest.controller;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import nl.devgames.Application;
+import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.rest.errors.BadRequestException;
+import nl.devgames.rest.errors.KnownInternalServerError;
+import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,23 +26,41 @@ public class LoginController {
         if (password == null || password.isEmpty() || username == null || username.isEmpty())
             throw new BadRequestException("Username or password was missing");
 
-        username = username.toLowerCase();
+        String jsonResponseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (n:User) WHERE n.username = '%s' AND n.password = '%s' RETURN n.username",
+                username,
+                password
+        );
 
-        // TODO, check db for existing users
-        if(username.equalsIgnoreCase("marcel") && password.equals("DevGames")) {
+        JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject();
+        JsonArray errors = jsonResponse.get("errors").getAsJsonArray();
 
-            java.util.Map<String, String> result = new java.util.HashMap<>();
+        if(errors.size() != 0) {
+            for (JsonElement error : errors) {
+                L.og(error.getAsString());
+            }
+            throw new KnownInternalServerError("InternalServerError: "+ errors.getAsString());
+        }
 
-            // TODO, user some real session management stuff
-            String sessionID = String.valueOf(UUID.randomUUID());
+        int users = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray().size();
 
-            result.put(Application.SESSION_HEADER_KEY, sessionID );
-
-            return result;
-
-        } else {
+        if(users == 0) {
+            L.og("no user with this combination");
             throw new BadRequestException("This username-password combination is not found");
         }
-    }
+        else {
+            java.util.Map<String, String> result = new java.util.HashMap<>();
+            // TODO, user some real session management stuff
+            String sessionID = String.valueOf(UUID.randomUUID());
+            result.put(Application.SESSION_HEADER_KEY, sessionID);
 
+            Neo4JRestService.getInstance().postQuery(
+                    "MATCH (n:User {username : '%s'}) SET n.session = '%s'",
+                    username,
+                    sessionID
+            );
+
+            return result;
+        }
+    }
 }

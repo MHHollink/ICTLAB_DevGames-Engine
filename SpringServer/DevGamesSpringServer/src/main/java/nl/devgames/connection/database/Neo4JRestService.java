@@ -3,6 +3,7 @@ package nl.devgames.connection.database;
 
 import nl.devgames.connection.AbsRestService;
 import nl.devgames.connection.Tuple;
+import nl.devgames.utils.L;
 
 import java.io.IOException;
 
@@ -21,13 +22,13 @@ public class Neo4JRestService extends AbsRestService {
         super("http://localhost:7474/db/data/transaction/commit");
     }
 
-    public void post(String json) {
+    public String post(String json) {
+        L.og(json);
         try {
-            super.post(json,
-                    new Tuple<>("Authorization","Basic bmVvNGo6OTVkMGU3NjIxNzlj")
-            );
+            return super.post(json, new Tuple<>("Authorization","Basic bmVvNGo6OTVkMGU3NjIxNzlj"));
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
     }
 
@@ -35,10 +36,13 @@ public class Neo4JRestService extends AbsRestService {
         return "{\"statements\":[{\"statement\":\""+query+"\"}]}";
     }
 
-    public void postQuery(String query) {
-        post(
+    public String postQuery(String query, Object... params) {
+        return post(
                 queryToJson(
-                        query
+                        String.format(
+                                query,
+                                params
+                        )
                 )
         );
     }

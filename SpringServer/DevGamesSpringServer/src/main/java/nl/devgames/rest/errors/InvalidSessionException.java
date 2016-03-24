@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(code = HttpStatus.FORBIDDEN)
 public class InvalidSessionException extends RuntimeException {
-
     public InvalidSessionException(String message) {
         super(message);
     }

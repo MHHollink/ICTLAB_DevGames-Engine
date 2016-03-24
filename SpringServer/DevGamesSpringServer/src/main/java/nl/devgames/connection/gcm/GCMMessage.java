@@ -1,20 +1,22 @@
 package nl.devgames.connection.gcm;
 
+import nl.devgames.utils.L;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
 public class GCMMessage{
 
-    private List<String> tokens;
+    private List<String> registration_ids;
     private Map<String,String> data;
 
     public GCMMessage() {
-        tokens  = new ArrayList<>();
+        registration_ids  = new ArrayList<>();
         data    = new HashMap<>();
     }
 
     public void createNotification(GCMMessageType type, String title, String message){
+        L.og("Created Notification");
         switch(type) {
             case PLAIN_NOTIFICATION:
             case NEW_DEVICE_REGISTERED:
@@ -29,15 +31,14 @@ public class GCMMessage{
     }
 
     public void addToken(String... token){
-        Collections.addAll(tokens, token);
+        Collections.addAll(registration_ids, token);
     }
 
-    public List<String> getTokens() {
-        return tokens;
+    public List<String> getRegistration_ids() {
+        return registration_ids;
     }
 
     public Map<String, String> getData() {
         return data;
     }
-
 }
