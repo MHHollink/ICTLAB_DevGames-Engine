@@ -1,6 +1,7 @@
 package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
+import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.model.User;
 import nl.devgames.rest.errors.InvalidSessionException;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,13 +22,9 @@ public class UserController {
             throw new InvalidSessionException("Request without session");
         }
 
-        /**
-         * TODO :
-         *
-         * - use session to get user
-         *   - user = null -> return error
-         *   - user != return user
-         */
+        Neo4JRestService.getInstance().postQuery(
+                "match (n:User) where n.session = \""+session+"\" return n"
+        );
 
         User user = new User();
 
