@@ -7,13 +7,11 @@ import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.model.User;
+import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.utils.L;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
@@ -23,6 +21,52 @@ public class UserController {
 
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public User getOwnUser(HttpServletRequest request) {
+        L.og("* called getOwnUser from %s",request.getHeader(Application.SESSION_HEADER_KEY));
+
+        JsonArray rows = getOwnUserFromSessionToken( request );
+
+        if(rows.size() == 0) {
+            throw new InvalidSessionException("Request session is not found");
+        }
+
+        Long userId = rows.get(0).getAsLong();
+        JsonObject userRow = rows.get(1).getAsJsonObject();
+
+        User user = new User();
+
+        user.setId(userId);
+        user.setUsername(userRow.get("username").getAsString());
+        user.setGitUsername(userRow.get("gitUsername").getAsString());
+
+        user.setCommits(new HashSet<>());
+        user.setProjects(new HashSet<>());
+
+        return user;
+    }
+
+    @RequestMapping(value = "/user", method = RequestMethod.PUT)
+    public User updateOwnUser(HttpServletRequest request, @RequestBody User user) {
+        L.og("* called updateOwnUser from %s",request.getHeader(Application.SESSION_HEADER_KEY));
+
+        if(user == null) {
+            throw new BadRequestException("No body was passed with the request");
+        }
+
+        getOwnUserFromSessionToken(request);
+
+        throw new UnsupportedOperationException("This will return a an ok if user is updated");
+    }
+
+
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
+    public User getUser(HttpServletRequest request, @PathVariable Long id) {
+        L.og("* called getUser from %s",request.getHeader(Application.SESSION_HEADER_KEY));
+
+        throw new UnsupportedOperationException("This will return a user with id : " + id);
+    }
+
+
+    private JsonArray getOwnUserFromSessionToken(HttpServletRequest request) {
         String session = request.getHeader(Application.SESSION_HEADER_KEY);
 
         if(session == null || session.isEmpty()) {
@@ -46,25 +90,10 @@ public class UserController {
 
         JsonArray rows = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray();
 
-        Long userId = rows.get(0).getAsLong();
-        JsonObject userRow = rows.get(1).getAsJsonObject();
+        if(rows.size() == 0) {
+            throw new InvalidSessionException("Request session is not found");
+        }
 
-        User user = new User();
-
-        user.setId(userId);
-        user.setUsername(userRow.get("username").getAsString());
-        user.setGitUsername(userRow.get("gitUsername").getAsString());
-
-        user.setCommits(new HashSet<>());
-        user.setProjects(new HashSet<>());
-
-        return user;
+        return rows;
     }
-
-    @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
-    public User getUser(HttpServletRequest request, @PathVariable Long id) {
-        throw new UnsupportedOperationException("This will return a user with id : " + id);
-    }
-
-
 }
