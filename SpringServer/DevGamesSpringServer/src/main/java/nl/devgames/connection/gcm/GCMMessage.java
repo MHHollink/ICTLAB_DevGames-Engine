@@ -15,6 +15,13 @@ public class GCMMessage{
         data    = new HashMap<>();
     }
 
+    /**
+     * Fill in the data for the push notification
+     *
+     * @param type     {@link GCMMessageType} of the message
+     * @param title     Title of the message
+     * @param message   Message it self
+     */
     public void createNotification(GCMMessageType type, String title, String message){
         L.og("Created Notification");
         switch(type) {
@@ -30,14 +37,29 @@ public class GCMMessage{
         }
     }
 
+    /**
+     * Adds a list of tokens (or one) to the push notification
+     *
+     * @param token String value of the users GCM token
+     */
     public void addToken(String... token){
         Collections.addAll(registration_ids, token);
     }
 
+    /**
+     * Getter for all id's used to map in {@link GCMRestService#messageToJson(GCMMessage)}
+     *
+     * @return array of all tokens for receives for this notification
+     */
     public List<String> getRegistration_ids() {
         return registration_ids;
     }
 
+    /**
+     * Getter for the data used to map in {@link GCMRestService#messageToJson(GCMMessage)}
+     *
+     * @return array of all tokens for receives for this notification
+     */
     public Map<String, String> getData() {
         return data;
     }
