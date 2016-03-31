@@ -100,7 +100,7 @@ public class TestMain {
             Neo4JRestService.getInstance().postQuery(
                     "CREATE (n:User { " +
                             "username: '%s', gitUsername: '%s', firstName: '%s', " +
-                            "lastName: '%s', age: %d, job: '%s', password: '%s'," +
+                            "lastName: '%s', age: %d, mainJob: '%s', password: '%s'," +
                             "gcmRegId: '%s' }) ",
                     user.getUsername(),
                     user.getGitUsername(),
