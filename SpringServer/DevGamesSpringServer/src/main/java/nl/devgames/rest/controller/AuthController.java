@@ -51,6 +51,7 @@ public class AuthController {
         else {
             java.util.Map<String, String> result = new java.util.HashMap<>();
             // TODO, user some real session management stuff
+
             String sessionID = String.valueOf(UUID.randomUUID());
             result.put(Application.SESSION_HEADER_KEY, sessionID);
 

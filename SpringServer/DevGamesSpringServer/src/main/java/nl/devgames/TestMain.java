@@ -12,16 +12,16 @@ import java.util.HashSet;
 
 public class TestMain {
 
-    static UserWithPassword[] users = {
-            new UserWithPassword("Marcel","Mjollnir94","Marcel",null,"Hollink",22,"App Developer", null, null ,null, null, "admin"),
-            new UserWithPassword("Evestar","Evestar01","Evert-Jan",null,"Heilema",22,"Backend developer", null, null, null, null, "admin"),
-            new UserWithPassword("Joris","Jorikito","Jorik",null,"Schouten",22,"Backend developer", null, null, null, null, "admin"),
-    };
-
     static Project[] projects = {
             new Project("Clarity","AR app for the Port of Rotterdam."),
             new Project("Adventure Track", "Geolocation based Rol playing game."),
             new Project("DevGames","Programming gamificated to ensure you code better")
+    };
+
+    static UserWithPassword[] users = {
+            new UserWithPassword("Marcel","Mjollnir94","Marcel",null,"Hollink",22,"App Developer", null, null ,null, null, "admin"),
+            new UserWithPassword("Evestar","Evestar01","Evert-Jan",null,"Heilema",22,"Backend developer", null, null, null, null, "admin"),
+            new UserWithPassword("Joris","Jorikito","Jorik",null,"Schouten",22,"Backend developer", null, null, null, null, "admin"),
     };
 
     static Business[] businesses = {
@@ -115,6 +115,7 @@ public class TestMain {
     }
 
     private static void addRelationships(){
+
 
     }
 
