@@ -149,8 +149,18 @@ public class User extends Model<User> {
     public User createFromJsonObject(JsonObject object) {
         User user = new User();
 
-        user.setUsername(object.get("username").getAsString());
-        // Todo
+        user.setId(object.get("id").getAsLong());
+
+        JsonObject data = object.get("data").getAsJsonObject();
+        user.setUsername(data.get("username").getAsString());
+        user.setGitUsername(data.get("gitUsername").getAsString());
+        user.setFirstName(data.get("firstName").getAsString());
+        user.setTween(data.get("tween").getAsString());
+        user.setLastName(data.get("lastName").getAsString());
+        user.setAge(data.get("age").getAsInt());
+        user.setMainJob(data.get("mainJob").getAsString());
+        user.setSessionId(data.get("sessionId").getAsString());
+        user.setGcmId(data.get("gcmId").getAsString());
 
         return user;
     }
