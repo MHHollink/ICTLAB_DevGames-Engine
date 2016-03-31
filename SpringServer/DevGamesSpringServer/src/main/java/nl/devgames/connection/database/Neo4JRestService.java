@@ -31,7 +31,6 @@ public class Neo4JRestService extends AbsRestService {
      */
     public String post(String json) {
         try {
-            System.out.println(json);
             return super.post(json, new Tuple<>("Authorization","Basic bmVvNGo6OTVkMGU3NjIxNzlj"));
         } catch (IOException e) {
             e.printStackTrace();

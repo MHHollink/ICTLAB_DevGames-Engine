@@ -28,6 +28,7 @@ public abstract class AbsRestService {
     }
 
     protected String post(String jsonString, Tuple... properties) throws IOException {
+        L.og("starting [POST] to %s", url);
         HttpURLConnection connection =
                 (HttpURLConnection) url.openConnection();
 

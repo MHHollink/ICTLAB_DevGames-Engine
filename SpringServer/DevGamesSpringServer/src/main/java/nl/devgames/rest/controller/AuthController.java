@@ -45,12 +45,15 @@ public class AuthController {
         int users = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray().size();
 
         if(users == 0) {
-            L.og("no user with this combination");
+            L.og("login attempt failed, no user with given combo");
             throw new BadRequestException("This username-password combination is not found");
         }
         else {
+            L.og("User %s has successfully logged in, generating session token...", username);
+
             java.util.Map<String, String> result = new java.util.HashMap<>();
             // TODO, user some real session management stuff
+
 
             String sessionID = String.valueOf(UUID.randomUUID());
             result.put(Application.SESSION_HEADER_KEY, sessionID);

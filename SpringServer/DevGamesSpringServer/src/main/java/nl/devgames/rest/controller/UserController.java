@@ -20,18 +20,17 @@ public class UserController {
 
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public User getOwnUser(HttpServletRequest request) {
-        L.og("* called getOwnUser from %s",request.getHeader(Application.SESSION_HEADER_KEY));
+        L.og("Called");
         return new User().createFromJsonObject( getUserJsonFromRequest( request ) );
     }
 
     @RequestMapping(value = "/user", method = RequestMethod.PUT)
     public User updateOwnUser(HttpServletRequest request, @RequestBody User userWithUpdateFields) {
-        L.og("* called updateOwnUser from %s",request.getHeader(Application.SESSION_HEADER_KEY));
-
+        L.og("Called");
         if(userWithUpdateFields == null) {
+            L.og("Update user received with empty body");
             throw new BadRequestException("No body was passed with the request");
         }
-
         User user = new User().createFromJsonObject( getUserJsonFromRequest( request ) );
 
         if(userWithUpdateFields.getUsername() != null)
@@ -65,12 +64,13 @@ public class UserController {
 
     @RequestMapping(value = "/user", method = RequestMethod.POST)
     public User createNewUser(@RequestBody User user) {
+        L.og("Called");
         throw new UnsupportedOperationException("This shall be used to create users");
     }
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
     public User getUser(HttpServletRequest request, @PathVariable Long id) {
-        L.og("* called getUser from %s", request.getHeader(Application.SESSION_HEADER_KEY));
+        L.og("Called");
         JsonArray array = getUsersFromQuery(request, "MATCH (n:User) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}", id);
         return array.size() != 0 ? new User().createFromJsonObject(array.get(0).getAsJsonObject()) : null ;
     }

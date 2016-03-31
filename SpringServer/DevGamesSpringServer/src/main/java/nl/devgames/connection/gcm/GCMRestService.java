@@ -3,6 +3,7 @@ package nl.devgames.connection.gcm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.devgames.connection.AbsRestService;
+import nl.devgames.utils.L;
 import nl.devgames.utils.Tuple;
 
 import java.io.IOException;
