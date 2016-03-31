@@ -147,6 +147,11 @@ public class User extends Model<User> {
 
     @Override
     public User createFromJsonObject(JsonObject object) {
-        return null;
+        User user = new User();
+
+        user.setUsername(object.get("username").getAsString());
+        // Todo
+
+        return user;
     }
 }
