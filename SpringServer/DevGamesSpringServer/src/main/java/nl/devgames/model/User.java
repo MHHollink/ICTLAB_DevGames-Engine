@@ -1,6 +1,7 @@
 package nl.devgames.model;
 
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.util.Set;
@@ -147,21 +148,8 @@ public class User extends Model<User> {
 
     @Override
     public User createFromJsonObject(JsonObject object) {
-        User user = new User();
-
-        user.setId(object.get("id").getAsLong());
-
-        JsonObject data = object.get("data").getAsJsonObject();
-        user.setUsername(data.get("username").getAsString());
-        user.setGitUsername(data.get("gitUsername").getAsString());
-        user.setFirstName(data.get("firstName").getAsString());
-        user.setTween(data.get("tween").getAsString());
-        user.setLastName(data.get("lastName").getAsString());
-        user.setAge(data.get("age").getAsInt());
-        user.setMainJob(data.get("mainJob").getAsString());
-        user.setSessionId(data.get("sessionId").getAsString());
-        user.setGcmId(data.get("gcmId").getAsString());
-
-        return user;
+        User o = new Gson().fromJson(object.get("data"), User.class);
+        o.setId(object.get("id").getAsLong());
+        return o;
     }
 }

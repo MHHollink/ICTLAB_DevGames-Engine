@@ -1,5 +1,6 @@
 package nl.devgames.model;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.util.Set;
@@ -56,6 +57,8 @@ public class Business extends Model<Business> {
 
     @Override
     public Business createFromJsonObject(JsonObject object) {
-        return null;
+        Business o = new Gson().fromJson(object.get("data"), Business.class);
+        o.setId(object.get("id").getAsLong());
+        return o;
     }
 }

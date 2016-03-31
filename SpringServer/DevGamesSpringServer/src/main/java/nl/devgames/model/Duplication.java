@@ -1,5 +1,6 @@
 package nl.devgames.model;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.util.HashSet;
@@ -35,6 +36,8 @@ public class Duplication extends Model<Duplication> {
 
     @Override
     public Duplication createFromJsonObject(JsonObject object) {
-        return null;
+        Duplication o = new Gson().fromJson(object.get("data"), Duplication.class);
+        o.setId(object.get("id").getAsLong());
+        return o;
     }
 }
