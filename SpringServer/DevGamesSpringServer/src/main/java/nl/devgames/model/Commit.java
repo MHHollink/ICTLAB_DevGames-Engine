@@ -2,39 +2,28 @@ package nl.devgames.model;
 
 public class Commit extends AbsModel {
 
-    private String hash;
-    private String description;
-    private int filesChanged;
+    private String commitId;
+    private String commitMsg;
     private long timeStamp;
-
-    private Project project;
 
     public Commit() {
 
     }
 
-    public String getHash() {
-        return hash;
+    public String getCommitId() {
+        return commitId;
     }
 
-    public void setHash(String hash) {
-        this.hash = hash;
+    public void setCommitId(String commitId) {
+        this.commitId = commitId;
     }
 
-    public String getDescription() {
-        return description;
+    public String getCommitMsg() {
+        return commitMsg;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getFilesChanged() {
-        return filesChanged;
-    }
-
-    public void setFilesChanged(int filesChanged) {
-        this.filesChanged = filesChanged;
+    public void setCommitMsg(String commitMsg) {
+        this.commitMsg = commitMsg;
     }
 
     public long getTimeStamp() {
@@ -45,24 +34,6 @@ public class Commit extends AbsModel {
         this.timeStamp = timeStamp;
     }
 
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    @Override
-    public String toString() {
-        return "Commit{" +
-                "hash='" + hash + '\'' +
-                ", description='" + description + '\'' +
-                ", filesChanged=" + filesChanged +
-                ", timeStamp=" + timeStamp +
-                ", project=" + project +
-                '}';
-    }
 }
 
 

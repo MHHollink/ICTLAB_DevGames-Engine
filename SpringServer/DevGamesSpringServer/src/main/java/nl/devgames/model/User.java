@@ -15,7 +15,6 @@ public class User extends AbsModel {
     private int age;
     private String mainJob;
 
-
     private Set<Project> projects;
     private Set<Commit> commits;
 
