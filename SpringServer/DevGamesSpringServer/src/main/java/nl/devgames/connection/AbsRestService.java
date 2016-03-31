@@ -1,6 +1,7 @@
 package nl.devgames.connection;
 
 import nl.devgames.utils.L;
+import nl.devgames.utils.Tuple;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -12,6 +13,8 @@ import java.net.URL;
 
 public abstract class AbsRestService {
 
+    private URL url;
+
     public AbsRestService(String url) {
         try {
             this.url = new URL(url);
@@ -20,10 +23,8 @@ public abstract class AbsRestService {
         }
     }
 
-    URL url;
-
-    protected void get() {
-
+    protected String get() {
+        return null;
     }
 
     protected String post(String jsonString, Tuple... properties) throws IOException {
@@ -47,32 +48,28 @@ public abstract class AbsRestService {
         stream.flush();
         stream.close();
 
-        //get response
-        int responseCode = connection.getResponseCode();
-        String responseMessage = connection.getResponseMessage();
-        L.og("Sending 'POST' request to URL : %s", url);
-        L.og("Response Message: %s", responseMessage);
-        L.og("Response Code: %d", responseCode);
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(
+                        connection.getInputStream()
+                )
+        );
 
-        BufferedReader in;
-            in = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream()));
-            String inputLine;
+        String inputLine;
         StringBuilder response = new StringBuilder();
 
-        while ((inputLine = in.readLine()) != null) {
+        while ((inputLine = in.readLine()) != null)
             response.append(inputLine);
-        }
+
         in.close();
 
         return response.toString();
     }
 
-    protected void put() {
-
+    protected String put() {
+        return null;
     }
 
-    protected void delete() {
-
+    protected String delete() {
+        return null;
     }
 }

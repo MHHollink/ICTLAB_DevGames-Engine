@@ -1,4 +1,4 @@
-package nl.devgames.connection;
+package nl.devgames.utils;
 
 public class Tuple<K,V> {
 

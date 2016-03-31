@@ -23,36 +23,36 @@ public class UserController {
     public User getOwnUser(HttpServletRequest request) {
         L.og("* called getOwnUser from %s",request.getHeader(Application.SESSION_HEADER_KEY));
 
-        JsonArray rows = getOwnUserFromSessionToken( request );
+        JsonArray rows = getUserJsonFromRequest( request );
 
-        if(rows.size() == 0) {
-            throw new InvalidSessionException("Request session is not found");
-        }
-
-        Long userId = rows.get(0).getAsLong();
-        JsonObject userRow = rows.get(1).getAsJsonObject();
-
-        User user = new User();
-
-        user.setId(userId);
-        user.setUsername(userRow.get("username").getAsString());
-        user.setGitUsername(userRow.get("gitUsername").getAsString());
-
-        user.setCommits(new HashSet<>());
-        user.setProjects(new HashSet<>());
-
-        return user;
+        return getOwnUserFromJsonArray( rows );
     }
 
     @RequestMapping(value = "/user", method = RequestMethod.PUT)
-    public User updateOwnUser(HttpServletRequest request, @RequestBody User user) {
+    public User updateOwnUser(HttpServletRequest request, @RequestBody User userWithUpdateFields) {
         L.og("* called updateOwnUser from %s",request.getHeader(Application.SESSION_HEADER_KEY));
 
-        if(user == null) {
+        if(userWithUpdateFields == null) {
             throw new BadRequestException("No body was passed with the request");
         }
 
-        getOwnUserFromSessionToken(request);
+        User user = getOwnUserFromJsonArray(
+                getUserJsonFromRequest(
+                        request
+                )
+        );
+
+        if(userWithUpdateFields.getUsername() != null) {
+            user.setGitUsername(
+                    userWithUpdateFields.getUsername()
+            );
+        }
+
+        if(userWithUpdateFields.getGitUsername() != null) {
+            user.setGitUsername(
+                    userWithUpdateFields.getGitUsername()
+            );
+        }
 
         throw new UnsupportedOperationException("This will return a an ok if user is updated");
     }
@@ -66,7 +66,7 @@ public class UserController {
     }
 
 
-    private JsonArray getOwnUserFromSessionToken(HttpServletRequest request) {
+    private JsonArray getUserJsonFromRequest(HttpServletRequest request) {
         String session = request.getHeader(Application.SESSION_HEADER_KEY);
 
         if(session == null || session.isEmpty()) {
@@ -74,7 +74,7 @@ public class UserController {
         }
 
         String jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                "match (n:User) where n.session = '%s' return ID(n), n",
+                "MATCH (n:User) WHERE n.session = '%s' RETURN ID(n), n",
                 session
         );
 
@@ -88,12 +88,38 @@ public class UserController {
             throw new KnownInternalServerError("InternalServerError: "+ errors.getAsString());
         }
 
-        JsonArray rows = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray();
+        JsonArray rows = jsonResponse
+                .get("results")
+                .getAsJsonArray()
+                .get(0)
+                .getAsJsonObject()
+                .get("data")
+                .getAsJsonArray()
+                .get(0)
+                .getAsJsonObject()
+                .get("row")
+                .getAsJsonArray();
 
         if(rows.size() == 0) {
             throw new InvalidSessionException("Request session is not found");
         }
 
         return rows;
+    }
+
+    private User getOwnUserFromJsonArray(JsonArray rows) {
+        Long userId = rows.get(0).getAsLong();
+        JsonObject userRow = rows.get(1).getAsJsonObject();
+
+        User user = new User();
+
+        user.setId(userId);
+        user.setUsername(userRow.get("username").getAsString());
+        user.setGitUsername(userRow.get("gitUsername").getAsString());
+
+        user.setCommits(new HashSet<>());
+        user.setProjects(new HashSet<>());
+
+        return user;
     }
 }

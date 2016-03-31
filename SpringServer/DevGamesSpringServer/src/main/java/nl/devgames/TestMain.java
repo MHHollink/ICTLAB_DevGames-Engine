@@ -13,6 +13,8 @@ public class TestMain {
     public static void main(String[] args) {
         Neo4JRestService service = Neo4JRestService.getInstance();
 
+        service.postQuery("MATCH n DETACH DELETE n");
+
         UserWithPassword[] users = {
             new UserWithPassword("Mjollnir","Mjollnir94","Marcel",null,"Hollink",22,"App developer", "Admin"),
             new UserWithPassword("Evestar","Evestar01","Evert-Jan",null,"Heilema",22,"Backend developer", "Admin"),
@@ -20,6 +22,20 @@ public class TestMain {
             new UserWithPassword("Joris","Jorikito","Jorik",null,"Schoutengit ",22,"Backend developer", "Admin"),
             new UserWithPassword("Jelle","Draikos","Jelle","van","Tooren",22,"Security Engineer", "Admin")
         };
+
+        for (UserWithPassword user : users) {
+            service.postQuery(
+                    "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, job: '%s', password: '%s' }) ",
+                    user.getUsername(),
+                    user.getGitUsername(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getAge(),
+                    user.getMainJob(),
+                    user.getPassword()
+            );
+        }
+
     }
 
 }

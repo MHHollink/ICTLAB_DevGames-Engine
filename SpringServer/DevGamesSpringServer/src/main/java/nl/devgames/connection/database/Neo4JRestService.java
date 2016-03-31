@@ -2,7 +2,7 @@ package nl.devgames.connection.database;
 
 
 import nl.devgames.connection.AbsRestService;
-import nl.devgames.connection.Tuple;
+import nl.devgames.utils.Tuple;
 import nl.devgames.utils.L;
 
 import java.io.IOException;
@@ -23,7 +23,6 @@ public class Neo4JRestService extends AbsRestService {
     }
 
     public String post(String json) {
-        L.og(json);
         try {
             return super.post(json, new Tuple<>("Authorization","Basic bmVvNGo6OTVkMGU3NjIxNzlj"));
         } catch (IOException e) {
