@@ -1,9 +1,11 @@
 package nl.devgames.model;
 
 
+import com.google.gson.JsonObject;
+
 import java.util.Set;
 
-public class User extends AbsModel {
+public class User extends Model<User> {
 
     private String username;
     private String gitUsername;
@@ -36,20 +38,6 @@ public class User extends AbsModel {
         this.pushes = pushes;
         SessionId = sessionId;
         this.gcmId = gcmId;
-    }
-
-    /**
-     * Use {@link #User(String, String, String, String, String, int, String, Set, Set, String, String)}
-     */
-    @Deprecated
-    public User(String username, String gitUsername, String firstName, String tween, String lastName, int age, String mainJob) {
-        this.username = username;
-        this.gitUsername = gitUsername;
-        this.firstName = firstName;
-        this.tween = tween;
-        this.lastName = lastName;
-        this.age = age;
-        this.mainJob = mainJob;
     }
 
     public String getUsername() {
@@ -155,5 +143,10 @@ public class User extends AbsModel {
                 ", SessionId='" + SessionId + '\'' +
                 ", gcmId='" + gcmId + '\'' +
                 "} " + super.toString();
+    }
+
+    @Override
+    public User createFromJsonObject(JsonObject object) {
+        return null;
     }
 }

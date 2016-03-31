@@ -1,8 +1,10 @@
 package nl.devgames.model;
 
+import com.google.gson.JsonObject;
+
 import java.util.Set;
 
-public class Company extends AbsModel{
+public class Business extends Model<Business> {
 
     private String name;
 
@@ -10,7 +12,13 @@ public class Company extends AbsModel{
     Set<Project> projects;
 
 
-    public Company() {
+    public Business() {
+    }
+
+    public Business(String name, Set<User> employees, Set<Project> projects) {
+        this.name = name;
+        this.employees = employees;
+        this.projects = projects;
     }
 
     public String getName() {
@@ -39,10 +47,15 @@ public class Company extends AbsModel{
 
     @Override
     public String toString() {
-        return "Company{" +
+        return "Business{" +
                 "name='" + name + '\'' +
                 ", employees=" + employees +
                 ", projects=" + projects +
                 '}';
+    }
+
+    @Override
+    public Business createFromJsonObject(JsonObject object) {
+        return null;
     }
 }

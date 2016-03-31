@@ -117,7 +117,7 @@ public class UserController {
         user.setUsername(userRow.get("username").getAsString());
         user.setGitUsername(userRow.get("gitUsername").getAsString());
 
-        user.setCommits(new HashSet<>());
+        user.setPushes(new HashSet<>());
         user.setProjects(new HashSet<>());
 
         return user;

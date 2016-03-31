@@ -1,6 +1,8 @@
 package nl.devgames.model;
 
-public class Commit extends AbsModel {
+import com.google.gson.JsonObject;
+
+public class Commit extends Model<Commit> {
 
     private String commitId;
     private String commitMsg;
@@ -8,6 +10,12 @@ public class Commit extends AbsModel {
 
     public Commit() {
 
+    }
+
+    public Commit(String commitId, String commitMsg, long timeStamp) {
+        this.commitId = commitId;
+        this.commitMsg = commitMsg;
+        this.timeStamp = timeStamp;
     }
 
     public String getCommitId() {
@@ -41,6 +49,11 @@ public class Commit extends AbsModel {
                 ", commitMsg='" + commitMsg + '\'' +
                 ", timeStamp=" + timeStamp +
                 "} " + super.toString();
+    }
+
+    @Override
+    public Commit createFromJsonObject(JsonObject object) {
+        return null;
     }
 }
 
