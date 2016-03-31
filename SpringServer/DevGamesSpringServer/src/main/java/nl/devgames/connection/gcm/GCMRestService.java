@@ -24,6 +24,10 @@ public class GCMRestService extends AbsRestService {
         super("https://gcm-http.googleapis.com/gcm/send");
     }
 
+    /**
+     * Posts a JSON object as string to the {@link GCMRestService#url}
+     * @param json string to post
+     */
     public void post(String json) {
         try {
             super.post(json,
@@ -34,6 +38,23 @@ public class GCMRestService extends AbsRestService {
         }
     }
 
+    /**
+     * Converts a {@link GCMMessage} to a json.
+     *
+     * @param message message which will be converted
+     * @return json object for GCM push notification
+     *
+     * Example JSON :
+     *
+     *  {
+     *      "registration_ids" : [ "GCM_TOKEN" ],
+     *      "data" : {
+     *          "text" : "GCM_MESSAGE",
+     *          "type" : "PLAIN_NOTIFICATION",
+     *          "title" : "GCM_MESSAGE_TITLE"
+     *      }
+     *  }
+     */
     private String messageToJson(GCMMessage message) {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -44,6 +65,13 @@ public class GCMRestService extends AbsRestService {
         return null;
     }
 
+    /**
+     * Post A Message as {@link GCMMessage} which will be
+     * converted via {@link #messageToJson(GCMMessage)}
+     * and send via {@link #post(String)}
+     *
+     * @param message Message object filled with data en tokens.
+     */
     public void postMessage(GCMMessage message) {
         post(
                 messageToJson(
