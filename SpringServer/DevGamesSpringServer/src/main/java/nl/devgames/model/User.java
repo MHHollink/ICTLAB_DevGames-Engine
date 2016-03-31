@@ -16,11 +16,32 @@ public class User extends AbsModel {
     private String mainJob;
 
     private Set<Project> projects;
-    private Set<Commit> commits;
+    private Set<Push> pushes;
+
+    private String SessionId;
+    private String gcmId;
 
     public User() {
     }
 
+    public User(String username, String gitUsername, String firstName, String tween, String lastName, int age, String mainJob, Set<Project> projects, Set<Push> pushes, String sessionId, String gcmId) {
+        this.username = username;
+        this.gitUsername = gitUsername;
+        this.firstName = firstName;
+        this.tween = tween;
+        this.lastName = lastName;
+        this.age = age;
+        this.mainJob = mainJob;
+        this.projects = projects;
+        this.pushes = pushes;
+        SessionId = sessionId;
+        this.gcmId = gcmId;
+    }
+
+    /**
+     * Use {@link #User(String, String, String, String, String, int, String, Set, Set, String, String)}
+     */
+    @Deprecated
     public User(String username, String gitUsername, String firstName, String tween, String lastName, int age, String mainJob) {
         this.username = username;
         this.gitUsername = gitUsername;
@@ -55,12 +76,32 @@ public class User extends AbsModel {
         this.projects = projects;
     }
 
-    public Set<Commit> getCommits() {
-        return commits;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public void setCommits(Set<Commit> commits) {
-        this.commits = commits;
+    public void setTween(String tween) {
+        this.tween = tween;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public void setMainJob(String mainJob) {
+        this.mainJob = mainJob;
+    }
+
+    public Set<Push> getPushes() {
+        return pushes;
+    }
+
+    public void setPushes(Set<Push> pushes) {
+        this.pushes = pushes;
     }
 
     public String getFirstName() {
@@ -83,6 +124,22 @@ public class User extends AbsModel {
         return mainJob;
     }
 
+    public String getSessionId() {
+        return SessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        SessionId = sessionId;
+    }
+
+    public String getGcmId() {
+        return gcmId;
+    }
+
+    public void setGcmId(String gcmId) {
+        this.gcmId = gcmId;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -94,7 +151,9 @@ public class User extends AbsModel {
                 ", age=" + age +
                 ", mainJob='" + mainJob + '\'' +
                 ", projects=" + projects +
-                ", commits=" + commits +
-                '}';
+                ", pushes=" + pushes +
+                ", SessionId='" + SessionId + '\'' +
+                ", gcmId='" + gcmId + '\'' +
+                "} " + super.toString();
     }
 }
