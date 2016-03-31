@@ -36,6 +36,17 @@ public class TestMain {
             );
         }
 
+//        GCMMessage message = new GCMMessage();
+//        message.addToken("GCM_TOKEN");
+//        message.createNotification(
+//                GCMMessageType.PLAIN_NOTIFICATION,
+//                "GCM_MESSAGE_TITLE",
+//                "GCM_MESSAGE"
+//        );
+//
+//        GCMRestService.getInstance().postMessage(
+//                message
+//        );
     }
 
 }

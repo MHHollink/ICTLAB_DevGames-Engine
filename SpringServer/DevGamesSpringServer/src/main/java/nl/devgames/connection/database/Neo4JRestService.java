@@ -22,8 +22,16 @@ public class Neo4JRestService extends AbsRestService {
         super("http://localhost:7474/db/data/transaction/commit");
     }
 
+
+    /**
+     * Post a json object to the {@link #url}
+     *
+     * @param json string object to send
+     * @return response string
+     */
     public String post(String json) {
         try {
+            System.out.println(json);
             return super.post(json, new Tuple<>("Authorization","Basic bmVvNGo6OTVkMGU3NjIxNzlj"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -31,10 +39,33 @@ public class Neo4JRestService extends AbsRestService {
         }
     }
 
+    /**
+     * formats a Query to the object the neo4j rest api wants
+     *
+     * @param query plain query with parameters
+     * @return a response string
+     *
+     * EXAMPLE QUERY :
+     *
+     *  {
+     *      "statements": [
+     *          {
+     *              "statement":"MATCH n DETACH DELETE n"
+     *          }
+     *       ]
+     *  }
+     */
     private String queryToJson(String query) {
         return "{\"statements\":[{\"statement\":\""+query+"\"}]}";
     }
 
+    /**
+     * Post a chipher query to the neo4j database via rest.
+     *
+     * @param query query with empty parameter fields as " MATCH n WHERE ID = %d RETURN N"
+     * @param params all parameters used in the query
+     * @return Response String.
+     */
     public String postQuery(String query, Object... params) {
         return post(
                 queryToJson(
