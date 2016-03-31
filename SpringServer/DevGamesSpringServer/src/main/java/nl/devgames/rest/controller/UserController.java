@@ -14,7 +14,6 @@ import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashSet;
 
 @RestController
 public class UserController {
@@ -23,9 +22,9 @@ public class UserController {
     public User getOwnUser(HttpServletRequest request) {
         L.og("* called getOwnUser from %s",request.getHeader(Application.SESSION_HEADER_KEY));
 
-        JsonArray rows = getUserJsonFromRequest( request );
+        JsonArray rows = getUsersJsonFromRequest( request );
 
-        return getOwnUserFromJsonArray( rows );
+        return new User().createFromJsonObject( rows.get(0).getAsJsonObject() );
     }
 
     @RequestMapping(value = "/user", method = RequestMethod.PUT)
@@ -36,10 +35,10 @@ public class UserController {
             throw new BadRequestException("No body was passed with the request");
         }
 
-        User user = getOwnUserFromJsonArray(
-                getUserJsonFromRequest(
-                        request
-                )
+        User user = new User().createFromJsonObject(
+                getUsersJsonFromRequest(
+                    request
+                ).get(0).getAsJsonObject()
         );
 
         if(userWithUpdateFields.getUsername() != null) {
@@ -57,7 +56,6 @@ public class UserController {
         throw new UnsupportedOperationException("This will return a an ok if user is updated");
     }
 
-
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
     public User getUser(HttpServletRequest request, @PathVariable Long id) {
         L.og("* called getUser from %s",request.getHeader(Application.SESSION_HEADER_KEY));
@@ -65,8 +63,7 @@ public class UserController {
         throw new UnsupportedOperationException("This will return a user with id : " + id);
     }
 
-
-    private JsonArray getUserJsonFromRequest(HttpServletRequest request) {
+    private JsonArray getUsersJsonFromRequest(HttpServletRequest request) {
         String session = request.getHeader(Application.SESSION_HEADER_KEY);
 
         if(session == null || session.isEmpty()) {
@@ -74,7 +71,7 @@ public class UserController {
         }
 
         String jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:User) WHERE n.session = '%s' RETURN ID(n), n",
+                "MATCH (n:User) WHERE n.session = '%s' RETURN {id:id(n), labels: labels(n), data: n}",
                 session
         );
 
@@ -105,21 +102,5 @@ public class UserController {
         }
 
         return rows;
-    }
-
-    private User getOwnUserFromJsonArray(JsonArray rows) {
-        Long userId = rows.get(0).getAsLong();
-        JsonObject userRow = rows.get(1).getAsJsonObject();
-
-        User user = new User();
-
-        user.setId(userId);
-        user.setUsername(userRow.get("username").getAsString());
-        user.setGitUsername(userRow.get("gitUsername").getAsString());
-
-        user.setPushes(new HashSet<>());
-        user.setProjects(new HashSet<>());
-
-        return user;
     }
 }

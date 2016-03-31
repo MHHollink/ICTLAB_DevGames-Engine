@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-public class LoginController {
+public class AuthController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public Map<String,String> login(@RequestParam(value="username") String username, @RequestParam(value="password") String password) {
