@@ -10,6 +10,7 @@ import nl.devgames.model.User;
 import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.KnownInternalServerError;
+import nl.devgames.rest.errors.NotFoundException;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.*;
 
@@ -107,10 +108,10 @@ public class UserController {
             throw new KnownInternalServerError("InternalServerError: " + errors.getAsString()); // throws exception with errors
         }
 
-        JsonArray rows = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray();
+        JsonArray rows = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
         if(rows.size() == 0) throw new InvalidSessionException("Request session is not found");
 
-        return rows.get(0).getAsJsonObject(); // Returns user object
+        return rows.get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject(); // Returns user object
     }
 
     private JsonArray getUsersFromQuery(HttpServletRequest request, String query, Object... params) {
@@ -130,6 +131,11 @@ public class UserController {
             throw new KnownInternalServerError("InternalServerError: " + errors.getAsString()); // throws exception with errors
         }
 
-        return jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray();
+        JsonArray data = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
+
+        if (data.size() == 0)
+            throw new NotFoundException("The server could not find the requested data...");
+
+        return data.get(0).getAsJsonObject().get("row").getAsJsonArray();
     }
 }
