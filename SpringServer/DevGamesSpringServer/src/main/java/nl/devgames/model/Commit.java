@@ -34,6 +34,14 @@ public class Commit extends AbsModel {
         this.timeStamp = timeStamp;
     }
 
+    @Override
+    public String toString() {
+        return "Commit{" +
+                "commitId='" + commitId + '\'' +
+                ", commitMsg='" + commitMsg + '\'' +
+                ", timeStamp=" + timeStamp +
+                "} " + super.toString();
+    }
 }
 
 
