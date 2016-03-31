@@ -52,9 +52,7 @@ Temporary Items
 
 .idea
 *.jks
-Android/DevGames/.idea
-Jenkins/*/.idea
-Maven/*/.idea
+SpringServer/DevGamesSpringServer/target
 
 # Targets
 # =========================
@@ -66,3 +64,5 @@ Maven/*/target
 # =========================
 
 Jenkins/*/work
+
+
