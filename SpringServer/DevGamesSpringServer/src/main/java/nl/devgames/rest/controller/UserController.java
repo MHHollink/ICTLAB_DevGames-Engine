@@ -18,11 +18,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
-public class UserController {
+public class UserController extends BaseController {
 
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public User getOwnUser(HttpServletRequest request) {
-        User caller = AuthController.getUserFromSession( request.getHeader(Application.SESSION_HEADER_KEY) );
+        User caller = getUserFromSession( getSession( request ) );
         L.og("Called");
         return caller;
     }
@@ -34,7 +34,7 @@ public class UserController {
             L.og("Update user received with empty body");
             throw new BadRequestException("No body was passed with the request");
         }
-        User caller = AuthController.getUserFromSession( request.getHeader(Application.SESSION_HEADER_KEY) );
+        User caller = getUserFromSession( getSession( request ) );
 
         if(userWithUpdateFields.getUsername() != null)
             caller.setGitUsername(userWithUpdateFields.getUsername());
@@ -73,10 +73,9 @@ public class UserController {
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
     public User getUser(HttpServletRequest request, @PathVariable Long id) {
-        User caller = AuthController.getUserFromSession( request.getHeader(Application.SESSION_HEADER_KEY) );
+        User caller = getUserFromSession( request.getHeader(Application.SESSION_HEADER_KEY) );
         L.og("Called");
-        JsonArray array = getUsersFromQuery(request, "MATCH (n:User) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}", id);
-        return array.size() != 0 ? new User().createFromJsonObject(array.get(0).getAsJsonObject()) : null ;
+        return getUserFromQuery("MATCH (n:User) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}", id);
     }
 
 

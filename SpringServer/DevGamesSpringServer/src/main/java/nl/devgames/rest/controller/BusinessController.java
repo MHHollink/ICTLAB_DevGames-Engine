@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-public class BusinessController {
+public class BusinessController extends BaseController{
 
     @RequestMapping(value = "/business/{id}", method = RequestMethod.GET)
     public Business getBusiness(HttpServletRequest request) {
@@ -21,7 +21,12 @@ public class BusinessController {
     }
 
 
-
+    @RequestMapping(value = "/business/{id}/user", method = RequestMethod.PUT)
+    public Business addEmployeeToBusiness(HttpServletRequest request) {
+        getUserFromSession(getSession(request));
+        L.og("Called");
+        throw new UnsupportedOperationException("Method call not implemented yet. Shall add user to Business");
+    }
 
 
 
@@ -29,7 +34,7 @@ public class BusinessController {
 
     private JsonObject getBusinessJsonFromRequest(HttpServletRequest request) {
 
-        User user = AuthController.getUserFromSession(request.getHeader(Application.SESSION_HEADER_KEY));
+        User user = getUserFromSession(request.getHeader(Application.SESSION_HEADER_KEY));
 
 
 

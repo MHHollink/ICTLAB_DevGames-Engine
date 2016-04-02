@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-public class AuthController {
+public class AuthController extends BaseController{
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public Map<String,String> login(@RequestParam(value="username") String username, @RequestParam(value="password") String password) {
@@ -38,20 +38,19 @@ public class AuthController {
         JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject();
         JsonArray errors = jsonResponse.get("errors").getAsJsonArray();
 
-        if(errors.size() != 0) {
+        if (errors.size() != 0) {
             for (JsonElement error : errors) {
                 L.og(error.getAsString());
             }
-            throw new KnownInternalServerError("InternalServerError: "+ errors.getAsString());
+            throw new KnownInternalServerError("InternalServerError: " + errors.getAsString());
         }
 
         int users = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray().size();
 
-        if(users == 0) {
+        if (users == 0) {
             L.og("login attempt failed, no user with given combo");
             throw new BadRequestException("This username-password combination is not found");
-        }
-        else {
+        } else {
             L.og("User %s has successfully logged in, generating session token...", username);
 
             java.util.Map<String, String> result = new java.util.HashMap<>();
@@ -69,30 +68,5 @@ public class AuthController {
 
             return result;
         }
-    }
-
-    public static User getUserFromSession(String session) {
-        if (session == null || session.isEmpty())
-            throw new InvalidSessionException("Request without session"); // throws exception when session is null or blank
-
-        String jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:User) WHERE n.session = '%s' RETURN {id:id(n), labels: labels(n), data: n}",
-                session
-        ); // Request to neo4j
-
-        JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject(); // parse neo4j response
-        JsonArray errors = jsonResponse.get("errors").getAsJsonArray(); // get the list of errors
-
-        if (errors.size() != 0) { // Check if there are more the 0 errors
-            for (JsonElement error : errors) L.og(error.getAsString());
-            throw new KnownInternalServerError("InternalServerError: " + errors.getAsString()); // throws exception with errors
-        }
-
-        JsonArray data = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
-        if(data.size() == 0) throw new InvalidSessionException("Request session is not found");
-
-        return new User().createFromJsonObject(
-                data.get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject()
-        ); // Returns user object
     }
 }
