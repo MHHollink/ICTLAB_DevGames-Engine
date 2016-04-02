@@ -28,6 +28,37 @@ public class TestMain {
             new Business("DevGames", new HashSet<User>(Arrays.asList(users)){}, new HashSet<>(Arrays.asList(projects)))
     };
 
+    static Commit[] commits = {
+            new Commit("b699883e3ccf7afbed8573d5c8add56e12f8393e", "Added .gitattributes & .gitignore files", 1455217086),
+            new Commit("58c38eb08dce96f734644a0aa17c8ff8939b531e", "Fixed SDK versions in Android gradle", 1455994686)
+    };
+
+    static Push[] pushes = {
+            new Push(projects[2], new HashSet<>(Arrays.asList(commits)), new HashSet<>(), new HashSet<>(), 1455994686)
+    };
+
+    static Duplication[] duplications = {
+            new Duplication(new HashSet<DuplicationFile>(){{
+                add(new DuplicationFile("filename", 10,17,7));
+                add(new DuplicationFile("filename", 10,17,7));
+                add(new DuplicationFile("filename", 10,17,7));
+            }}),
+            new Duplication(new HashSet<DuplicationFile>(){{
+                add(new DuplicationFile("filename", 10,17,7));
+                add(new DuplicationFile("filename", 10,17,7));
+                add(new DuplicationFile("filename", 10,17,7));
+            }}),
+            new Duplication(new HashSet<DuplicationFile>(){{
+                add(new DuplicationFile("filename", 10,17,7));
+                add(new DuplicationFile("filename", 10,17,7));
+                add(new DuplicationFile("filename", 10,17,7));
+            }})
+    };
+
+    static Issue[] issues = {
+            new Issue("MAJOR", "nl.devgames.Application", 11, 13, "OPEN", null, "This application is still shit", 840, 1455217086, 1459624317, 0)
+    };
+
     public static void main(String[] args) {
 
         fillDummyDB();
@@ -60,18 +91,56 @@ public class TestMain {
     }
 
     private static void addDummyPushes() {
+        for (Push push : pushes) {
+            Neo4JRestService.getInstance().postQuery(
+                    "CREATE (n:Push { " +
+                            "timestamp: '%s' })",
+                    push.getTimestamp()
+            );
+        }
     }
 
     private static void addDummyCommits() {
-
+        for (Commit commit : commits) {
+            Neo4JRestService.getInstance().postQuery(
+                    "CREATE (n:Commit { " +
+                            "commitId: '%s', commitMsg: '%s', timestamp: %d })",
+                    commit.getCommitId(),
+                    commit.getCommitMsg(),
+                    commit.getTimeStamp()
+            );
+        }
     }
 
     private static void addDummyIssues() {
-
+        for (Issue issue : issues) {
+            Neo4JRestService.getInstance().postQuery(
+                    "CREATE (n:Issue { " +
+                            "severity: '%s', component: '%s', message: '%s', " +
+                            "status: '%s', resolution: '%s', dept: %d, " +
+                            "startLine: %d, endLine: %d, creationDate : %d," +
+                            "updateData: %d, closeData: %d })",
+                    issue.getSeverity(),
+                    issue.getComponent(),
+                    issue.getMessage(),
+                    issue.getStatus(),
+                    issue.getResolution(),
+                    issue.getDebt(),
+                    issue.getStartLine(),
+                    issue.getEndLine(),
+                    issue.getCreationDate(),
+                    issue.getUpdateDate(),
+                    issue.getCloseDate()
+            );
+        }
     }
 
     private static void addDummyDuplications() {
-
+        for (Duplication duplication : duplications) {
+            Neo4JRestService.getInstance().postQuery(
+                    "CREATE (n:Duplication)"
+            );
+        }
     }
 
     private static void addDummyBusiness() {
@@ -115,6 +184,33 @@ public class TestMain {
     }
 
     private static void addRelationships(){
+        Neo4JRestService s = Neo4JRestService.getInstance();
+
+        s.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'DevGames' }) CREATE (a)-[:is_developing]->(b)");
+        s.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Clarity' }) CREATE (a)-[:is_developing]->(b)");
+        s.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Adventure Track' }) CREATE (a)-[:is_developing]->(b)");
+
+        s.postQuery("MATCH (a:User { username: 'Marcel' }), (b:Project { name: 'DevGames' }) CREATE (a)-[:is_developing]->(b)");
+        s.postQuery("MATCH (a:User { username: 'Marcel' }), (b:Project { name: 'Clarity' }) CREATE (a)-[:is_developing]->(b)");
+        s.postQuery("MATCH (a:User { username: 'Marcel' }), (b:Project { name: 'Adventure Track' }) CREATE (a)-[:is_developing]->(b)");
+
+        s.postQuery("MATCH (a:User { username: 'Joris' }), (b:Project { name: 'DevGames' }) CREATE (a)-[:is_developing]->(b)");
+        s.postQuery("MATCH (a:User { username: 'Joris' }), (b:Project { name: 'Clarity' }) CREATE (a)-[:is_developing]->(b)");
+
+        s.postQuery("MATCH (a:Business { name: 'DevGames' }), (b:User { username: 'Marcel' }) CREATE (a)-[:has_employee]->(b)");
+        s.postQuery("MATCH (a:Business { name: 'DevGames' }), (b:User { username: 'Evestar' }) CREATE (a)-[:has_employee]->(b)");
+        s.postQuery("MATCH (a:Business { name: 'DevGames' }), (b:User { username: 'Joris' }) CREATE (a)-[:has_employee]->(b)");
+
+        s.postQuery("MATCH (a:User { username: 'Marcel' }), (b:Push { timestamp: '1455994686' }) CREATE (a)-[:pushed]->(b)");
+
+        s.postQuery("MATCH (a:Push { timestamp: '1455994686' }), (b:Commit { commitId: 'b699883e3ccf7afbed8573d5c8add56e12f8393e' }) CREATE (a)-[:contains_commit]->(b)");
+        s.postQuery("MATCH (a:Push { timestamp: '1455994686' }), (b:Commit { commitId: '58c38eb08dce96f734644a0aa17c8ff8939b531e' }) CREATE (a)-[:contains_commit]->(b)");
+
+        s.postQuery("MATCH (a:Push { timestamp: '1455994686' }), (b:Issue { creationDate: 1455217086 }) CREATE (a)-[:has_issue]->(b)");
+
+        s.postQuery("MATCH (a:Push { timestamp: '1455994686' }), (b:Duplication) CREATE (a)-[:has_duplication]->(b)");
+
+
 
 
     }
