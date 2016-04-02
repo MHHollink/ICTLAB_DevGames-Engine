@@ -15,14 +15,16 @@ import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 public class UserController {
 
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public User getOwnUser(HttpServletRequest request) {
+        User caller = AuthController.getUserFromSession( request.getHeader(Application.SESSION_HEADER_KEY) );
         L.og("Called");
-        return new User().createFromJsonObject( getUserJsonFromRequest( request ) );
+        return caller;
     }
 
     @RequestMapping(value = "/user", method = RequestMethod.PUT)
@@ -32,31 +34,31 @@ public class UserController {
             L.og("Update user received with empty body");
             throw new BadRequestException("No body was passed with the request");
         }
-        User user = new User().createFromJsonObject( getUserJsonFromRequest( request ) );
+        User caller = AuthController.getUserFromSession( request.getHeader(Application.SESSION_HEADER_KEY) );
 
         if(userWithUpdateFields.getUsername() != null)
-            user.setGitUsername(userWithUpdateFields.getUsername());
+            caller.setGitUsername(userWithUpdateFields.getUsername());
 
         if(userWithUpdateFields.getGitUsername() != null)
-            user.setGitUsername(userWithUpdateFields.getGitUsername());
+            caller.setGitUsername(userWithUpdateFields.getGitUsername());
 
         if(userWithUpdateFields.getFirstName() != null)
-            user.setFirstName(userWithUpdateFields.getFirstName());
+            caller.setFirstName(userWithUpdateFields.getFirstName());
 
         if(userWithUpdateFields.getTween() != null)
-            user.setTween(userWithUpdateFields.getTween());
+            caller.setTween(userWithUpdateFields.getTween());
 
         if(userWithUpdateFields.getLastName() != null)
-            user.setLastName(userWithUpdateFields.getLastName());
+            caller.setLastName(userWithUpdateFields.getLastName());
 
         if(userWithUpdateFields.getGcmId() != null )
-            user.setGcmId(userWithUpdateFields.getGcmId());
+            caller.setGcmId(userWithUpdateFields.getGcmId());
 
         if(userWithUpdateFields.getAge() != 0 )
-            user.setAge(userWithUpdateFields.getAge());
+            caller.setAge(userWithUpdateFields.getAge());
 
         if(userWithUpdateFields.getMainJob() != null)
-            user.setMainJob(userWithUpdateFields.getMainJob());
+            caller.setMainJob(userWithUpdateFields.getMainJob());
 
         // TODO, update it in neo and return 200
 
@@ -71,6 +73,7 @@ public class UserController {
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
     public User getUser(HttpServletRequest request, @PathVariable Long id) {
+        User caller = AuthController.getUserFromSession( request.getHeader(Application.SESSION_HEADER_KEY) );
         L.og("Called");
         JsonArray array = getUsersFromQuery(request, "MATCH (n:User) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}", id);
         return array.size() != 0 ? new User().createFromJsonObject(array.get(0).getAsJsonObject()) : null ;
@@ -89,6 +92,7 @@ public class UserController {
      * @param request the http request containing headers and such
      * @return json array with all data
      */
+    @Deprecated
     private JsonObject getUserJsonFromRequest(HttpServletRequest request) {
         String session = request.getHeader(Application.SESSION_HEADER_KEY); // gets the session from the headers
 
@@ -114,6 +118,7 @@ public class UserController {
         return rows.get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject(); // Returns user object
     }
 
+    @Deprecated
     private JsonArray getUsersFromQuery(HttpServletRequest request, String query, Object... params) {
         if(getUserJsonFromRequest(request) == null)
             throw new InvalidSessionException("Request without session"); // throws exception when session is null or blank
@@ -138,4 +143,54 @@ public class UserController {
 
         return data.get(0).getAsJsonObject().get("row").getAsJsonArray();
     }
+
+    private User getUserFromQuery(String query, Object... params) {
+        String jsonResponseString = Neo4JRestService.getInstance().postQuery(
+                query,
+                params
+        ); // Request to neo4j
+
+        JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject(); // parse neo4j response
+        JsonArray errors = jsonResponse.get("errors").getAsJsonArray(); // get the list of errors
+
+        if (errors.size() != 0) { // Check if there are more the 0 errors
+            for (JsonElement error : errors) L.og(error.getAsString());
+            throw new KnownInternalServerError("InternalServerError: " + errors.getAsString()); // throws exception with errors
+        }
+
+        JsonArray data = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
+
+        if (data.size() == 0)
+            throw new NotFoundException("The server could not find the requested data...");
+
+        JsonArray rows = data.get(0).getAsJsonObject().get("row").getAsJsonArray();
+
+        if (rows.size() == 0)
+            throw new NotFoundException("The server could not find the requested data...");
+
+        return new User().createFromJsonObject(rows.get(0).getAsJsonObject());
+    }
+
+    private List<User> getUsersFromQuery(String query, Object... params) {
+        String jsonResponseString = Neo4JRestService.getInstance().postQuery(
+                query,
+                params
+        ); // Request to neo4j
+
+        JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject(); // parse neo4j response
+        JsonArray errors = jsonResponse.get("errors").getAsJsonArray(); // get the list of errors
+
+        if (errors.size() != 0) { // Check if there are more the 0 errors
+            for (JsonElement error : errors) L.og(error.getAsString());
+            throw new KnownInternalServerError("InternalServerError: " + errors.getAsString()); // throws exception with errors
+        }
+
+        JsonArray data = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
+
+        if (data.size() == 0)
+            throw new NotFoundException("The server could not find the requested data...");
+
+        return new User().createFromJsonArray(data.get(0).getAsJsonObject().get("row").getAsJsonArray());
+    }
+
 }

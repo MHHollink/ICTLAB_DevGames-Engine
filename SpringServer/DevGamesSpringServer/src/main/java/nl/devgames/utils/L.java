@@ -4,7 +4,6 @@ import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@SuppressWarnings("PointlessBooleanExpression")
 public class L {
 
     // The format of the automatically created tag in each log line.
