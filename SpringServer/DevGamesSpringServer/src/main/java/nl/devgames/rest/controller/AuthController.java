@@ -32,14 +32,8 @@ public class AuthController extends BaseController{
         );
 
         JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject();
-        JsonArray errors = jsonResponse.get("errors").getAsJsonArray();
 
-        if (errors.size() != 0) {
-            for (JsonElement error : errors) {
-                L.og(error.getAsString());
-            }
-            throw new KnownInternalServerError("InternalServerError: " + errors.getAsString());
-        }
+        if (hasErrors(jsonResponse)) return null;
 
         int users = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray().size();
 

@@ -128,12 +128,8 @@ public class UserController extends BaseController {
         ); // Request to neo4j
 
         JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject(); // parse neo4j response
-        JsonArray errors = jsonResponse.get("errors").getAsJsonArray(); // get the list of errors
 
-        if (errors.size() != 0) { // Check if there are more the 0 errors
-            for (JsonElement error : errors) L.og(error.getAsString());
-            throw new KnownInternalServerError("InternalServerError: " + errors.getAsString()); // throws exception with errors
-        }
+        if(hasErrors(jsonResponse)) return null;
 
         JsonArray data = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
 
@@ -150,12 +146,8 @@ public class UserController extends BaseController {
         ); // Request to neo4j
 
         JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject(); // parse neo4j response
-        JsonArray errors = jsonResponse.get("errors").getAsJsonArray(); // get the list of errors
 
-        if (errors.size() != 0) { // Check if there are more the 0 errors
-            for (JsonElement error : errors) L.og(error.getAsString());
-            throw new KnownInternalServerError("InternalServerError: " + errors.getAsString()); // throws exception with errors
-        }
+        if (hasErrors(jsonResponse)) return null;
 
         JsonArray data = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
 
@@ -177,12 +169,8 @@ public class UserController extends BaseController {
         ); // Request to neo4j
 
         JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject(); // parse neo4j response
-        JsonArray errors = jsonResponse.get("errors").getAsJsonArray(); // get the list of errors
 
-        if (errors.size() != 0) { // Check if there are more the 0 errors
-            for (JsonElement error : errors) L.og(error.getAsString());
-            throw new KnownInternalServerError("InternalServerError: " + errors.getAsString()); // throws exception with errors
-        }
+        if(hasErrors(jsonResponse)) return null;
 
         JsonArray data = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
 

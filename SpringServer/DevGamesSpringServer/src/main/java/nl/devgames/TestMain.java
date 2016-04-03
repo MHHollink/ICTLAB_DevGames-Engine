@@ -5,6 +5,7 @@ import nl.devgames.connection.gcm.GCMMessage;
 import nl.devgames.connection.gcm.GCMMessageType;
 import nl.devgames.connection.gcm.GCMRestService;
 import nl.devgames.model.*;
+import nl.devgames.rest.controller.ProjectController;
 import nl.devgames.utils.L;
 
 import java.util.Arrays;
@@ -61,7 +62,9 @@ public class TestMain {
 
     public static void main(String[] args) {
 
-        fillDummyDB();
+        new ProjectController().getProjectMembersTokens("Marcel", "DevGames");
+
+        //fillDummyDB();
 
 //        GCMMessage message = new GCMMessage();
 //        message.addToken("GCM_TOKEN");

@@ -14,6 +14,15 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class BusinessController extends BaseController{
 
+
+    /**
+     * Get all colleagues of a user :
+     *      <code>
+     *          MATCH (u:User { username : 'Marcel' }) <-[:has_employee]- (b:Business) -[:has_employee]-> (r:User) return r
+     *      </code>
+     *
+     */
+
     @RequestMapping(value = "/business/{id}", method = RequestMethod.GET)
     public Business getBusiness(HttpServletRequest request) {
         L.og("Called");
