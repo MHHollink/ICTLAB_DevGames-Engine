@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.model.User;
+import nl.devgames.model.UserWithPassword;
 import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.KnownInternalServerError;
@@ -21,20 +22,20 @@ import java.util.List;
 public class UserController extends BaseController {
 
     @RequestMapping(value = "/user", method = RequestMethod.GET)
-    public User getOwnUser(HttpServletRequest request) {
-        User caller = getUserFromSession( getSession( request ) );
+    public User getOwnUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session) {
+        User caller = getUserFromSession( session );
         L.og("Called");
         return caller;
     }
 
     @RequestMapping(value = "/user", method = RequestMethod.PUT)
-    public User updateOwnUser(HttpServletRequest request, @RequestBody User userWithUpdateFields) {
+    public User updateOwnUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session, @RequestBody User userWithUpdateFields) {
         L.og("Called");
         if(userWithUpdateFields == null) {
             L.og("Update user received with empty body");
             throw new BadRequestException("No body was passed with the request");
         }
-        User caller = getUserFromSession( getSession( request ) );
+        User caller = getUserFromSession( session );
 
         if(userWithUpdateFields.getUsername() != null)
             caller.setGitUsername(userWithUpdateFields.getUsername());
@@ -66,7 +67,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/user", method = RequestMethod.POST)
-    public User createNewUser(@RequestBody User user) {
+    public User createNewUser(@RequestBody UserWithPassword user) {
         L.og("Called");
         throw new UnsupportedOperationException("This shall be used to create users");
     }
@@ -77,7 +78,6 @@ public class UserController extends BaseController {
         L.og("Called");
         return getUserFromQuery("MATCH (n:User) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}", id);
     }
-
 
 
 

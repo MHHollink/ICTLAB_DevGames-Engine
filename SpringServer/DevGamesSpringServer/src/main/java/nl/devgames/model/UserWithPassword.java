@@ -16,6 +16,9 @@ public class UserWithPassword extends User {
         this.password = password;
     }
 
+    public UserWithPassword() {
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }

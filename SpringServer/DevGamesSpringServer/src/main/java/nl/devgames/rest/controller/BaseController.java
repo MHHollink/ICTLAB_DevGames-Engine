@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public abstract class BaseController {
 
+    @Deprecated
     protected String getSession(HttpServletRequest request) {
         return request.getHeader(Application.SESSION_HEADER_KEY);
     }
