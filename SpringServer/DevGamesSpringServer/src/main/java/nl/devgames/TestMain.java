@@ -10,6 +10,7 @@ import nl.devgames.utils.L;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 public class TestMain {
 
@@ -62,7 +63,18 @@ public class TestMain {
 
     public static void main(String[] args) {
 
-        new ProjectController().getProjectMembersTokens("Marcel", "DevGames");
+        List<String> tokens = new ProjectController().getProjectMembersTokens("Marcel", "DevGames");
+
+        GCMMessage gcmMessage = new GCMMessage();
+
+        gcmMessage.addToken(tokens);
+        gcmMessage.createNotification(
+                GCMMessageType.PLAIN_NOTIFICATION,
+                "Plain test message",
+                "this is a test message for the neo4j query"
+        );
+
+        GCMRestService.getInstance().postMessage(gcmMessage);
 
         //fillDummyDB();
 

@@ -15,6 +15,8 @@ public abstract class AbsRestService {
 
     private URL url;
 
+    protected String response;
+
     public AbsRestService(String url) {
         try {
             this.url = new URL(url);
@@ -24,6 +26,7 @@ public abstract class AbsRestService {
     }
 
     protected String get() {
+        L.og("tried to use not implemented method [GET]");
         return null;
     }
 
@@ -63,14 +66,17 @@ public abstract class AbsRestService {
 
         in.close();
 
-        return response.toString();
+        this.response = response.toString();
+        return this.response;
     }
 
     protected String put() {
+        L.og("tried to use not implemented method [PUT]");
         return null;
     }
 
     protected String delete() {
+        L.og("tried to use not implemented method [DELETE]");
         return null;
     }
 }

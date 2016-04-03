@@ -31,7 +31,7 @@ public class Neo4JRestService extends AbsRestService {
      */
     public String post(String json) {
         try {
-            return super.post(
+            super.post(
                     json,
                     new Tuple<>(
                             "Authorization","Basic bmVvNGo6OTVkMGU3NjIxNzlj"
@@ -41,6 +41,8 @@ public class Neo4JRestService extends AbsRestService {
             e.printStackTrace();
             return null;
         }
+        L.og("Recieved response: %s", response);
+        return response;
     }
 
     /**

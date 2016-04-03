@@ -3,6 +3,7 @@ package nl.devgames.connection.gcm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.devgames.connection.AbsRestService;
+import nl.devgames.utils.L;
 import nl.devgames.utils.Tuple;
 
 import java.io.IOException;
@@ -38,6 +39,7 @@ public class GCMRestService extends AbsRestService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        L.og("Recieved response: %s", response);
     }
 
     /**
@@ -75,6 +77,7 @@ public class GCMRestService extends AbsRestService {
      * @param message Message object filled with data en tokens.
      */
     public void postMessage(GCMMessage message) {
+        L.og(message.toString());
         post(
                 messageToJson(
                         message
