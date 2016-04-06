@@ -1,7 +1,10 @@
 package nl.devgames.model;
 
 
-public class Issue extends AbsModel {
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+public class Issue extends Model<Issue> {
 
     String severity;
     String component;
@@ -20,6 +23,20 @@ public class Issue extends AbsModel {
     long closeDate;
 
     public Issue() {
+    }
+
+    public Issue(String severity, String component, int startLine, int endLine, String status, String resolution, String message, int debt, long creationDate, long updateDate, long closeDate) {
+        this.severity = severity;
+        this.component = component;
+        this.startLine = startLine;
+        this.endLine = endLine;
+        this.status = status;
+        this.resolution = resolution;
+        this.message = message;
+        this.debt = debt;
+        this.creationDate = creationDate;
+        this.updateDate = updateDate;
+        this.closeDate = closeDate;
     }
 
     public String getSeverity() {
@@ -125,5 +142,12 @@ public class Issue extends AbsModel {
                 ", component='" + getComponent() + '\'' +
                 ", severity='" + getSeverity() + '\'' +
                 "} " + super.toString();
+    }
+
+    @Override
+    public Issue createFromJsonObject(JsonObject object) {
+        Issue o = new Gson().fromJson(object.get("data"), Issue.class);
+        o.setId(object.get("id").getAsLong());
+        return o;
     }
 }

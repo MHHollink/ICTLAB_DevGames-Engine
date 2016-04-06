@@ -46,7 +46,7 @@ public class L {
 
         try {
             StackTraceElement[] traces = Thread.currentThread().getStackTrace();
-            StackTraceElement trace = traces[4];
+            StackTraceElement trace = traces[3];
             String tag = trace.getClassName();
             Matcher m = ANONYMOUS_CLASS_PATTERN.matcher(tag);
 

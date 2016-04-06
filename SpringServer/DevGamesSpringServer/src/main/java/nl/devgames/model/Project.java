@@ -1,12 +1,20 @@
 package nl.devgames.model;
 
-public class Project extends AbsModel {
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+public class Project extends Model<Project> {
 
     private String name;
     private String description;
 
 
     public Project() {
+    }
+
+    public Project(String name, String description) {
+        this.name = name;
+        this.description = description;
     }
 
     public String getName() {
@@ -31,5 +39,12 @@ public class Project extends AbsModel {
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 '}';
+    }
+
+    @Override
+    public Project createFromJsonObject(JsonObject object) {
+        Project o = new Gson().fromJson(object.get("data"), Project.class);
+        o.setId(object.get("id").getAsLong());
+        return o;
     }
 }

@@ -1,8 +1,13 @@
 package nl.devgames.model;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import java.util.List;
 import java.util.Set;
 
-public class Push extends AbsModel{
+public class Push extends Model<Push> {
 
     private Project project;
     private Set<Commit> commits;
@@ -11,6 +16,14 @@ public class Push extends AbsModel{
     private long timestamp;
 
     public Push() {
+    }
+
+    public Push(Project project, Set<Commit> commits, Set<Issue> issues, Set<Duplication> duplications, long timestamp) {
+        this.project = project;
+        this.commits = commits;
+        this.issues = issues;
+        this.duplications = duplications;
+        this.timestamp = timestamp;
     }
 
     public Project getProject() {
@@ -64,4 +77,10 @@ public class Push extends AbsModel{
                 "} " + super.toString();
     }
 
+    @Override
+    public Push createFromJsonObject(JsonObject object) {
+        Push o = new Gson().fromJson(object.get("data"), Push.class);
+        o.setId(object.get("id").getAsLong());
+        return o;
+    }
 }

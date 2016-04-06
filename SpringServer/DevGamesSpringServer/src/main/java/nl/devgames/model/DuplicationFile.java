@@ -10,6 +10,13 @@ public class DuplicationFile {
     public DuplicationFile() {
     }
 
+    public DuplicationFile(String file, int beginLine, int endLine, int size) {
+        this.file = file;
+        this.beginLine = beginLine;
+        this.endLine = endLine;
+        this.size = size;
+    }
+
     public String getFile() {
         return file;
     }
