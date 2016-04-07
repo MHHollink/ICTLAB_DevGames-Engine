@@ -52,8 +52,7 @@ public class TestMain {
 	         String reportAsString = scanner.useDelimiter("\\Z").next();
 	         scanner.close();
 	         JsonObject reportAsJson = new JsonParser().parse(reportAsString).getAsJsonObject();
-	         SQReport testReport = new SQReport();
-	         testReport.buildFromJson(reportAsJson);
+	         SQReport testReport = new SQReport().buildFromJson(reportAsJson);
 		}
 		catch(Exception e) {
 			e.printStackTrace();

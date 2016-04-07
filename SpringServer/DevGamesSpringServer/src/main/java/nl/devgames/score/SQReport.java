@@ -10,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import nl.devgames.connection.gcm.GCMMessageType;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
 import nl.devgames.model.DuplicationFile;
@@ -41,43 +42,24 @@ public class SQReport {
 		this.duplications = duplications;
 	}
 	
-	public void buildFromJson(JsonObject reportAsJson) {
+	/**
+     * Builds a Sonar Qube report from a json object
+     *
+     * @param reportAsJson 		the report as json object
+     * @return sqreport 		the new parsed report
+     */
+	public SQReport buildFromJson(JsonObject reportAsJson) {
 		System.out.println("================Parsing SonarQube report================");
 		//build project
-		String projectName = reportAsJson.get("projectName").getAsString();
-		if(projectName!=null) {
-			Project project = new Project(projectName, "");
-			setProject(project);
-		}
-		else {
-			System.out.println("error parsing project");
-		}
+		Project project = parseProject(reportAsJson);
+		
 		//author
-		String pushAuthor = reportAsJson.get("author").getAsString();
-		if(pushAuthor!=null) {
-			User author = new User();
-			String[] names = pushAuthor.split("\\s+");
-			if(names.length == 1) {
-				author.setFirstName(names[0]);
-			}
-			else if(names.length == 2) {
-				author.setFirstName(names[0]);
-				author.setLastName(names[1]);
-			}
-			else if(names.length == 3) {
-				author.setFirstName(names[0]);
-				author.setTween(names[1]);
-				author.setFirstName(names[2]);
-			}
-			setAuthor(author);	
-		}
-		else {
-			System.out.println("error parsing author");
-		}
+		User author = parseAuthor(reportAsJson);
+		
 		//build result
 		String buildResult = reportAsJson.get("result").getAsString();
+		ReportResultType resultType = ReportResultType.UNDEFINED;
 		if(buildResult!=null) {
-			ReportResultType resultType;
 			switch (buildResult) {
 			case "SUCCESS":
 				resultType = ReportResultType.SUCCESS;
@@ -93,8 +75,8 @@ public class SQReport {
 		}
 		//timestamp
 		String buildTimestamp = reportAsJson.get("timestamp").getAsString();
+		long timestamp = System.currentTimeMillis();
 		if(buildResult!=null) {
-			long timestamp;
 			try{
 				 timestamp = Long.parseLong(buildTimestamp);
 			}
@@ -209,8 +191,75 @@ public class SQReport {
 			duplicationsList.add(duplication);
 		}
 		setDuplications(duplicationsList);
+		
+		SQReport sqreport = new SQReport();
+		sqreport.setProject(project);
+		sqreport.setAuthor(author);
+		sqreport.setBuildResult(resultType);
+		sqreport.setTimeStamp(timestamp);
+		sqreport.setCommits(commitList);
+		sqreport.setIssues(issueList);
+		sqreport.setDuplications(duplicationsList);;setTimeStamp(timestamp);
+		//setters here
+		return sqreport;
 	}
 
+	/**
+	 * ==========================Convenience methods=========================
+	 */
+	
+	/**
+	 * Parses the project name from the json object
+	 * @param reportAsJson		the json object of the report
+	 * @return project			the project with the project name
+	 */
+	private Project parseProject(JsonObject reportAsJson) {
+		String projectName = reportAsJson.get("projectName").getAsString();
+		Project project = new Project();
+		if(projectName!=null) {
+			project.setName(projectName);
+			setProject(project);
+		}
+		else {
+			System.out.println("error parsing project name");
+		}
+		return project;
+	}
+	
+	/**
+	 * Parses the push author from the json object
+	 * @param reportAsJson		the json object of the report
+	 * @return project			the project with the project name
+	 */
+	private User parseAuthor(JsonObject reportAsJson) {
+		String pushAuthor = reportAsJson.get("author").getAsString();
+		User author = new User();
+		if(pushAuthor!=null) {
+			String[] names = pushAuthor.split("\\s+");
+			if(names.length == 1) {
+				author.setFirstName(names[0]);
+			}
+			else if(names.length == 2) {
+				author.setFirstName(names[0]);
+				author.setLastName(names[1]);
+			}
+			else if(names.length == 3) {
+				author.setFirstName(names[0]);
+				author.setTween(names[1]);
+				author.setFirstName(names[2]);
+			}
+			setAuthor(author);	
+		}
+		else {
+			System.out.println("error parsing author");
+		}
+		return author;
+	}
+
+	/**
+	 * getters and setters
+	 */
+	
 	public Project getProject() {
 		return project;
 	}
