@@ -2,8 +2,8 @@ package nl.devgames.connection.database;
 
 
 import nl.devgames.connection.AbsRestService;
-import nl.devgames.utils.Tuple;
 import nl.devgames.utils.L;
+import nl.devgames.utils.Tuple;
 
 import java.io.IOException;
 
@@ -36,6 +36,8 @@ public class Neo4JRestService extends AbsRestService {
             e.printStackTrace();
             return null;
         }
+        L.og("Recieved response: %s", response);
+        return response;
     }
 
     /**
@@ -66,12 +68,12 @@ public class Neo4JRestService extends AbsRestService {
      * @return Response String.
      */
     public String postQuery(String query, Object... params) {
+        query = String.format(query,params);
+        L.og(query);
+
         return post(
                 queryToJson(
-                        String.format(
-                                query,
-                                params
-                        )
+                        query
                 )
         );
     }

@@ -14,12 +14,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
 @RestController
-public class AuthController {
+public class AuthController extends BaseController{
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public Map<String,String> login(@RequestParam(value="username") String username, @RequestParam(value="password") String password) {
@@ -33,22 +32,15 @@ public class AuthController {
         );
 
         JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject();
-        JsonArray errors = jsonResponse.get("errors").getAsJsonArray();
 
-        if(errors.size() != 0) {
-            for (JsonElement error : errors) {
-                L.og(error.getAsString());
-            }
-            throw new KnownInternalServerError("InternalServerError: "+ errors.getAsString());
-        }
+        if (hasErrors(jsonResponse)) return null;
 
         int users = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray().size();
 
-        if(users == 0) {
+        if (users == 0) {
             L.og("login attempt failed, no user with given combo");
             throw new BadRequestException("This username-password combination is not found");
-        }
-        else {
+        } else {
             L.og("User %s has successfully logged in, generating session token...", username);
 
             java.util.Map<String, String> result = new java.util.HashMap<>();

@@ -4,7 +4,6 @@ import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@SuppressWarnings("PointlessBooleanExpression")
 public class L {
 
     // The format of the automatically created tag in each log line.
@@ -50,7 +49,7 @@ public class L {
             String tag = trace.getClassName();
             Matcher m = ANONYMOUS_CLASS_PATTERN.matcher(tag);
 
-            if (m != null && m.find()) {
+            if (m.find()) {
                 tag = m.replaceAll("");
             }
 

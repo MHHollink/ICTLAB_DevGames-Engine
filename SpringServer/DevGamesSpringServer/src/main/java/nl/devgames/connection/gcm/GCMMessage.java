@@ -46,6 +46,14 @@ public class GCMMessage{
         Collections.addAll(registration_ids, token);
     }
 
+    public void addToken(List<String> tokens) {
+        registration_ids.addAll(tokens);
+    }
+
+    public void addToken(Set<String> tokens) {
+        registration_ids.addAll(tokens);
+    }
+
     /**
      * Getter for all id's used to map in {@link GCMRestService#messageToJson(GCMMessage)}
      *
@@ -62,5 +70,13 @@ public class GCMMessage{
      */
     public Map<String, String> getData() {
         return data;
+    }
+
+    @Override
+    public String toString() {
+        return "GCMMessage{" +
+                "registration_ids=" + registration_ids +
+                ", data=" + data +
+                '}';
     }
 }

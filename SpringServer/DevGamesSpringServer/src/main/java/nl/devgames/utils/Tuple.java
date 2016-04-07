@@ -10,6 +10,9 @@ public class Tuple<K,V> {
         this.v = v;
     }
 
+    public Tuple() {
+    }
+
     public K getK() {
         return k;
     }
@@ -17,4 +20,10 @@ public class Tuple<K,V> {
         return v;
     }
 
+    public void setK(K k) {
+        this.k = k;
+    }
+    public void setV(V v) {
+        this.v = v;
+    }
 }
