@@ -4,12 +4,9 @@ import nl.devgames.Application;
 import nl.devgames.DevGamesTests;
 import nl.devgames.rest.controller.AuthController;
 import nl.devgames.rest.errors.BadRequestException;
-import org.apache.tomcat.util.file.Matcher;
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 
 import java.util.Map;
 

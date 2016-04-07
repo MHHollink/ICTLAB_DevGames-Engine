@@ -73,8 +73,8 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
-    public User getUser(HttpServletRequest request, @PathVariable Long id) {
-        User caller = getUserFromSession( request.getHeader(Application.SESSION_HEADER_KEY) );
+    public User getUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session, @PathVariable Long id) {
+        User caller = getUserFromSession( session );
         L.og("Called");
         return getUserFromQuery("MATCH (n:User) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}", id);
     }

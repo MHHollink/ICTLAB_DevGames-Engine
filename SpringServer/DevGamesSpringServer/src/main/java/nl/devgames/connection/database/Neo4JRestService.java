@@ -22,7 +22,6 @@ public class Neo4JRestService extends AbsRestService {
         super("http://localhost:7474/db/data/transaction/commit");
     }
 
-
     /**
      * Post a json object to the {@link #url}
      *

@@ -1,6 +1,8 @@
 package nl.devgames.rest.controller;
 
+import nl.devgames.Application;
 import nl.devgames.model.Push;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,7 +17,7 @@ import java.util.List;
 public class PushController extends BaseController {
 
     @RequestMapping(value = "/push", method = RequestMethod.GET)
-    public List<Push> getPushes(HttpServletRequest request,
+    public List<Push> getPushes(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                 @RequestParam(value = "begin", required = false) Long begin,
                                 @RequestParam(value = "end", required = false) Long End) {
         List<Push> responseList = new ArrayList<>();
