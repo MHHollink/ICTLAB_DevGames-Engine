@@ -63,6 +63,7 @@ public class UserControllerTest extends DevGamesTests{
 
         controller.updateOwnUser(
                 sessionToken,
+                user.getId(),
                 user
         );
 

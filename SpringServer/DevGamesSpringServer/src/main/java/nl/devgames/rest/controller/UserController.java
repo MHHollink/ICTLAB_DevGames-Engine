@@ -1,22 +1,16 @@
 package nl.devgames.rest.controller;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.model.User;
-import nl.devgames.model.UserWithPassword;
+import nl.devgames.model.*;
 import nl.devgames.rest.errors.BadRequestException;
-import nl.devgames.rest.errors.InvalidSessionException;
-import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.rest.errors.NotFoundException;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,9 +31,18 @@ public class UserController extends BaseController {
         return caller;
     }
 
+    @RequestMapping(value = "{id}", method = RequestMethod.GET)
+    public User getUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+                        @PathVariable Long id)
+    {
+        User caller = getUserFromSession( session );
+        L.og("Called");
+        return getUserFromQuery("MATCH (n:User) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}", id);
+    }
+
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public User updateOwnUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
-                              @PathVariable Long id,
+                              @PathVariable long id,
                               @RequestBody User userWithUpdateFields)
     {
         L.og("Called");
@@ -48,6 +51,15 @@ public class UserController extends BaseController {
             throw new BadRequestException("No body was passed with the request");
         }
         User caller = getUserFromSession( session );
+
+        if(caller.getId() != id) {
+            throw new BadRequestException(
+                    String.format(
+                            "Session does not match session for user with id '%d'",
+                            id
+                    )
+            );
+        }
 
         if(userWithUpdateFields.getUsername() != null)
             caller.setGitUsername(userWithUpdateFields.getUsername());
@@ -75,30 +87,55 @@ public class UserController extends BaseController {
 
         // TODO, update it in neo and return 200
 
-        throw new UnsupportedOperationException("This will return a an ok if user is updated");
+        throw new UnsupportedOperationException("This will return the updated user");
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     public Map deleteUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                           @PathVariable Long id)
     {
-
-        return new HashMap<>();
+        throw new UnsupportedOperationException("This will return an empty map if the user is deleted");
     }
 
-    @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public User getUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
-                        @PathVariable Long id)
+    @RequestMapping(value = "{id}/projects", method = RequestMethod.GET)
+    public List<Project> getProjects(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+                                     @PathVariable Long id)
     {
-        User caller = getUserFromSession( session );
-        L.og("Called");
-        return getUserFromQuery("MATCH (n:User) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}", id);
+        throw new UnsupportedOperationException("This will return an list containing all projects the user is involved in");
+    }
+
+    @RequestMapping(value = "{id}/pushes", method = RequestMethod.GET)
+    public List<Push> getPushes(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+                                @PathVariable Long id)
+    {
+        throw new UnsupportedOperationException("This will return an list containing all pushes under the user");
+    }
+
+    @RequestMapping(value = "{id}/commits", method = RequestMethod.GET)
+    public List<Commit> getCommits(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+                                   @PathVariable Long id)
+    {
+        throw new UnsupportedOperationException("This will return an list containing all commits under the user");
+    }
+
+    @RequestMapping(value = "{id}/issues", method = RequestMethod.GET)
+    public List<Issue> getIssues(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+                                 @PathVariable Long id)
+    {
+        throw new UnsupportedOperationException("This will return an list containing all issues the user created");
+    }
+
+    @RequestMapping(value = "{id}/duplications", method = RequestMethod.GET)
+    public List<Duplication> getDuplications(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+                                @PathVariable Long id)
+    {
+        throw new UnsupportedOperationException("This will return an list containing all duplications the user created");
     }
 
 
 
 
-      /*****************************/
+        /*****************************/
      /**  Convenience methods   **/
     /****************************/
 
