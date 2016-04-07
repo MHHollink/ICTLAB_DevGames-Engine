@@ -19,6 +19,16 @@ public abstract class DevGamesTests {
 
     @Before
     public void setUp() throws Exception {
+        // setUpDb();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+
+
+    }
+
+    private void setUpDb() {
         Project[] projects = {
                 new Project("Clarity","AR app for the Port of Rotterdam."),
                 new Project("Adventure Track", "Geolocation based Rol playing game."),
@@ -89,12 +99,6 @@ public abstract class DevGamesTests {
             dbService.postQuery(
                     "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmRegId: '%s' }) ",
                     user.getUsername(), user.getGitUsername(), user.getFirstName(), user.getLastName(), user.getAge(), user.getMainJob(), user.getPassword(), user.getGcmId());
-    }
-
-    @After
-    public void tearDown() throws Exception {
-
-
     }
 
 }

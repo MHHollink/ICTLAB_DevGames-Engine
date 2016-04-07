@@ -7,9 +7,6 @@ import nl.devgames.rest.controller.UserController;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Created by Marcel on 03-4-2016.
- */
 public class DatabaseTests extends DevGamesTests{
     String userSession;
 
