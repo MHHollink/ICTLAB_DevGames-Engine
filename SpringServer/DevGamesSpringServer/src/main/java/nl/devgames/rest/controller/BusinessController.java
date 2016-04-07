@@ -12,10 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * The Bussiness controller contains all rest request used on the `business` resource.
+ *      Employees and projects linked to a business can be asked for.
+ */
 @RestController
+@RequestMapping(value = "/businesses")
 public class BusinessController extends BaseController{
 
-    /**
+    /*
      * Get all colleagues of a user :
      *      <code>
      *          MATCH (u:User { username : 'Marcel' }) <-[:has_employee]- (b:Business) -[:has_employee]-> (r:User) return r
@@ -23,14 +28,25 @@ public class BusinessController extends BaseController{
      *
      */
 
-    @RequestMapping(value = "/business/{id}", method = RequestMethod.GET)
+
+    /**
+     *
+     * @param session
+     * @return
+     */
+    @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public Business getBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session) {
         L.og("Called");
         return new Business().createFromJsonObject( getBusinessJsonFromRequest( session ) );
     }
 
 
-    @RequestMapping(value = "/business/{id}/user", method = RequestMethod.PUT)
+    /**
+     *
+     * @param session
+     * @return
+     */
+    @RequestMapping(value = "{id}/user", method = RequestMethod.PUT)
     public Business addEmployeeToBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session) {
         getUserFromSession( session );
         L.og("Called");
@@ -41,11 +57,13 @@ public class BusinessController extends BaseController{
 
 
 
+    /**
+     *
+     * @param session
+     * @return
+     */
     private JsonObject getBusinessJsonFromRequest(String session) {
-
         User user = getUserFromSession(session);
-
-
 
         return null;
     }

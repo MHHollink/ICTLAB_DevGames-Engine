@@ -1,7 +1,10 @@
 package nl.devgames.rest.controller;
 
-/**
- * Created by Marcel on 31-3-2016.
- */
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+
+@RestController
+@RequestMapping(value = "/issues")
 public class IssueController extends BaseController{
 }

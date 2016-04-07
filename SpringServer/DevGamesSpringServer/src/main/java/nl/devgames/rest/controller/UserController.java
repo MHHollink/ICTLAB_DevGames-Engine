@@ -16,20 +16,32 @@ import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
+@RequestMapping(value = "/users")
 public class UserController extends BaseController {
 
-    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.POST)
+    public User createNewUser(@RequestBody UserWithPassword user) {
+        L.og("Called");
+        throw new UnsupportedOperationException("This shall be used to create users");
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
     public User getOwnUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session) {
         User caller = getUserFromSession( session );
         L.og("Called");
         return caller;
     }
 
-    @RequestMapping(value = "/user", method = RequestMethod.PUT)
-    public User updateOwnUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session, @RequestBody User userWithUpdateFields) {
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
+    public User updateOwnUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+                              @PathVariable Long id,
+                              @RequestBody User userWithUpdateFields)
+    {
         L.og("Called");
         if(userWithUpdateFields == null) {
             L.og("Update user received with empty body");
@@ -66,14 +78,18 @@ public class UserController extends BaseController {
         throw new UnsupportedOperationException("This will return a an ok if user is updated");
     }
 
-    @RequestMapping(value = "/user", method = RequestMethod.POST)
-    public User createNewUser(@RequestBody UserWithPassword user) {
-        L.og("Called");
-        throw new UnsupportedOperationException("This shall be used to create users");
+    @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
+    public Map deleteUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+                          @PathVariable Long id)
+    {
+
+        return new HashMap<>();
     }
 
-    @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
-    public User getUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session, @PathVariable Long id) {
+    @RequestMapping(value = "{id}", method = RequestMethod.GET)
+    public User getUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+                        @PathVariable Long id)
+    {
         User caller = getUserFromSession( session );
         L.og("Called");
         return getUserFromQuery("MATCH (n:User) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}", id);
@@ -82,62 +98,9 @@ public class UserController extends BaseController {
 
 
 
-      /*************************/
-     /**  Convince methods   **/
-    /*************************/
-
-    /**
-     *
-     * @param request the http request containing headers and such
-     * @return json array with all data
-     */
-    @Deprecated
-    private JsonObject getUserJsonFromRequest(HttpServletRequest request) {
-        String session = request.getHeader(Application.SESSION_HEADER_KEY); // gets the session from the headers
-
-        if (session == null || session.isEmpty())
-            throw new InvalidSessionException("Request without session"); // throws exception when session is null or blank
-
-        String jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:User) WHERE n.session = '%s' RETURN {id:id(n), labels: labels(n), data: n}",
-                session
-        ); // Request to neo4j
-
-        JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject(); // parse neo4j response
-        JsonArray errors = jsonResponse.get("errors").getAsJsonArray(); // get the list of errors
-
-        if (errors.size() != 0) { // Check if there are more the 0 errors
-            for (JsonElement error : errors) L.og(error.getAsString());
-            throw new KnownInternalServerError("InternalServerError: " + errors.getAsString()); // throws exception with errors
-        }
-
-        JsonArray rows = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
-        if(rows.size() == 0) throw new InvalidSessionException("Request session is not found");
-
-        return rows.get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject(); // Returns user object
-    }
-
-    @Deprecated
-    private JsonArray getUsersFromQuery(HttpServletRequest request, String query, Object... params) {
-        if(getUserJsonFromRequest(request) == null)
-            throw new InvalidSessionException("Request without session"); // throws exception when session is null or blank
-
-        String jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                query,
-                params
-        ); // Request to neo4j
-
-        JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject(); // parse neo4j response
-
-        if(hasErrors(jsonResponse)) return null;
-
-        JsonArray data = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
-
-        if (data.size() == 0)
-            throw new NotFoundException("The server could not find the requested data...");
-
-        return data.get(0).getAsJsonObject().get("row").getAsJsonArray();
-    }
+      /*****************************/
+     /**  Convenience methods   **/
+    /****************************/
 
     private User getUserFromQuery(String query, Object... params) {
         String jsonResponseString = Neo4JRestService.getInstance().postQuery(

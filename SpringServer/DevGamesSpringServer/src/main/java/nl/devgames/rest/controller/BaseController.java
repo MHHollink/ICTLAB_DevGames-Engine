@@ -14,7 +14,7 @@ import nl.devgames.utils.L;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Created by Marcel on 02-4-2016.
+ * BaseController contains every method that all other controllers should have access to.
  */
 public abstract class BaseController {
 
