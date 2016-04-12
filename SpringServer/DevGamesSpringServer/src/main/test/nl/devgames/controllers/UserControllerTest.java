@@ -12,8 +12,10 @@ import org.junit.Test;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.IsNull.nullValue;
 
 public class UserControllerTest extends DevGamesTests{
 
@@ -52,14 +54,18 @@ public class UserControllerTest extends DevGamesTests{
     public void testUpdateOwnUserWithSessionToken() throws Exception {
         String username = "Marcel", password = "admin";
 
-        int age;
-
         String sessionToken = new AuthController().login(username, password).get(Application.SESSION_HEADER_KEY);
         User user = controller.getOwnUser(sessionToken);
 
-        age = user.getAge();
+        int age = user.getAge();
+        String gcmId = user.getGcmId();
+        String git = user.getGitUsername();
+        String main = user.getMainJob();
 
         user.setAge( age + 25 );
+        user.setGcmId( "gmc" );
+        user.setGitUsername( "git");
+        user.setMainJob( "job" );
 
         controller.updateOwnUser(
                 sessionToken,
@@ -71,5 +77,39 @@ public class UserControllerTest extends DevGamesTests{
 
         assertThat(updatedUser.getAge(), not(age));
         assertThat(updatedUser.getAge(), equalTo(age+25));
+
+        assertThat(updatedUser.getGcmId(), not(gcmId));
+        assertThat(updatedUser.getGcmId(), equalTo("gcm"));
+
+        assertThat(updatedUser.getGitUsername(), not(git));
+        assertThat(updatedUser.getGitUsername(), equalTo("git"));
+
+        assertThat(updatedUser.getMainJob(), not(main));
+        assertThat(updatedUser.getMainJob(), equalTo("job"));
+    }
+
+    @Test
+    public void testUserUpdateNullFieldUnchanged() throws Exception {
+        String username = "Marcel", password = "admin";
+
+        String sessionToken = new AuthController().login(username, password).get(Application.SESSION_HEADER_KEY);
+        User user = controller.getOwnUser(sessionToken);
+
+        String first = user.getGitUsername();
+
+        user.setGitUsername(null);
+
+        assertThat(user.getGitUsername(), nullValue());
+        assertThat(first, notNullValue());
+
+        controller.updateOwnUser(
+                sessionToken,
+                user.getId(),
+                user
+        );
+
+        User updatedUser = controller.getOwnUser(sessionToken);
+
+        assertThat(first, equalTo(updatedUser.getGitUsername()));
     }
 }

@@ -13,6 +13,7 @@ public class Push extends Model<Push> {
     private Set<Commit> commits;
     private Set<Issue> issues;
     private Set<Duplication> duplications;
+
     private long timestamp;
 
     public Push() {

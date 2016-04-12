@@ -1,6 +1,5 @@
 package nl.devgames.connection.database;
 
-
 import nl.devgames.connection.AbsRestService;
 import nl.devgames.utils.L;
 import nl.devgames.utils.Tuple;

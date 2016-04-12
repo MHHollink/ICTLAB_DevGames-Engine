@@ -4,9 +4,16 @@ import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.gcm.GCMMessage;
 import nl.devgames.connection.gcm.GCMMessageType;
 import nl.devgames.connection.gcm.GCMRestService;
-import nl.devgames.model.*;
+import nl.devgames.model.Business;
+import nl.devgames.model.Commit;
+import nl.devgames.model.Duplication;
+import nl.devgames.model.DuplicationFile;
+import nl.devgames.model.Issue;
+import nl.devgames.model.Project;
+import nl.devgames.model.Push;
+import nl.devgames.model.User;
+import nl.devgames.model.UserWithPassword;
 import nl.devgames.rest.controller.ProjectController;
-import nl.devgames.utils.L;
 
 import java.util.Arrays;
 import java.util.HashSet;

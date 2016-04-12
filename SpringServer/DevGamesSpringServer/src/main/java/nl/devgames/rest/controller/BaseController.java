@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.model.User;
+import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.utils.L;
@@ -25,7 +26,7 @@ public abstract class BaseController {
 
     protected User getUserFromSession(String session) {
         if (session == null || session.isEmpty())
-            throw new InvalidSessionException("Request without session"); // throws exception when session is null or blank
+            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
 
         String jsonResponseString = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:User) WHERE n.session = '%s' RETURN {id:id(n), labels: labels(n), data: n}",
