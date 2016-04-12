@@ -23,7 +23,7 @@ public class GCMMessage{
      * @param message   Message it self
      */
     public void createNotification(GCMMessageType type, String title, String message){
-        L.og("Created Notification");
+        L.d("Created Notification");
         switch(type) {
             case PLAIN_NOTIFICATION:
             case NEW_DEVICE_REGISTERED:

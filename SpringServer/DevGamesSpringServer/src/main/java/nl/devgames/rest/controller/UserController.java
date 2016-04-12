@@ -31,14 +31,14 @@ public class UserController extends BaseController {
 
     @RequestMapping(method = RequestMethod.POST)
     public User createNewUser(@RequestBody UserWithPassword user) {
-        L.og("Called");
+        L.i("Called");
         throw new UnsupportedOperationException("This shall be used to create users");
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public User getOwnUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session) {
         User caller = getUserFromSession( session );
-        L.og("Called");
+        L.i("Called");
         return caller;
     }
 
@@ -47,7 +47,7 @@ public class UserController extends BaseController {
                         @PathVariable Long id)
     {
         User caller = getUserFromSession( session );
-        L.og("Called");
+        L.i("Called");
         return getUserFromQuery("MATCH (n:User) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}", id);
     }
 
@@ -56,9 +56,9 @@ public class UserController extends BaseController {
                               @PathVariable long id,
                               @RequestBody User userWithUpdateFields)
     {
-        L.og("Called");
+        L.i("Called");
         if(userWithUpdateFields == null) {
-            L.og("Update user received with empty body");
+            L.w("Update user received with empty body");
             throw new BadRequestException("No body was passed with the request");
         }
         User caller = getUserFromSession( session );

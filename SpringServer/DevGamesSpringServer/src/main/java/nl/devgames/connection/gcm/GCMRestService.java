@@ -39,7 +39,7 @@ public class GCMRestService extends AbsRestService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        L.og("Recieved response: %s", response);
+        L.d("Recieved response: %s", response);
     }
 
     /**
@@ -77,7 +77,7 @@ public class GCMRestService extends AbsRestService {
      * @param message Message object filled with data en tokens.
      */
     public void postMessage(GCMMessage message) {
-        L.og(message.toString());
+        L.d(message.toString());
         post(
                 messageToJson(
                         message

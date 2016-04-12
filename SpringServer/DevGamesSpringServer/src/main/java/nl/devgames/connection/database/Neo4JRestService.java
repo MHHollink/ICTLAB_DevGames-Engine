@@ -39,7 +39,7 @@ public class Neo4JRestService extends AbsRestService {
             e.printStackTrace();
             return null;
         }
-        L.og("Recieved response: %s", response);
+        L.d("Recieved response: %s", response);
         return response;
     }
 
@@ -72,7 +72,7 @@ public class Neo4JRestService extends AbsRestService {
      */
     public String postQuery(String query, Object... params) {
         query = String.format(query,params);
-        L.og(query);
+        L.d(query);
 
         return post(
                 queryToJson(

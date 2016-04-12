@@ -49,7 +49,7 @@ public abstract class BaseController {
         JsonArray errors = json.get("errors").getAsJsonArray(); // get the list of errors
 
         if (errors.size() != 0) { // Check if there are more the 0 errors
-            for (JsonElement error : errors) L.og(error.getAsString());
+            for (JsonElement error : errors) L.e(error.getAsString());
             throw new KnownInternalServerError("InternalServerError: " + errors.getAsString()); // throws exception with errors
         }
 

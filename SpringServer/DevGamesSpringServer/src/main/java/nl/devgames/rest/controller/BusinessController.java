@@ -36,7 +36,7 @@ public class BusinessController extends BaseController{
      */
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public Business getBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session) {
-        L.og("Called");
+        L.d("Called");
         return new Business().createFromJsonObject( getBusinessJsonFromRequest( session ) );
     }
 
@@ -49,7 +49,7 @@ public class BusinessController extends BaseController{
     @RequestMapping(value = "{id}/user", method = RequestMethod.PUT)
     public Business addEmployeeToBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session) {
         getUserFromSession( session );
-        L.og("Called");
+        L.d("Called");
         throw new UnsupportedOperationException("Method call not implemented yet. Shall add user to Business");
     }
 

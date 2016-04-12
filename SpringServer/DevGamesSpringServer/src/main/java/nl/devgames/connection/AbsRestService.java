@@ -26,12 +26,12 @@ public abstract class AbsRestService {
     }
 
     protected String get() {
-        L.og("tried to use not implemented method [GET]");
+        L.w("tried to use not implemented method [GET]");
         return null;
     }
 
     protected String post(String jsonString, Tuple... properties) throws IOException {
-        L.og("starting [POST] to %s", url);
+        L.i("starting [POST] to %s", url);
         HttpURLConnection connection =
                 (HttpURLConnection) url.openConnection();
 
@@ -71,12 +71,12 @@ public abstract class AbsRestService {
     }
 
     protected String put() {
-        L.og("tried to use not implemented method [PUT]");
+        L.w("tried to use not implemented method [PUT]");
         return null;
     }
 
     protected String delete() {
-        L.og("tried to use not implemented method [DELETE]");
+        L.w("tried to use not implemented method [DELETE]");
         return null;
     }
 }
