@@ -25,7 +25,6 @@ public abstract class DevGamesTests {
     @After
     public void tearDown() throws Exception {
 
-
     }
 
     private void setUpDb() {

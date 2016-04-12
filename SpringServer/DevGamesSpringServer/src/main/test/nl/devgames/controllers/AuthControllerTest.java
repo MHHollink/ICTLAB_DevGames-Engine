@@ -10,10 +10,10 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
 
 public class AuthControllerTest extends DevGamesTests {
 
@@ -35,30 +35,30 @@ public class AuthControllerTest extends DevGamesTests {
     public void testGetSessionFromLogin() throws Exception {
         Map<String,String> session = controller.login("Marcel", "admin");
         assertThat(session, hasKey(Application.SESSION_HEADER_KEY));
-        assertThat(session.get(Application.SESSION_HEADER_KEY), notNullValue());
+        assertNotNull(session.get(Application.SESSION_HEADER_KEY));
     }
 
     @Test(expected = BadRequestException.class)
     public void testExceptionFromFailedLoginWrongCombo() throws Exception {
         Map<String,String> session = controller.login("Marcel", "Error");
-        assertThat(session, nullValue());
+        assertNull(session);
     }
 
     @Test(expected = BadRequestException.class)
     public void testExceptionFromFailedLoginEmptyFields() throws Exception {
         Map<String,String> session = controller.login(null, null);
-        assertThat(session, nullValue());
+        assertNull(session);
     }
 
     @Test(expected = BadRequestException.class)
     public void testExceptionFromFailedLoginEmptyFieldUsername() throws Exception {
         Map<String,String> session = controller.login("Marcel", null);
-        assertThat(session, nullValue());
+        assertNull(session);
     }
 
     @Test(expected = BadRequestException.class)
     public void testExceptionFromFailedLoginEmptyFieldPassword() throws Exception {
         Map<String,String> session = controller.login(null, "admin");
-        assertThat(session, nullValue());
+        assertNull(session);
     }
 }
