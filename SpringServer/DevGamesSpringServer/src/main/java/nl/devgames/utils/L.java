@@ -1,19 +1,26 @@
 package nl.devgames.utils;
 
-import org.springframework.boot.logging.LogLevel;
-
 import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.springframework.boot.logging.LogLevel.DEBUG;
-import static org.springframework.boot.logging.LogLevel.ERROR;
-import static org.springframework.boot.logging.LogLevel.INFO;
-import static org.springframework.boot.logging.LogLevel.TRACE;
-import static org.springframework.boot.logging.LogLevel.WARN;
+import static nl.devgames.utils.L.LogLevel.TRACE;
+import static nl.devgames.utils.L.LogLevel.DEBUG;
+import static nl.devgames.utils.L.LogLevel.INFO;
+import static nl.devgames.utils.L.LogLevel.WARN;
+import static nl.devgames.utils.L.LogLevel.ERROR;
 
 public class L {
 
+    public enum LogLevel {
+        TRACE,
+        DEBUG,
+        INFO,
+        WARN,
+        ERROR,
+        FATAL,
+        OFF
+    }
     private static LogLevel level = DEBUG;
 
     // The format of the automatically created tag in each log line.
