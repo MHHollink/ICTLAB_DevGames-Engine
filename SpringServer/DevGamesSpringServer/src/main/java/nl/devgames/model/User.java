@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 
 import java.util.Set;
 
-public class User extends Model<User> {
+public class User extends Model {
 
     private String username;
     private String gitUsername;
@@ -145,10 +145,4 @@ public class User extends Model<User> {
                 "} " + super.toString();
     }
 
-    @Override
-    public User createFromJsonObject(JsonObject object) {
-        User o = new Gson().fromJson(object.get("data"), User.class);
-        o.setId(object.get("id").getAsLong());
-        return o;
-    }
 }

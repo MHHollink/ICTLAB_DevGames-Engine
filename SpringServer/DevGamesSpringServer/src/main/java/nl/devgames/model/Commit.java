@@ -3,7 +3,7 @@ package nl.devgames.model;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-public class Commit extends Model<Commit> {
+public class Commit extends Model {
 
     private String commitId;
     private String commitMsg;
@@ -52,12 +52,6 @@ public class Commit extends Model<Commit> {
                 "} " + super.toString();
     }
 
-    @Override
-    public Commit createFromJsonObject(JsonObject object) {
-        Commit o = new Gson().fromJson(object.get("data"), Commit.class);
-        o.setId(object.get("id").getAsLong());
-        return o;
-    }
 }
 
 

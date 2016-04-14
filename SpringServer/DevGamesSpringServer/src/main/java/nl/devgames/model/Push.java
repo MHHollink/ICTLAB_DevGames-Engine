@@ -7,7 +7,7 @@ import com.google.gson.JsonObject;
 import java.util.List;
 import java.util.Set;
 
-public class Push extends Model<Push> {
+public class Push extends Model {
 
     private Project project;
     private Set<Commit> commits;
@@ -78,10 +78,4 @@ public class Push extends Model<Push> {
                 "} " + super.toString();
     }
 
-    @Override
-    public Push createFromJsonObject(JsonObject object) {
-        Push o = new Gson().fromJson(object.get("data"), Push.class);
-        o.setId(object.get("id").getAsLong());
-        return o;
-    }
 }
