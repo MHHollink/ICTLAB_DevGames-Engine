@@ -34,13 +34,13 @@
 	}],
 	duplications: [{
 		blocks: [{
-			file: {
+			{
 				name: "src/nl/evertjanheilema/Main.java",
 				project: "DevGames",
 				from: 119,
 				size: 10
 			},
-			file: {
+			{
 				name: "src/nl/evertjanheilema/Controllers/MainScreenController.java",
 				project: "DevGames",
 				from: 221,

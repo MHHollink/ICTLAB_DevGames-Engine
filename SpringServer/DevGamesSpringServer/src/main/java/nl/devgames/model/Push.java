@@ -14,6 +14,7 @@ public class Push extends Model<Push> {
     private Set<Issue> issues;
     private Set<Duplication> duplications;
     private long timestamp;
+    private double score;
 
     public Push() {
     }

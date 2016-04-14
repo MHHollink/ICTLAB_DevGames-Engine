@@ -67,7 +67,7 @@ public class GCMMessageComposer {
         JsonObject tokenResponseJson = new JsonParser().parse(tokenResponseAsString).getAsJsonObject(); //parse neo4j response
         JsonArray errorsArray = tokenResponseJson.get("errors").getAsJsonArray(); //get list of errors
 
-        //rhrows exception if there are errors
+        //Trhrows exception if there are errors
         if (errorsArray.size() != 0) { 
             for (JsonElement error : errorsArray) L.og(error.getAsString());
             throw new KnownInternalServerError("InternalServerError: " + errorsArray.getAsString());

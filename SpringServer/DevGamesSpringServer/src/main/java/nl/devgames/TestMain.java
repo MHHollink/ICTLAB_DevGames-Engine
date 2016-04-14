@@ -6,8 +6,9 @@ import nl.devgames.connection.gcm.GCMMessageComposer;
 import nl.devgames.connection.gcm.GCMMessageType;
 import nl.devgames.connection.gcm.GCMRestService;
 import nl.devgames.model.*;
+import nl.devgames.model.dto.SQReportDTO;
 import nl.devgames.rest.controller.ProjectController;
-import nl.devgames.score.SQReport;
+import nl.devgames.score.calculator.ScoreCalculator;
 import nl.devgames.utils.L;
 
 import java.io.File;
@@ -100,7 +101,9 @@ public class TestMain {
 	         String reportAsString = scanner.useDelimiter("\\Z").next();
 	         scanner.close();
 	         JsonObject reportAsJson = new JsonParser().parse(reportAsString).getAsJsonObject();
-	         SQReport testReport = new SQReport().buildFromJson(reportAsJson);
+	         SQReportDTO testReport = new SQReportDTO().buildFromJson(reportAsJson);
+	         testReport.setScore(new ScoreCalculator().calculateScoreFromReport(testReport));
+	         testReport.saveReportDataToDatabase();
 		}
 		catch(Exception e) {
 			e.printStackTrace();
