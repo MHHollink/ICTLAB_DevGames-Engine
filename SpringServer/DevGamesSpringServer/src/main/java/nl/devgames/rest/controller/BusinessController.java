@@ -1,10 +1,13 @@
 package nl.devgames.rest.controller;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import nl.devgames.Application;
+import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.model.Business;
 import nl.devgames.model.User;
 import nl.devgames.utils.L;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,39 +23,41 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping(value = "/businesses")
 public class BusinessController extends BaseController{
 
-    /*
-     * Get all colleagues of a user :
-     *      <code>
-     *          MATCH (u:User { username : 'Marcel' }) <-[:has_employee]- (b:Business) -[:has_employee]-> (r:User) return r
-     *      </code>
-     *
-     */
-
-
     /**
      *
      * @param session
      * @return
      */
-    @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public Business getBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session) {
+    @RequestMapping(method = RequestMethod.GET)
+    public Business getCallersBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session) {
         L.d("Called");
-        return new Business().createFromJsonObject( getBusinessJsonFromRequest( session ) );
+        return getBusiness( session );
     }
 
-
     /**
      *
      * @param session
      * @return
      */
-    @RequestMapping(value = "{id}/user", method = RequestMethod.PUT)
+    @RequestMapping(value = "{id}/users", method = RequestMethod.PUT)
     public Business addEmployeeToBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session) {
         getUserFromSession( session );
         L.d("Called");
         throw new UnsupportedOperationException("Method call not implemented yet. Shall add user to Business");
     }
 
+    /**
+     *
+     * @param session
+     * @return
+     */
+    @RequestMapping(value = "{id}/users", method = RequestMethod.GET)
+    public Business getEmployeeFromCallersBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session) {
+        getUserFromSession( session );
+        L.d("Called");
+        throw new UnsupportedOperationException("Method call not implemented yet. Shall get all employees of a Business");
+    }
+
 
 
 
@@ -62,9 +67,14 @@ public class BusinessController extends BaseController{
      * @param session
      * @return
      */
-    private JsonObject getBusinessJsonFromRequest(String session) {
-        User user = getUserFromSession(session);
+    private Business getBusiness(String session) {
+        String json = Neo4JRestService.getInstance().postQuery(
+                "MATCH (u:User { session : '%s' }) <-[:has_employee]- (b:Business) RETURN {id:id(b), labels: labels(b), data: b}",
+                session
+        );
 
-        return null;
+        return new Business().createFromJsonObject(
+                grabData(json).get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject()
+        ); // Returns business object
     }
 }
