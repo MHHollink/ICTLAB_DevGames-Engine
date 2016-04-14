@@ -143,14 +143,8 @@ public class UserController extends BaseController {
         throw new UnsupportedOperationException("This will return an list containing all duplications the user created");
     }
 
-    @Deprecated
-    private JsonArray getUsersFromQuery(HttpServletRequest request, String query, Object... params) {
-        if(getUserJsonFromRequest(request) == null)
-            throw new InvalidSessionException("Request without session"); // throws exception when session is null or blank
 
-
-
-        /*****************************/
+      /*****************************/
      /**  Convenience methods   **/
     /****************************/
 

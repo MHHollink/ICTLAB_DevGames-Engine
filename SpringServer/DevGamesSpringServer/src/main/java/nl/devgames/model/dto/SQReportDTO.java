@@ -263,31 +263,31 @@ public class SQReportDTO {
 		JsonArray commitArray = reportAsJson.get("items").getAsJsonArray();
 		for(JsonElement commitElement : commitArray) {	
 			JsonObject object = commitElement.getAsJsonObject();
-			Commit commit = new Gson().fromJson(object, Commit.class);
+			CommitDTO commit = new Gson().fromJson(object, CommitDTO.class);
 			//check if fields aren't empty
 			if(commit.isValid()) {
 				
 			}
-			String commitId = commitElement.getAsJsonObject().get("commitId").getAsString();
-			String commitMsg = commitElement.getAsJsonObject().get("commitMsg").getAsString();
-			String commitDate = commitElement.getAsJsonObject().get("date").getAsString();
-			Long commitTimestamp = null;
-			try{
-				//parse date to epoch
-			    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss Z");
-			    Date parsedDate = dateFormat.parse(commitDate);
-			    commitTimestamp = parsedDate.getTime();
-			}
-			catch(Exception e){
-				L.og("error parsing timestamp of commit with id: %d ,set to current time" + commitId);
-				commitTimestamp = System.currentTimeMillis();
-			}
-			if(commitId!=null && commitMsg!=null && commitTimestamp!=null) {
-				commitList.add(new Commit(commitId, commitMsg, commitTimestamp));
-			}
-			else{
-				L.og("error parsing commit with id: %s", commitId);
-			}
+//			String commitId = commitElement.getAsJsonObject().get("commitId").getAsString();
+//			String commitMsg = commitElement.getAsJsonObject().get("commitMsg").getAsString();
+//			String commitDate = commitElement.getAsJsonObject().get("date").getAsString();
+//			Long commitTimestamp = null;
+//			try{
+//				//parse date to epoch
+//			    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss Z");
+//			    Date parsedDate = dateFormat.parse(commitDate);
+//			    commitTimestamp = parsedDate.getTime();
+//			}
+//			catch(Exception e){
+//				L.og("error parsing timestamp of commit with id: %d ,set to current time" + commitId);
+//				commitTimestamp = System.currentTimeMillis();
+//			}
+//			if(commitId!=null && commitMsg!=null && commitTimestamp!=null) {
+//				commitList.add(new Commit(commitId, commitMsg, commitTimestamp));
+//			}
+//			else{
+//				L.og("error parsing commit with id: %s", commitId);
+//			}
 		}
 		return commitList;
 	}

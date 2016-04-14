@@ -1,17 +1,14 @@
 package nl.devgames.model.dto;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Commit;
 
-public class CommitDTO extends ModelDTO<CommitDTO, Commit> {
-/**
- * Created by Marcel on 14-4-2016.
- */
-public class CommitDTO extends ModelDTO<CommitDTO, Commit> {
+public abstract class CommitDTO extends ModelDTO<CommitDTO, Commit> {
 
 	@Override
 	public Commit toModel() {
-		
+		return new Commit();
 	}
 	@Override
 	public boolean isValid() {
@@ -19,8 +16,8 @@ public class CommitDTO extends ModelDTO<CommitDTO, Commit> {
 		
 	}
 	@Override
-	public CommitDTO createFromSjonObject(JsonObject object) {
-		return new Gson().fromJson(object, CommitDTO.class)
+	public CommitDTO createFromJsonObject(JsonObject object) {
+		return new Gson().fromJson(object, CommitDTO.class);
 	}
 	
 }

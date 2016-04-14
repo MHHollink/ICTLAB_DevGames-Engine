@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Duplication extends Model<Duplication> {
+public class Duplication extends Model {
 
     Set<DuplicationFile> files;
 
@@ -33,10 +33,4 @@ public class Duplication extends Model<Duplication> {
                 '}';
     }
 
-    @Override
-    public Duplication createFromJsonObject(JsonObject object) {
-        Duplication o = new Gson().fromJson(object.get("data"), Duplication.class);
-        o.setId(object.get("id").getAsLong());
-        return o;
-    }
 }
