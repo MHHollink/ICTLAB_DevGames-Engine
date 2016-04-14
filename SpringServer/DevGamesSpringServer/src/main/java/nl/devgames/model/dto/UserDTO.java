@@ -3,8 +3,12 @@ package nl.devgames.model.dto;
 import com.google.gson.JsonObject;
 import nl.devgames.model.User;
 
-public class UserDTO extends ModelDTO<User> {
+public class UserDTO extends ModelDTO<UserDTO, User> {
 
+    @Override
+    public User toModel() {
+        return null;
+    }
 
     @Override
     public boolean isValid() {
@@ -12,7 +16,7 @@ public class UserDTO extends ModelDTO<User> {
     }
 
     @Override
-    public User createFromJsonObject(JsonObject object) {
+    public UserDTO createFromJsonObject(JsonObject object) {
         return null;
     }
 }

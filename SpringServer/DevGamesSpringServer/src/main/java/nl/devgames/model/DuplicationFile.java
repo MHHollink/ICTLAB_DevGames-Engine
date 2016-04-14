@@ -1,6 +1,6 @@
 package nl.devgames.model;
 
-public class DuplicationFile {
+public class DuplicationFile extends Model {
 
     String file;
     int beginLine;
