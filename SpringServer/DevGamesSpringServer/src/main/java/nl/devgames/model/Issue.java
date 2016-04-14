@@ -3,7 +3,7 @@ package nl.devgames.model;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-public class Issue extends Model<Issue> {
+public class Issue extends Model {
 
     String severity;
     String component;
@@ -141,12 +141,5 @@ public class Issue extends Model<Issue> {
                 ", component='" + getComponent() + '\'' +
                 ", severity='" + getSeverity() + '\'' +
                 "} " + super.toString();
-    }
-
-    @Override
-    public Issue createFromJsonObject(JsonObject object) {
-        Issue o = new Gson().fromJson(object.get("data"), Issue.class);
-        o.setId(object.get("id").getAsLong());
-        return o;
     }
 }

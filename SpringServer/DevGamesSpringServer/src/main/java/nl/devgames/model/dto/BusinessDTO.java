@@ -3,7 +3,6 @@ package nl.devgames.model.dto;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Business;
-import nl.devgames.model.Model;
 
 /**
  * Created by Marcel on 14-4-2016.

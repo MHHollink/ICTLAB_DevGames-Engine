@@ -3,7 +3,7 @@ package nl.devgames.model;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-public class Project extends Model<Project> {
+public class Project extends Model {
 
     private String name;
     private String description;
@@ -39,12 +39,5 @@ public class Project extends Model<Project> {
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 '}';
-    }
-
-    @Override
-    public Project createFromJsonObject(JsonObject object) {
-        Project o = new Gson().fromJson(object.get("data"), Project.class);
-        o.setId(object.get("id").getAsLong());
-        return o;
     }
 }

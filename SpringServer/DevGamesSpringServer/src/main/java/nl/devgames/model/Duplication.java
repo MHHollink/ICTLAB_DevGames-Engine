@@ -32,5 +32,4 @@ public class Duplication extends Model {
                 "files=" + files +
                 '}';
     }
-
 }
