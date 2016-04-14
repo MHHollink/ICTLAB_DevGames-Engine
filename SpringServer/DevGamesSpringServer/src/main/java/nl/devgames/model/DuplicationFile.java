@@ -41,6 +41,14 @@ public class DuplicationFile extends Model {
         this.endLine = endLine;
     }
 
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
     @Override
     public String toString() {
         return "DuplicationFile{" +

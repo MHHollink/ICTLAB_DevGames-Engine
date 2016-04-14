@@ -6,18 +6,22 @@ import nl.devgames.model.Commit;
 
 public abstract class CommitDTO extends ModelDTO<CommitDTO, Commit> {
 
-	@Override
-	public Commit toModel() {
-		return new Commit();
-	}
-	@Override
-	public boolean isValid() {
-		return false;
-		
-	}
-	@Override
-	public CommitDTO createFromJsonObject(JsonObject object) {
-		return new Gson().fromJson(object, CommitDTO.class);
-	}
-	
+    public String commitId;
+    public String commitMsg;
+    public long timeStamp;
+
+    @Override
+    public Commit toModel() {
+        return null;
+    }
+
+    @Override
+    public boolean isValid() {
+        return false;
+    }
+
+    @Override
+    public CommitDTO createFromJsonObject(JsonObject object) {
+        return new Gson().fromJson(object, CommitDTO.class);
+    }
 }
