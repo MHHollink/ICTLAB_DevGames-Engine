@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.model.User;
+import nl.devgames.model.dto.UserDTO;
 import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.KnownInternalServerError;
@@ -33,9 +34,9 @@ public abstract class BaseController {
                 session
         ); // Request to neo4j
 
-        return new User().createFromJsonObject(
+        return new UserDTO().createFromJsonObject(
                 grabData(jsonResponseString).get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject()
-        ); // Returns user object
+        ).toModel(); // Returns user object
     }
 
     protected boolean hasErrors(JsonObject json) {

@@ -6,6 +6,7 @@ import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.model.Business;
 import nl.devgames.model.User;
+import nl.devgames.model.dto.BusinessDTO;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -73,8 +74,8 @@ public class BusinessController extends BaseController{
                 session
         );
 
-        return new Business().createFromJsonObject(
+        return new BusinessDTO().createFromJsonObject(
                 grabData(json).get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject()
-        ); // Returns business object
+        ).toModel(); // Returns business object
     }
 }

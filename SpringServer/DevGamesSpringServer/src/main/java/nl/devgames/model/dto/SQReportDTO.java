@@ -27,6 +27,7 @@ public class SQReportDTO {
 	private List<Issue> issues;
 	private List<Duplication> duplications;
 	private double score;
+    private boolean valid = true;
 
 	public SQReportDTO() {
 		
@@ -91,60 +92,60 @@ public class SQReportDTO {
 	/**
      * Saves the report data to the neo4j database
      */
-	public void saveReportDataToDatabase() {
+	public void saveReportToDatabase() {
 		//TODO: save relations between objects
-		//push pushes to database
-		if(getTimeStamp()!=0L) {
+		if(valid) {
+            //push pushes to database
 			 Neo4JRestService.getInstance().postQuery(
 	                 "CREATE (n:Push { " +
 	                         "timestamp: '%d', score: '%d'})",
 	                 getTimeStamp(),
 	                 getScore()
 	         );
-		}
-		//push commits to database
-		if(getCommits()!=null) {
+		    //push commits to database
 			for (Commit commit : getCommits()) {
-				Neo4JRestService.getInstance().postQuery(
-		                "CREATE (n:Commit { " +
-		                        "commitId: '%s', commitMsg: '%s', timestamp: %d })",
-		                commit.getCommitId(),
-		                commit.getCommitMsg(),
-		                commit.getTimeStamp()
-		        );
-			}
-		}
-		//push issues to database
-		if(getIssues()!=null) {
-			for (Issue issue : getIssues()) {
-	            Neo4JRestService.getInstance().postQuery(
-	                    "CREATE (n:Issue { " +
-	                            "severity: '%s', component: '%s', message: '%s', " +
-	                            "status: '%s', resolution: '%s', dept: %d, " +
-	                            "startLine: %d, endLine: %d, creationDate : %d," +
-	                            "updateData: %d, closeData: %d })",
-	                    issue.getSeverity(),
-	                    issue.getComponent(),
-	                    issue.getMessage(),
-	                    issue.getStatus(),
-	                    issue.getResolution(),
-	                    issue.getDebt(),
-	                    issue.getStartLine(),
-	                    issue.getEndLine(),
-	                    issue.getCreationDate(),
-	                    issue.getUpdateDate(),
-	                    issue.getCloseDate()
-	            );
-	        }
-		}
-		//push duplications to neo4j database 
-		if(getDuplications()!=null) {
-			for (Duplication duplication : getDuplications()) {
-	            Neo4JRestService.getInstance().postQuery(
-	                    "CREATE (n:Duplication)"
-	            );
-	        }
-		}
+                Neo4JRestService.getInstance().postQuery(
+                        "CREATE (n:Commit { " +
+                                "commitId: '%s', commitMsg: '%s', timestamp: %d })",
+                        commit.getCommitId(),
+                        commit.getCommitMsg(),
+                        commit.getTimeStamp()
+                );
+            }
+            //push issues to database
+            for (Issue issue : getIssues()) {
+                Neo4JRestService.getInstance().postQuery(
+                        "CREATE (n:Issue { " +
+                                "severity: '%s', component: '%s', message: '%s', " +
+                                "status: '%s', resolution: '%s', dept: %d, " +
+                                "startLine: %d, endLine: %d, creationDate : %d," +
+                                "updateData: %d, closeData: %d })",
+                        issue.getSeverity(),
+                        issue.getComponent(),
+                        issue.getMessage(),
+                        issue.getStatus(),
+                        issue.getResolution(),
+                        issue.getDebt(),
+                        issue.getStartLine(),
+                        issue.getEndLine(),
+                        issue.getCreationDate(),
+                        issue.getUpdateDate(),
+                        issue.getCloseDate()
+                );
+            }
+            //push duplications to neo4j database
+            for (Duplication duplication : getDuplications()) {
+                Neo4JRestService.getInstance().postQuery(
+                        "CREATE (n:Duplication)"
+                );
+                //push duplication files to neo4j database
+                for (DuplicationFile duplicationFile : duplication.getFiles()) {
+                    Neo4JRestService.getInstance().postQuery(
+                            "CREATE (n:DuplicationFile)"
+                    );
+                }
+            }
+        }
 	}
 	
 //	private void getScoreBasedOnReport() {
@@ -266,7 +267,10 @@ public class SQReportDTO {
 			CommitDTO commit = new Gson().fromJson(object, CommitDTO.class);
 			//check if fields aren't empty
 			if(commit.isValid()) {
-				
+				commitList.add(commit.toModel());
+			}
+			else {
+				valid = false;
 			}
 //			String commitId = commitElement.getAsJsonObject().get("commitId").getAsString();
 //			String commitMsg = commitElement.getAsJsonObject().get("commitMsg").getAsString();
@@ -301,61 +305,70 @@ public class SQReportDTO {
 		//default
 		List<Issue> issueList = new ArrayList<>();
 		JsonArray issueArray = reportAsJson.get("issues").getAsJsonArray();
-		for(JsonElement issueElement : issueArray) {			
-			String issueSeverity = issueElement.getAsJsonObject().get("severity").getAsString();
-			String issueComponent = issueElement.getAsJsonObject().get("component").getAsString();
-			//range
-			JsonObject issueTextRange = issueElement.getAsJsonObject().get("textRange").getAsJsonObject();
-			Integer issueStartLine = issueTextRange.get("startLine").getAsInt();
-		    Integer issueEndLine = issueTextRange.get("endLine").getAsInt();
-		    
-		    String status = issueElement.getAsJsonObject().get("status").getAsString();
-		    String resolution = issueElement.getAsJsonObject().get("resolution").getAsString();
-		    String message = issueElement.getAsJsonObject().get("message").getAsString();
-		    
-		    //convert debt to int
-		    String debtAsString = "";
-		    Integer debt = 0;
-		    try{
-		        debtAsString = issueElement.getAsJsonObject().get("debt").getAsString();
-			    debt = Integer.parseInt(debtAsString.substring(0, debtAsString.length()-3));
-		    }
-		    catch(Exception e) {
-		    	L.og("error parsing debt of issue with message: %s", message);
-		    }
-		
-		    //timestamps 
-		    String creationDate = issueElement.getAsJsonObject().get("creationDate").getAsString();
-		    String updateDate = issueElement.getAsJsonObject().get("updateDate").getAsString();
-		    String closeDate = issueElement.getAsJsonObject().get("closeDate").getAsString();
-		    Long creationTimestamp = null;
-		    Long updateTimestamp = null;;
-		    Long closeTimestamp = null;;
-			try{
-				//parse date to epoch
-			    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss Z");
-			    Date parsedCreationDate = dateFormat.parse(creationDate);
-			    Date parsedUpdateDate = dateFormat.parse(updateDate);
-			    Date parsedCloseDate = dateFormat.parse(closeDate);
-			    creationTimestamp = parsedCreationDate.getTime();
-			    updateTimestamp = parsedUpdateDate.getTime();
-			    closeTimestamp = parsedCloseDate.getTime();
-			}
-			catch(Exception e){
-				L.og("error parsing timestamp of issue with message: %s", message);
-				creationTimestamp = System.currentTimeMillis();
-			    updateTimestamp = System.currentTimeMillis();
-			    closeTimestamp = System.currentTimeMillis();
-			}
-			if(issueSeverity!=null && issueComponent!=null && issueStartLine!=null && issueEndLine!=null
-					&& status!=null && resolution!=null && message!=null && debtAsString!=null) {
-				issueList.add(new Issue(issueSeverity, issueComponent, issueStartLine, issueEndLine,
-						status, resolution, message, debt, creationTimestamp, updateTimestamp,
-						closeTimestamp));
-			}
-			else{
-				System.out.println("error parsing issue with message: " + message);
-			}
+		for(JsonElement issueElement : issueArray) {
+            JsonObject object = issueElement.getAsJsonObject();
+            IssueDTO commit = new Gson().fromJson(object, IssueDTO.class);
+            //check if fields aren't empty
+            if(commit.isValid()) {
+                issueList.add(commit.toModel());
+            }
+            else {
+                valid = false;
+            }
+//			String issueSeverity = issueElement.getAsJsonObject().get("severity").getAsString();
+//			String issueComponent = issueElement.getAsJsonObject().get("component").getAsString();
+//			//range
+//			JsonObject issueTextRange = issueElement.getAsJsonObject().get("textRange").getAsJsonObject();
+//			Integer issueStartLine = issueTextRange.get("startLine").getAsInt();
+//		    Integer issueEndLine = issueTextRange.get("endLine").getAsInt();
+//
+//		    String status = issueElement.getAsJsonObject().get("status").getAsString();
+//		    String resolution = issueElement.getAsJsonObject().get("resolution").getAsString();
+//		    String message = issueElement.getAsJsonObject().get("message").getAsString();
+//
+//		    //convert debt to int
+//		    String debtAsString = "";
+//		    Integer debt = 0;
+//		    try{
+//		        debtAsString = issueElement.getAsJsonObject().get("debt").getAsString();
+//			    debt = Integer.parseInt(debtAsString.substring(0, debtAsString.length()-3));
+//		    }
+//		    catch(Exception e) {
+//		    	L.og("error parsing debt of issue with message: %s", message);
+//		    }
+//
+//		    //timestamps
+//		    String creationDate = issueElement.getAsJsonObject().get("creationDate").getAsString();
+//		    String updateDate = issueElement.getAsJsonObject().get("updateDate").getAsString();
+//		    String closeDate = issueElement.getAsJsonObject().get("closeDate").getAsString();
+//		    Long creationTimestamp = null;
+//		    Long updateTimestamp = null;;
+//		    Long closeTimestamp = null;;
+//			try{
+//				//parse date to epoch
+//			    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss Z");
+//			    Date parsedCreationDate = dateFormat.parse(creationDate);
+//			    Date parsedUpdateDate = dateFormat.parse(updateDate);
+//			    Date parsedCloseDate = dateFormat.parse(closeDate);
+//			    creationTimestamp = parsedCreationDate.getTime();
+//			    updateTimestamp = parsedUpdateDate.getTime();
+//			    closeTimestamp = parsedCloseDate.getTime();
+//			}
+//			catch(Exception e){
+//				L.og("error parsing timestamp of issue with message: %s", message);
+//				creationTimestamp = System.currentTimeMillis();
+//			    updateTimestamp = System.currentTimeMillis();
+//			    closeTimestamp = System.currentTimeMillis();
+//			}
+//			if(issueSeverity!=null && issueComponent!=null && issueStartLine!=null && issueEndLine!=null
+//					&& status!=null && resolution!=null && message!=null && debtAsString!=null) {
+//				issueList.add(new Issue(issueSeverity, issueComponent, issueStartLine, issueEndLine,
+//						status, resolution, message, debt, creationTimestamp, updateTimestamp,
+//						closeTimestamp));
+//			}
+//			else{
+//				System.out.println("error parsing issue with message: " + message);
+//			}
 		}
 		return issueList;
 	}
@@ -373,25 +386,34 @@ public class SQReportDTO {
 			//ONE duplication
 			Duplication duplication = new Duplication();
 			Set<DuplicationFile> duplicationFilesSet = new HashSet<>();
-			//TODO: HOE KRIJG IK ALLE FILES ALS ZE DEZELFDE NAAM HEBBEN??
 			JsonArray fileArray = duplicationElement.getAsJsonArray();
+            //for each duplication file
 			for(int i = 0; i < fileArray.size(); i++)
 			{
-				//for each file
-				String fileName = "unknown";
-				try{
-					DuplicationFile duplicationFile = new DuplicationFile();
-					JsonObject file = fileArray.get(i).getAsJsonObject();
-					fileName = file.get("name").getAsString();
-				    Integer fileFromLine = file.get("from").getAsInt();
-				    Integer fileSize = file.get("size").getAsInt();
-				    Integer fileEndLine = fileFromLine + fileSize;
-					//add to set
-					duplicationFilesSet.add(duplicationFile);
-				}
-				catch(Exception e) {
-					System.out.println("error parsing duplication with name: " + fileName);
-				}
+                JsonObject object = fileArray.get(i).getAsJsonObject();
+                DuplicationFileDTO duplicationFile = new Gson().fromJson(object, DuplicationFileDTO.class);
+                //check if fields aren't empty
+                if(duplicationFile.isValid()) {
+                    duplicationFilesSet.add(duplicationFile.toModel());
+                }
+                else {
+                    valid = false;
+                }
+//				//for each file
+//				String fileName = "unknown";
+//				try{
+//					DuplicationFile duplicationFile = new DuplicationFile();
+//					JsonObject file = fileArray.get(i).getAsJsonObject();
+//					fileName = file.get("name").getAsString();
+//				    Integer fileFromLine = file.get("from").getAsInt();
+//				    Integer fileSize = file.get("size").getAsInt();
+//				    Integer fileEndLine = fileFromLine + fileSize;
+//					//add to set
+//					duplicationFilesSet.add(duplicationFile);
+//				}
+//				catch(Exception e) {
+//					System.out.println("error parsing duplication with name: " + fileName);
+//				}
 			}
 			duplication.setFiles(duplicationFilesSet);
 			duplicationsList.add(duplication);

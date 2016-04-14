@@ -1,20 +1,13 @@
 package nl.devgames;
 
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.gcm.GCMMessage;
-import nl.devgames.connection.gcm.GCMMessageComposer;
-import nl.devgames.connection.gcm.GCMMessageType;
-import nl.devgames.connection.gcm.GCMRestService;
 import nl.devgames.model.*;
 import nl.devgames.model.dto.SQReportDTO;
-import nl.devgames.rest.controller.ProjectController;
 import nl.devgames.score.calculator.ScoreCalculator;
-import nl.devgames.utils.L;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Scanner;
 
 import com.google.gson.JsonObject;
@@ -103,7 +96,7 @@ public class TestMain {
 	         JsonObject reportAsJson = new JsonParser().parse(reportAsString).getAsJsonObject();
 	         SQReportDTO testReport = new SQReportDTO().buildFromJson(reportAsJson);
 	         testReport.setScore(new ScoreCalculator().calculateScoreFromReport(testReport));
-	         testReport.saveReportDataToDatabase();
+	         testReport.saveReportToDatabase();
 		}
 		catch(Exception e) {
 			e.printStackTrace();

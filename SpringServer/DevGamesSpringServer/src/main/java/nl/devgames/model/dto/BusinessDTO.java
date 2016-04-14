@@ -16,6 +16,7 @@ public class BusinessDTO extends ModelDTO<BusinessDTO, Business>{
 
     @Override
     public boolean isValid() {
+        boolean valid;
         return false;
     }
 
