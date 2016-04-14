@@ -3,6 +3,7 @@ package nl.devgames.model.dto;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import nl.devgames.model.DuplicationFile;
+import nl.devgames.utils.L;
 
 /**
  * Created by Marcel on 14-4-2016.
@@ -10,18 +11,40 @@ import nl.devgames.model.DuplicationFile;
 public class DuplicationFileDTO extends ModelDTO<DuplicationFileDTO, DuplicationFile> {
 
     public String file;
-    public int beginLine;
-    public int endLine;
-    public int size;
+    public Integer beginLine;
+    public Integer endLine;
+    public Integer size;
 
     @Override
     public DuplicationFile toModel() {
-        return null;
+        DuplicationFile df = new DuplicationFile();
+
+        df.setFile(file);
+        df.setBeginLine(beginLine);
+        df.setEndLine(endLine);
+        df.setSize(size);
+
+        return df;
     }
 
     @Override
     public boolean isValid() {
-        return false;
+        boolean valid = file != null &&
+                        beginLine != null &&
+                        endLine != null &&
+                        size != null;
+
+        if(!valid) {
+            L.w("DuplicationFile is not valid! False indicates a problem: " +
+                    "file:'%b', beginLine:'%b', endLine:'%b', size:'%b'",
+                    file != null,
+                    beginLine != null,
+                    endLine != null,
+                    size != null
+            );
+        }
+
+        return valid;
     }
 
     @Override
