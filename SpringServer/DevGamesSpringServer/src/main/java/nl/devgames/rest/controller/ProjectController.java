@@ -4,13 +4,17 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@RestController
+@RequestMapping(value = "/projects")
 public class ProjectController extends BaseController{
 
-    /**
+    /*
      * Get all project members excluding the user :
      *      <code>
      *          MATCH (u:User { username : 'Marcel' }) -[:is_developing]-> (p:Project) <-[:is_developing]- (r:User) RETURN r

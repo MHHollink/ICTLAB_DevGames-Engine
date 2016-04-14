@@ -1,12 +1,7 @@
 package nl.devgames.model;
 
-import com.google.gson.JsonObject;
-
 import java.util.Set;
 
-/**
- * Created by Marcel on 25-3-2016.
- */
 public class UserWithPassword extends User {
 
     private String password;

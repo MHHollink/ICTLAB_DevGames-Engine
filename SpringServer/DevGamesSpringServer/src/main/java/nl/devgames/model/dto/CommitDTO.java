@@ -1,11 +1,12 @@
 package nl.devgames.model.dto;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-
 import nl.devgames.model.Commit;
-import nl.devgames.model.Model;
 
+public class CommitDTO extends ModelDTO<CommitDTO, Commit> {
+/**
+ * Created by Marcel on 14-4-2016.
+ */
 public class CommitDTO extends ModelDTO<CommitDTO, Commit> {
 
 	@Override

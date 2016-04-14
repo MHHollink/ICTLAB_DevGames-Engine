@@ -1,13 +1,14 @@
 package nl.devgames.model;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Model<M> {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public abstract class Model {
 
     Long id;
 
@@ -38,31 +39,5 @@ public abstract class Model<M> {
         return id.equals(entity.id);
     }
 
-    /**
-     * Convine method to create a single object from a {@link com.google.gson.JsonObject}
-     *
-     * @param object
-     * @return
-     */
-    public abstract M createFromJsonObject(JsonObject object);
 
-    /**
-     * Creates a list of the {@link M} from a {@link com.google.gson.JsonArray}. The Objects are converted via {@link #createFromJsonObject(JsonObject)}
-     *
-     * @param array JSON array from Gson
-     * @return List of objects from the given model type
-     */
-    public List<M> createFromJsonArray(JsonArray array) {
-        List<M> list = new ArrayList<>();
-
-        for (int i = 0; i < array.size(); i++) {
-            list.add(
-                    createFromJsonObject(
-                            array.get(i).getAsJsonObject()
-                    )
-            );
-        }
-
-        return list;
-    }
 }
