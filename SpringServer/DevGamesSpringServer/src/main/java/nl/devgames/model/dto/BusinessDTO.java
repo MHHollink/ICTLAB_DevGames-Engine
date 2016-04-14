@@ -3,11 +3,20 @@ package nl.devgames.model.dto;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Business;
+import nl.devgames.model.Project;
+import nl.devgames.model.User;
+
+import java.util.Set;
 
 /**
  * Created by Marcel on 14-4-2016.
  */
 public class BusinessDTO extends ModelDTO<BusinessDTO, Business>{
+
+    public String name;
+
+    public Set<User> employees;
+    public Set<Project> projects;
 
     @Override
     public Business toModel() {

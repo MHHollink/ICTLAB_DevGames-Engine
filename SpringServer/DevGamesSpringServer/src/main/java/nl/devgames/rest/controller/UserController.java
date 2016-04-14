@@ -1,6 +1,7 @@
 package nl.devgames.rest.controller;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.Application;
@@ -12,6 +13,7 @@ import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
 import nl.devgames.model.UserWithPassword;
+import nl.devgames.model.dto.UserDTO;
 import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.NotFoundException;
 import nl.devgames.utils.L;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -170,7 +173,7 @@ public class UserController extends BaseController {
         if (rows.size() == 0)
             throw new NotFoundException("The server could not find the requested data...");
 
-        return new User().createFromJsonObject(rows.get(0).getAsJsonObject());
+        return new UserDTO().createFromJsonObject(rows.get(0).getAsJsonObject()).toModel();
     }
 
     private List<User> getUsersFromQuery(String query, Object... params) {
@@ -188,7 +191,13 @@ public class UserController extends BaseController {
         if (data.size() == 0)
             throw new NotFoundException("The server could not find the requested data...");
 
-        return new User().createFromJsonArray(data.get(0).getAsJsonObject().get("row").getAsJsonArray());
+        List<UserDTO> dtos = new UserDTO().createFromJsonArray(data.get(0).getAsJsonObject().get("row").getAsJsonArray());
+        List<User> users = new ArrayList<>();
+        for (UserDTO dto : dtos) {
+            users.add(dto.toModel());
+        }
+
+        return users;
     }
 
 }

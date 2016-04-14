@@ -1,5 +1,6 @@
 package nl.devgames.model.dto;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Project;
 
@@ -7,6 +8,10 @@ import nl.devgames.model.Project;
  * Created by Marcel on 14-4-2016.
  */
 public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
+
+    public String name;
+    public String description;
+
     @Override
     public Project toModel() {
         return null;
@@ -19,6 +24,6 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
 
     @Override
     public ProjectDTO createFromJsonObject(JsonObject object) {
-        return null;
+        return new Gson().fromJson(object, ProjectDTO.class);
     }
 }

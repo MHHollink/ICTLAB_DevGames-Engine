@@ -1,5 +1,6 @@
 package nl.devgames.model.dto;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Commit;
 
@@ -7,6 +8,10 @@ import nl.devgames.model.Commit;
  * Created by Marcel on 14-4-2016.
  */
 public class CommitDTO extends ModelDTO<CommitDTO, Commit> {
+
+    public String commitId;
+    public String commitMsg;
+    public long timeStamp;
 
     @Override
     public Commit toModel() {
@@ -20,6 +25,6 @@ public class CommitDTO extends ModelDTO<CommitDTO, Commit> {
 
     @Override
     public CommitDTO createFromJsonObject(JsonObject object) {
-        return null;
+        return new Gson().fromJson(object, CommitDTO.class);
     }
 }
