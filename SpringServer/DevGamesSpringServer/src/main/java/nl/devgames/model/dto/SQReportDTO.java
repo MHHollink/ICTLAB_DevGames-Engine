@@ -20,6 +20,7 @@ import nl.devgames.utils.L;
 
 public class SQReportDTO {
 	private Project project;
+	private long id;
 	private User author;
 	private Long timeStamp;
 	private ReportResultType buildResult;
@@ -50,7 +51,7 @@ public class SQReportDTO {
      * @param reportAsJson 		the report as json object
      * @return sqreport 		the new parsed report
      */
-	public SQReportDTO buildFromJson(JsonObject reportAsJson) {
+	public SQReportDTO buildFromJson(JsonObject reportAsJson) throws Exception {
 		L.og("Parsing SonarQube report");
 		//build project
 		Project project = parseProject(reportAsJson);
@@ -72,33 +73,40 @@ public class SQReportDTO {
 		
 		//duplications
 		List<Duplication> duplicationsList = parseDuplications(reportAsJson);
-		
-		SQReportDTO sqreport = new SQReportDTO();
-		//setters here
-		sqreport.setProject(project);
-		sqreport.setAuthor(author);
-		sqreport.setBuildResult(resultType);
-		sqreport.setTimeStamp(timestamp);
-		sqreport.setCommits(commitList);
-		sqreport.setIssues(issueList);
-		sqreport.setDuplications(duplicationsList);
-		sqreport.setTimeStamp(timestamp);
-//		sqreport.setScore(score);
-		L.og("Done parsing SonarQube report");
 
+		//return sqreport if valid data
+		SQReportDTO sqreport = new SQReportDTO();
+		if(valid) {
+			//setters here
+			sqreport.setProject(project);
+			sqreport.setAuthor(author);
+			sqreport.setBuildResult(resultType);
+			sqreport.setTimeStamp(timestamp);
+			sqreport.setCommits(commitList);
+			sqreport.setIssues(issueList);
+			sqreport.setDuplications(duplicationsList);
+			sqreport.setTimeStamp(timestamp);
+//		sqreport.setScore(score);
+			L.og("Done parsing SonarQube report");
+		}
+		else{
+			//throw exception
+			throw new Exception("error parsing sonar qube qreport");
+		}
 		return sqreport;
 	}
 	
 	/**
      * Saves the report data to the neo4j database
      */
-	public void saveReportToDatabase() {
-		//TODO: save relations between objects
+	public void saveReportToDatabase() throws Exception {
 		if(valid) {
-            //push pushes to database
+//			NODES
+            //push push to database
 			 Neo4JRestService.getInstance().postQuery(
 	                 "CREATE (n:Push { " +
-	                         "timestamp: '%d', score: '%d'})",
+	                         "id: '%d', timestamp: '%d', score: '%d'})",
+					 getId(),
 	                 getTimeStamp(),
 	                 getScore()
 	         );
@@ -136,7 +144,9 @@ public class SQReportDTO {
             //push duplications to neo4j database
             for (Duplication duplication : getDuplications()) {
                 Neo4JRestService.getInstance().postQuery(
-                        "CREATE (n:Duplication)"
+                        "CREATE (n:Duplication { " +
+								"id: '%d' })",
+						duplication.getId()
                 );
                 //push duplication files to neo4j database
                 for (DuplicationFile duplicationFile : duplication.getFiles()) {
@@ -145,7 +155,47 @@ public class SQReportDTO {
                     );
                 }
             }
+//			RELATIONSHIPS
+			//push push relations to database
+			for (Commit commit : getCommits()) {
+				Neo4JRestService.getInstance().postQuery(
+						"MATCH (a:Push { id: '%d' }), (b:Commit { id: '%d' }) " +
+								"CREATE (a)-[:contains_commits]->(b)",
+						getId(),
+						commit.getCommitId()
+				);
+			}
+			//push issue relations to database
+			for (Issue issue : getIssues()) {
+				Neo4JRestService.getInstance().postQuery(
+						"MATCH (a:Push { id: '%d' }), (b:Issue { id: '%d' }) " +
+								"CREATE (a)-[:contains_issues]->(b)",
+						getId(),
+						issue.getId()
+				);
+			}
+			//push duplication to database
+			for(Duplication duplication : getDuplications()) {
+				Neo4JRestService.getInstance().postQuery(
+						"MATCH (a:Push { id: '%d' }), (b:Duplication { id: '%d' }) " +
+								"CREATE (a)-[:contains_duplications]->(b)",
+						getId(),
+						duplication.getId()
+				);
+				//push duplication files to database
+				for(DuplicationFile duplicationFile : duplication.getFiles()) {
+					Neo4JRestService.getInstance().postQuery(
+							"MATCH (a:Duplication { id: '%d' }), (b:DuplicationFile { id: '%d' }) " +
+									"CREATE (a)-[:contains_files]->(b)",
+							duplication.getId(),
+							duplicationFile.getId()
+					);
+				}
+			}
         }
+		else {
+			throw new Exception("cannot save report due to invalid data");
+		}
 	}
 	
 //	private void getScoreBasedOnReport() {
@@ -161,8 +211,7 @@ public class SQReportDTO {
 	 * @param reportAsJson		the json object of the report
 	 * @return project			the project with the project name
 	 */
-	private Project parseProject(JsonObject reportAsJson) {	
-//		reportAsJson.has("projectName")
+	private Project parseProject(JsonObject reportAsJson) {
 		//default
 		String projectName = reportAsJson.get("projectName").getAsString();
 		Project project = new Project();
@@ -170,9 +219,8 @@ public class SQReportDTO {
 			project.setName(projectName);
 		}
 		else {
-//			Exception e = new ("");
-//			L.og(e, "error parsing project name");
-//			throw e;
+			valid = false;
+			L.og("error parsing project name");
 		}
 		return project;
 	}
@@ -203,6 +251,7 @@ public class SQReportDTO {
 		}
 		else {
 			L.og("error parsing author");
+			valid = false;
 		}
 		return author;
 	}
@@ -229,6 +278,9 @@ public class SQReportDTO {
 				break;
 			}
 		}
+		else {
+			valid = false;
+		}
 		return resultType;
 	}
 	
@@ -249,6 +301,9 @@ public class SQReportDTO {
 				L.og("invalid timestamp while parsing the report, set to current time");
 				timestamp = System.currentTimeMillis();
 			}
+		}
+		else {
+			valid = false;
 		}
 		return timestamp;
 	}
@@ -431,6 +486,14 @@ public class SQReportDTO {
 
 	public void setProject(Project project) {
 		this.project = project;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public User getAuthor() {

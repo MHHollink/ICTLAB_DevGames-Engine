@@ -9,6 +9,7 @@ import java.util.Set;
 public class Duplication extends Model {
 
     Set<DuplicationFile> files;
+    long duplicationId;
 
     public Duplication() {
         files = new HashSet<>();
@@ -24,6 +25,14 @@ public class Duplication extends Model {
 
     public void setFiles(Set<DuplicationFile> files) {
         this.files = files;
+    }
+
+    public long getDuplicationId() {
+        return duplicationId;
+    }
+
+    public void setDuplicationId(long id) {
+        this.duplicationId = id;
     }
 
     @Override

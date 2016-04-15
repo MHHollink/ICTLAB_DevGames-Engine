@@ -7,7 +7,6 @@ public class Issue extends Model {
 
     String severity;
     String component;
-    String author;
 
     int startLine;
     int endLine;
