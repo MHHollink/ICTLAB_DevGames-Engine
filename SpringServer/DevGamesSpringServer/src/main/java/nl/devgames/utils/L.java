@@ -4,11 +4,11 @@ import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static nl.devgames.utils.L.LogLevel.TRACE;
 import static nl.devgames.utils.L.LogLevel.DEBUG;
-import static nl.devgames.utils.L.LogLevel.INFO;
-import static nl.devgames.utils.L.LogLevel.WARN;
 import static nl.devgames.utils.L.LogLevel.ERROR;
+import static nl.devgames.utils.L.LogLevel.INFO;
+import static nl.devgames.utils.L.LogLevel.TRACE;
+import static nl.devgames.utils.L.LogLevel.WARN;
 
 public class L {
 

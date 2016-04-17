@@ -3,7 +3,12 @@ package nl.devgames.connection.gcm;
 import nl.devgames.utils.L;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class GCMMessage{
 

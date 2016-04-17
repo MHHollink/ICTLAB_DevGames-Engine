@@ -2,6 +2,10 @@ package nl.devgames.model;
 
 import java.util.Set;
 
+/**
+ * This class is used for the {@link User}'s that need a password. It is used in the {@link nl.devgames.rest.controller.UserController#createNewUser(UserWithPassword)} to save a password.
+ * This class i only used for creation of uses and updating a users password.
+ */
 public class UserWithPassword extends User {
 
     private String password;

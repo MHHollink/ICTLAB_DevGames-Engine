@@ -1,4 +1,4 @@
-package nl.devgames.model.dto;
+package nl.devgames.connection.database.dto;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

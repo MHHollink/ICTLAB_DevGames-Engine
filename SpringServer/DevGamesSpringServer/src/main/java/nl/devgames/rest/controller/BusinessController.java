@@ -1,20 +1,14 @@
 package nl.devgames.rest.controller;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
+import nl.devgames.connection.database.dto.BusinessDTO;
 import nl.devgames.model.Business;
-import nl.devgames.model.User;
-import nl.devgames.model.dto.BusinessDTO;
 import nl.devgames.utils.L;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * The Bussiness controller contains all rest request used on the `business` resource.

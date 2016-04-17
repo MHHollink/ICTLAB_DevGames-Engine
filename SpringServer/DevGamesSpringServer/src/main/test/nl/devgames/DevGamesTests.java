@@ -1,13 +1,19 @@
 package nl.devgames;
 
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.model.*;
+import nl.devgames.model.Business;
+import nl.devgames.model.Commit;
+import nl.devgames.model.Duplication;
+import nl.devgames.model.DuplicationFile;
+import nl.devgames.model.Issue;
+import nl.devgames.model.Project;
+import nl.devgames.model.Push;
+import nl.devgames.model.User;
+import nl.devgames.model.UserWithPassword;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 
 /**
@@ -102,6 +108,11 @@ public abstract class DevGamesTests {
             dbService.postQuery(
                     "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmRegId: '%s' }) ",
                     user.getUsername(), user.getGitUsername(), user.getFirstName(), user.getLastName(), user.getAge(), user.getMainJob(), user.getPassword(), user.getGcmId());
+
+
+
+        dbService.postQuery("CREATE (n:User { id: '1', username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmRegId: '%s' }) ");
+
 
         dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'DevGames' }) CREATE (a)-[:is_developing]->(b)");
         dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Clarity' }) CREATE (a)-[:is_developing]->(b)");

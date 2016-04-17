@@ -35,7 +35,7 @@ public class UserControllerTest extends DevGamesTests{
     @Test
     public void testGetOwnUserFromSessionToken() throws Exception {
         User user = controller.getOwnUser(sessionToken);
-        assertEquals(user.getUsername(), username);
+        assertEquals(username, user.getUsername());
     }
 
     @Test(expected = InvalidSessionException.class)
@@ -118,8 +118,8 @@ public class UserControllerTest extends DevGamesTests{
                                 .get(Application.SESSION_HEADER_KEY)
                 ).getId();
         User otherUser = controller.getUser(sessionToken, otherUserId);
-        assertEquals(otherUser.getId(), otherUserId);
-        assertEquals(otherUser.getUsername(), "Evestar");
+        assertEquals(otherUserId, otherUser.getId());
+        assertEquals("Evestar", otherUser.getUsername());
     }
 
     @Test (expected = InvalidSessionException.class)

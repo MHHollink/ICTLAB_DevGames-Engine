@@ -1,8 +1,5 @@
 package nl.devgames.model;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
 import java.util.Set;
 
 public class User extends Model {
@@ -20,7 +17,7 @@ public class User extends Model {
     private Set<Project> projects;
     private Set<Push> pushes;
 
-    private String SessionId;
+    private String sessionId;
     private String gcmId;
 
     public User() {
@@ -36,7 +33,7 @@ public class User extends Model {
         this.mainJob = mainJob;
         this.projects = projects;
         this.pushes = pushes;
-        SessionId = sessionId;
+        this.sessionId = sessionId;
         this.gcmId = gcmId;
     }
 
@@ -113,11 +110,11 @@ public class User extends Model {
     }
 
     public String getSessionId() {
-        return SessionId;
+        return sessionId;
     }
 
     public void setSessionId(String sessionId) {
-        SessionId = sessionId;
+        this.sessionId = sessionId;
     }
 
     public String getGcmId() {
@@ -140,7 +137,7 @@ public class User extends Model {
                 ", mainJob='" + mainJob + '\'' +
                 ", projects=" + projects +
                 ", pushes=" + pushes +
-                ", SessionId='" + SessionId + '\'' +
+                ", sessionId='" + sessionId + '\'' +
                 ", gcmId='" + gcmId + '\'' +
                 "} " + super.toString();
     }

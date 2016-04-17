@@ -1,8 +1,5 @@
 package nl.devgames.model;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
 import java.util.Set;
 
 public class Business extends Model {

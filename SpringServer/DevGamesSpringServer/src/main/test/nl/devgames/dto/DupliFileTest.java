@@ -1,13 +1,10 @@
 package nl.devgames.dto;
 
-import nl.devgames.model.Duplication;
-import nl.devgames.model.DuplicationFile;
-import nl.devgames.model.dto.DuplicationFileDTO;
+import nl.devgames.connection.database.dto.DuplicationFileDTO;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertFalse;
-import static org.hamcrest.junit.MatcherAssert.assertThat;
 
 /**
  * Created by Marcel on 14-4-2016.

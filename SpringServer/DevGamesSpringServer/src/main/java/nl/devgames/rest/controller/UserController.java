@@ -1,11 +1,10 @@
 package nl.devgames.rest.controller;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
+import nl.devgames.connection.database.dto.ModelDTO;
+import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
 import nl.devgames.model.Issue;
@@ -13,7 +12,6 @@ import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
 import nl.devgames.model.UserWithPassword;
-import nl.devgames.model.dto.UserDTO;
 import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.NotFoundException;
 import nl.devgames.utils.L;
@@ -147,46 +145,44 @@ public class UserController extends BaseController {
     }
 
 
-
-
-        /*****************************/
-     /**  Convenience methods   **/
-    /****************************/
-
+    /**
+     * This private method is used to extract a user object from a database query
+     *
+     * @param query     String value of a formatted query
+     * @param params    Optional parameters used in the {@param query}
+     * @return a user found by the {@param query}
+     */
     private User getUserFromQuery(String query, Object... params) {
         String jsonResponseString = Neo4JRestService.getInstance().postQuery(
                 query,
                 params
         ); // Request to neo4j
 
-        JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject(); // parse neo4j response
+        JsonArray data = UserDTO.getNeo4JData(jsonResponseString);
 
-        if (hasErrors(jsonResponse)) return null;
+        if (data.size() == 0) throw new NotFoundException("The server could not find the requested data...");
 
-        JsonArray data = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
+        UserDTO userDTO = new UserDTO().createFromJsonObject(
+                data.get(0).getAsJsonObject()
+        );
 
-        if (data.size() == 0)
-            throw new NotFoundException("The server could not find the requested data...");
-
-        JsonArray rows = data.get(0).getAsJsonObject().get("row").getAsJsonArray();
-
-        if (rows.size() == 0)
-            throw new NotFoundException("The server could not find the requested data...");
-
-        return new UserDTO().createFromJsonObject(rows.get(0).getAsJsonObject()).toModel();
+        return userDTO.toModel();
     }
 
+    /**
+     * This private method is used to extract multiple users from a database query
+     *
+     * @param query     String value of a formatted query
+     * @param params    Optional parameters used in the {@param query}
+     * @return a list of all users found by the {@param query}
+     */
     private List<User> getUsersFromQuery(String query, Object... params) {
         String jsonResponseString = Neo4JRestService.getInstance().postQuery(
                 query,
                 params
         ); // Request to neo4j
 
-        JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject(); // parse neo4j response
-
-        if(hasErrors(jsonResponse)) return null;
-
-        JsonArray data = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
+        JsonArray data = ModelDTO.getNeo4JData(jsonResponseString);
 
         if (data.size() == 0)
             throw new NotFoundException("The server could not find the requested data...");

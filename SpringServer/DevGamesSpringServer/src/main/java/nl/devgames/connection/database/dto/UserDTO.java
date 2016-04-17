@@ -1,4 +1,4 @@
-package nl.devgames.model.dto;
+package nl.devgames.connection.database.dto;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -23,12 +23,28 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
     public Set<Project> projects;
     public Set<Push> pushes;
 
-    public String SessionId;
+    public String session;
     public String gcmId;
 
     @Override
     public User toModel() {
-        return null;
+
+        User user = new User();
+
+        user.setId(id);
+        user.setUsername(username);
+        user.setGitUsername(gitUsername);
+        user.setFirstName(firstName);
+        user.setTween(tween);
+        user.setLastName(lastName);
+        user.setAge(age);
+        user.setMainJob(mainJob);
+        user.setProjects(projects);
+        user.setPushes(pushes);
+        user.setSessionId(session);
+        user.setGcmId(gcmId);
+
+        return user;
     }
 
     @Override
