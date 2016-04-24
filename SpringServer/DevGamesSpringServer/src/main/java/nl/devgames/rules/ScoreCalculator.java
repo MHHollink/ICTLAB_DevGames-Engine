@@ -1,11 +1,11 @@
-package nl.devgames.score.calculator;
-
-import java.util.List;
+package nl.devgames.rules;
 
 import com.google.gson.JsonObject;
 import nl.devgames.model.Issue;
-import nl.devgames.model.dto.ReportResultType;
-import nl.devgames.model.dto.SQReportDTO;
+import nl.devgames.connection.database.dto.ReportResultType;
+import nl.devgames.connection.database.dto.SQReportDTO;
+
+import java.util.List;
 
 public class ScoreCalculator {
 	SQReportDTO sqReporDTO;
@@ -31,7 +31,7 @@ public class ScoreCalculator {
 	private double subtractBuildPoints(double score) {
 		double newScore = score;
 		if(this.sqReporDTO.getBuildResult()==ReportResultType.SUCCESS) {
-			
+			// TODO ?
 		}
 		else if(this.sqReporDTO.getBuildResult()==ReportResultType.FAILED){
 			newScore -= 500.0;

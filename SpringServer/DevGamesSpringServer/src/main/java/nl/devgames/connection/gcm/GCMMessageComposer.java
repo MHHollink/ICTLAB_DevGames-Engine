@@ -1,19 +1,13 @@
 package nl.devgames.connection.gcm;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import nl.devgames.model.User;
+import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.rest.errors.NotFoundException;
 import nl.devgames.utils.L;
-import nl.devgames.connection.AbsRestService;
-import nl.devgames.connection.database.Neo4JRestService;
 
 public class GCMMessageComposer {
 	/*

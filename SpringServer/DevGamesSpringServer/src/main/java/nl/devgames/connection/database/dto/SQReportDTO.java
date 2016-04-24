@@ -1,12 +1,9 @@
-package nl.devgames.model.dto;
-
-import java.util.*;
+package nl.devgames.connection.database.dto;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
@@ -15,6 +12,11 @@ import nl.devgames.model.Issue;
 import nl.devgames.model.Project;
 import nl.devgames.model.User;
 import nl.devgames.utils.L;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class SQReportDTO {
 	private Project project;
