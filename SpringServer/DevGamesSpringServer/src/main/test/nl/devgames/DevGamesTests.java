@@ -66,7 +66,7 @@ public abstract class DevGamesTests {
         };
 
         Issue[] issues = {
-                new Issue("MAJOR", "nl.devgames.Application", 11, 13, "OPEN", null, "This application is still shit", 840, 1455217086, 1459624317, 0)
+                new Issue(213456, "MAJOR", "nl.devgames.Application", 11, 13, "OPEN", null, "This application is still shit", 840, 1455217086, 1459624317, 0)
         };
 
         dbService = Neo4JRestService.getInstance();

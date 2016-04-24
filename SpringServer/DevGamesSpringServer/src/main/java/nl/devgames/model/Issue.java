@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 public class Issue extends Model {
+    long issueId;
 
     String severity;
     String component;
@@ -24,7 +25,8 @@ public class Issue extends Model {
     public Issue() {
     }
 
-    public Issue(String severity, String component, int startLine, int endLine, String status, String resolution, String message, int debt, long creationDate, long updateDate, long closeDate) {
+    public Issue(long issueId, String severity, String component, int startLine, int endLine, String status, String resolution, String message, int debt, long creationDate, long updateDate, long closeDate) {
+        this.issueId = issueId;
         this.severity = severity;
         this.component = component;
         this.startLine = startLine;
@@ -36,6 +38,14 @@ public class Issue extends Model {
         this.creationDate = creationDate;
         this.updateDate = updateDate;
         this.closeDate = closeDate;
+    }
+
+    public long getIssueId() {
+        return issueId;
+    }
+
+    public void setIssueId(long issueId) {
+        this.issueId = issueId;
     }
 
     public String getSeverity() {

@@ -59,7 +59,7 @@ public class TestMain {
     };
 
     static Issue[] issues = {
-            new Issue("MAJOR", "nl.devgames.Application", 11, 13, "OPEN", null, "This application is still shit", 840, 1455217086, 1459624317, 0)
+            new Issue(21345656, "MAJOR", "nl.devgames.Application", 11, 13, "OPEN", null, "This application is still shit", 840, 1455217086, 1459624317, 0)
     };
 
     public static void main(String[] args) {
@@ -88,19 +88,51 @@ public class TestMain {
     }
 
     private static void loadTestPush() {
-		try {
-	         File file = new File("jsonJenkins.txt");
-	         Scanner scanner = new Scanner(file);
-	         String reportAsString = scanner.useDelimiter("\\Z").next();
-	         scanner.close();
-	         JsonObject reportAsJson = new JsonParser().parse(reportAsString).getAsJsonObject();
-	         SQReportDTO testReport = new SQReportDTO().buildFromJson(reportAsJson);
-	         testReport.setScore(new ScoreCalculator().calculateScoreFromReport(testReport));
-	         testReport.saveReportToDatabase();
+        try {
+            File testReportFile = new File("jsonJenkins.txt");
+            Scanner scanner = new Scanner(testReportFile);
+            String reportAsString = scanner.useDelimiter("\\Z").next();
+            JsonObject reportAsJson = new JsonParser().parse(reportAsString).getAsJsonObject();
+            SQReportDTO testReport = new SQReportDTO().buildFromJson(reportAsJson);
+
+            //calculate score
+            File testSettingsFile = new File("settingsTest.txt");
+            scanner = new Scanner(testSettingsFile);
+            String settingsAsString = scanner.useDelimiter("\\Z").next();
+            scanner.close();
+            JsonObject settings = new JsonParser().parse(settingsAsString).getAsJsonObject();
+            testReport.setScore(new ScoreCalculator().calculateScoreFromReport(testReport, settings));
+
+            //delete everything first
+            deleteAllReports();
+            testReport.saveReportToDatabase();
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 		}
+    }
+
+    private static void deleteAllReports() {
+        //delete pushes
+        Neo4JRestService.getInstance().postQuery(
+                "MATCH (n:Push) DETACH DELETE n"
+        );
+        //delete commits
+        Neo4JRestService.getInstance().postQuery(
+                "MATCH (n:Commit) DETACH DELETE n"
+        );
+        //delete issues
+        Neo4JRestService.getInstance().postQuery(
+                "MATCH (n:Issue) DETACH DELETE n"
+        );
+        //delete duplications
+        Neo4JRestService.getInstance().postQuery(
+                "MATCH (n:Duplication) DETACH DELETE n"
+        );
+        //delete duplication files
+        Neo4JRestService.getInstance().postQuery(
+                "MATCH (n:DuplicationFile) DETACH DELETE n"
+        );
     }
 
     private static void fillDummyDB(){

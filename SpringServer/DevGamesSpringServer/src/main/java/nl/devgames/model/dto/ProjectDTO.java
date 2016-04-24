@@ -3,6 +3,7 @@ package nl.devgames.model.dto;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Project;
+import nl.devgames.utils.L;
 
 /**
  * Created by Marcel on 14-4-2016.
@@ -14,12 +15,28 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
 
     @Override
     public Project toModel() {
-        return null;
+        Project project = new Project();
+
+        project.setName(this.name);
+        project.setDescription(this.description);
+
+        return project;
     }
 
     @Override
     public boolean isValid() {
-        return false;
+        boolean valid = name != null &&
+                description != null;
+
+        if(!valid) {
+            L.w("Project is not valid! False indicates a problem: " +
+                            "name:'%b', description:'%b'",
+                    name != null,
+                    description != null
+            );
+        }
+
+        return valid;
     }
 
     @Override

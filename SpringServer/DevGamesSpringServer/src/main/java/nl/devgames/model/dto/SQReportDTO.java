@@ -1,6 +1,5 @@
 package nl.devgames.model.dto;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.google.gson.Gson;
@@ -15,14 +14,13 @@ import nl.devgames.model.DuplicationFile;
 import nl.devgames.model.Issue;
 import nl.devgames.model.Project;
 import nl.devgames.model.User;
-import nl.devgames.score.calculator.ScoreCalculator;
 import nl.devgames.utils.L;
 
 public class SQReportDTO {
 	private Project project;
 	private long id;
 	private User author;
-	private Long timeStamp;
+	private long timestamp;
 	private ReportResultType buildResult;
 	private List<Commit> commits;
 	private List<Issue> issues;
@@ -34,11 +32,11 @@ public class SQReportDTO {
 		
 	}
 	
-	public SQReportDTO(Project project, User author, long timeStamp, ReportResultType buildResult, 
+	public SQReportDTO(Project project, User author, long timestamp, ReportResultType buildResult,
 			List<Commit> commits, List<Issue> issues, List<Duplication> duplications) {
 		this.project = project;
 		this.author = author;
-		this.timeStamp = timeStamp;
+		this.timestamp = timestamp;
 		this.buildResult = buildResult;
 		this.commits = commits;
 		this.issues = issues;
@@ -52,7 +50,7 @@ public class SQReportDTO {
      * @return sqreport 		the new parsed report
      */
 	public SQReportDTO buildFromJson(JsonObject reportAsJson) throws Exception {
-		L.og("Parsing SonarQube report");
+		L.i("Parsing SonarQube report");
 		//build project
 		Project project = parseProject(reportAsJson);
 		
@@ -81,11 +79,11 @@ public class SQReportDTO {
 			sqreport.setProject(project);
 			sqreport.setAuthor(author);
 			sqreport.setBuildResult(resultType);
-			sqreport.setTimeStamp(timestamp);
+			sqreport.setTimestamp(timestamp);
 			sqreport.setCommits(commitList);
 			sqreport.setIssues(issueList);
 			sqreport.setDuplications(duplicationsList);
-			sqreport.setTimeStamp(timestamp);
+			sqreport.setTimestamp(timestamp);
 //		sqreport.setScore(score);
 			L.og("Done parsing SonarQube report");
 		}
@@ -105,13 +103,13 @@ public class SQReportDTO {
             //push push to database
 			 Neo4JRestService.getInstance().postQuery(
 	                 "CREATE (n:Push { " +
-	                         "id: '%d', timestamp: '%d', score: '%d'})",
-					 getId(),
-	                 getTimeStamp(),
-	                 getScore()
+	                         "id: '%d', timestamp: '%d', score: '%f'})",
+					 this.getId(),
+					 this.getTimestamp(),
+					 this.getScore()
 	         );
 		    //push commits to database
-			for (Commit commit : getCommits()) {
+			for (Commit commit : this.getCommits()) {
                 Neo4JRestService.getInstance().postQuery(
                         "CREATE (n:Commit { " +
                                 "commitId: '%s', commitMsg: '%s', timestamp: %d })",
@@ -121,14 +119,16 @@ public class SQReportDTO {
                 );
             }
             //push issues to database
-            for (Issue issue : getIssues()) {
+            for (Issue issue : this.getIssues()) {
                 Neo4JRestService.getInstance().postQuery(
                         "CREATE (n:Issue { " +
+								"issueId: '%d', " +
                                 "severity: '%s', component: '%s', message: '%s', " +
                                 "status: '%s', resolution: '%s', dept: %d, " +
                                 "startLine: %d, endLine: %d, creationDate : %d," +
                                 "updateData: %d, closeData: %d })",
-                        issue.getSeverity(),
+                        issue.getId(),
+						issue.getSeverity(),
                         issue.getComponent(),
                         issue.getMessage(),
                         issue.getStatus(),
@@ -142,7 +142,7 @@ public class SQReportDTO {
                 );
             }
             //push duplications to neo4j database
-            for (Duplication duplication : getDuplications()) {
+            for (Duplication duplication : this.getDuplications()) {
                 Neo4JRestService.getInstance().postQuery(
                         "CREATE (n:Duplication { " +
 								"id: '%d' })",
@@ -157,29 +157,29 @@ public class SQReportDTO {
             }
 //			RELATIONSHIPS
 			//push push relations to database
-			for (Commit commit : getCommits()) {
+			for (Commit commit : this.getCommits()) {
 				Neo4JRestService.getInstance().postQuery(
-						"MATCH (a:Push { id: '%d' }), (b:Commit { id: '%d' }) " +
+						"MATCH (a:Push { id: '%d' }), (b:Commit { id: '%s' }) " +
 								"CREATE (a)-[:contains_commits]->(b)",
-						getId(),
+						this.getId(),
 						commit.getCommitId()
 				);
 			}
 			//push issue relations to database
-			for (Issue issue : getIssues()) {
+			for (Issue issue : this.getIssues()) {
 				Neo4JRestService.getInstance().postQuery(
 						"MATCH (a:Push { id: '%d' }), (b:Issue { id: '%d' }) " +
 								"CREATE (a)-[:contains_issues]->(b)",
-						getId(),
+						this.getId(),
 						issue.getId()
 				);
 			}
 			//push duplication to database
-			for(Duplication duplication : getDuplications()) {
+			for(Duplication duplication : this.getDuplications()) {
 				Neo4JRestService.getInstance().postQuery(
 						"MATCH (a:Push { id: '%d' }), (b:Duplication { id: '%d' }) " +
 								"CREATE (a)-[:contains_duplications]->(b)",
-						getId(),
+						this.getId(),
 						duplication.getId()
 				);
 				//push duplication files to database
@@ -212,7 +212,6 @@ public class SQReportDTO {
 	 * @return project			the project with the project name
 	 */
 	private Project parseProject(JsonObject reportAsJson) {
-		//default
 		String projectName = reportAsJson.get("projectName").getAsString();
 		Project project = new Project();
 		if(projectName!=null) {
@@ -220,7 +219,7 @@ public class SQReportDTO {
 		}
 		else {
 			valid = false;
-			L.og("error parsing project name");
+			L.e("error parsing project name");
 		}
 		return project;
 	}
@@ -362,10 +361,10 @@ public class SQReportDTO {
 		JsonArray issueArray = reportAsJson.get("issues").getAsJsonArray();
 		for(JsonElement issueElement : issueArray) {
             JsonObject object = issueElement.getAsJsonObject();
-            IssueDTO commit = new Gson().fromJson(object, IssueDTO.class);
+            IssueDTO issue = new Gson().fromJson(object, IssueDTO.class);
             //check if fields aren't empty
-            if(commit.isValid()) {
-                issueList.add(commit.toModel());
+            if(issue.isValid()) {
+                issueList.add(issue.toModel());
             }
             else {
                 valid = false;
@@ -441,7 +440,7 @@ public class SQReportDTO {
 			//ONE duplication
 			Duplication duplication = new Duplication();
 			Set<DuplicationFile> duplicationFilesSet = new HashSet<>();
-			JsonArray fileArray = duplicationElement.getAsJsonArray();
+			JsonArray fileArray = duplicationElement.getAsJsonObject().get("files").getAsJsonArray();
             //for each duplication file
 			for(int i = 0; i < fileArray.size(); i++)
 			{
@@ -504,12 +503,12 @@ public class SQReportDTO {
 		this.author = author;
 	}
 
-	public long getTimeStamp() {
-		return timeStamp;
+	public long getTimestamp() {
+		return timestamp;
 	}
 
-	public void setTimeStamp(long timeStamp) {
-		this.timeStamp = timeStamp;
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	public ReportResultType getBuildResult() {

@@ -6,46 +6,37 @@
 	items: [{
 		commitId: "81f5429a5145a25001ae2510ad860d04e11a8460",
 		commitMsg: "remove test files",
-		date: "2016-03-24 13:14:57 +0100"
+		timestamp: "123456"
 	}, {
 		commitId: "879a0ba220f5c1441cfc6ac5d8d521f5df0dfee7",
 		commitMsg: "folders",
-		date: "2016-03-24 13:15:50 +0100"
+		timestamp: "123456"
 	}],
 	issues: [{
 		severity: "MAJOR",
 		component: "nl.evertjanheilema.testprojects:TestProject:src/main/java/Application.java",
-		project: "nl.evertjanheilema.testprojects:TestProject",
-		textRange: {
-			startLine: 7,
-			endLine: 7,
-			startOffset: 0,
-			endOffset: 36
-		},
+		startLine: 7,
+		endLine: 20,
 		status: "OPEN",
 		resolution: "FIXED",
 		message: "Add a private constructor to hide the implicit public one.",
-		debt: "30min",
-		author: "evertjan9@gmail.com",
-		tags: ["convention"],
-		creationDate: "2016-03-24T14:24:15+0100",
-		updateDate: "2016-03-24T15:40:41+0100",
-		closeDate: "2016-03-24T15:40:41+0100"
+		debt: "30",
+		creationDate: "2345678",
+		updateDate: "2345678",
+		closeDate: "2345678"
 	}],
 	duplications: [{
-		blocks: [{
-			{
-				name: "src/nl/evertjanheilema/Main.java",
-				project: "DevGames",
-				from: 119,
-				size: 10
+		files: [{
+				file: "src/nl/evertjanheilema/Main.java",
+				beginLine: 119,
+				endLine: 125,
+				size: 16
 			},
 			{
-				name: "src/nl/evertjanheilema/Controllers/MainScreenController.java",
-				project: "DevGames",
-				from: 221,
-				size: 11
-			}
-		}]
+				file: "src/nl/evertjanheilema/Controllers/MainScreenController.java",
+				beginLine: 221,
+				endLine: 127,
+				size: 15
+			}]
 	}]
 }

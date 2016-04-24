@@ -3,21 +3,41 @@ package nl.devgames.model.dto;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Commit;
+import nl.devgames.utils.L;
 
-public abstract class CommitDTO extends ModelDTO<CommitDTO, Commit> {
+public class CommitDTO extends ModelDTO<CommitDTO, Commit> {
 
     public String commitId;
     public String commitMsg;
-    public long timeStamp;
+    public long timestamp;
 
     @Override
     public Commit toModel() {
-        return null;
+        Commit commit = new Commit();
+
+        commit.setCommitId(this.commitId);
+        commit.setCommitMsg(this.commitMsg);
+        commit.setTimeStamp(this.timestamp);
+
+        return commit;
     }
 
     @Override
     public boolean isValid() {
-        return false;
+        boolean valid = commitId != null &&
+                commitMsg != null &&
+                timestamp != 0d;
+
+        if(!valid) {
+            L.w("Commit is not valid! False indicates a problem: " +
+                            "commitId:'%b', commitMsg:'%b', timestamp:'%b'",
+                    commitId != null,
+                    commitMsg != null,
+                    timestamp != 0d
+            );
+        }
+
+        return valid;
     }
 
     @Override

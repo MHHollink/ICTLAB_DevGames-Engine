@@ -2,6 +2,7 @@ package nl.devgames.score.calculator;
 
 import java.util.List;
 
+import com.google.gson.JsonObject;
 import nl.devgames.model.Issue;
 import nl.devgames.model.dto.ReportResultType;
 import nl.devgames.model.dto.SQReportDTO;
@@ -18,7 +19,7 @@ public class ScoreCalculator {
 	 * @param sqReportDTO the report which to calculate the score with
 	 * @return the score based on the sent in report as a double
 	 */
-	public double calculateScoreFromReport(SQReportDTO sqReportDTO) {
+	public double calculateScoreFromReport(SQReportDTO sqReportDTO, JsonObject settings) {
 		this.sqReporDTO = sqReportDTO;
 		double score = 1000;
 		score = subtractBuildPoints(score);
