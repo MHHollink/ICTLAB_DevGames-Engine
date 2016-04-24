@@ -40,7 +40,7 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
         user.setMainJob(this.mainJob);
         user.setProjects(this.projects);
         user.setPushes(this.pushes);
-        user.setSessionId(this.SessionId);
+        user.setSessionId(this.session);
         user.setGcmId(this.gcmId);
 
         return user;
@@ -57,7 +57,7 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
                 mainJob != null &&
                 projects != null &&
                 pushes != null &&
-                SessionId != null &&
+                session != null &&
                 gcmId != null;
 
         if(!valid) {
@@ -65,7 +65,7 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
                             "username:'%b', gitUsername:'%b', firstName:'%b', " +
                             "tween:'%b', lastName:'%b', age:'%b', " +
                             "mainJob:'%b', projects:'%b', pushes:'%b', " +
-                            "SessionId: '%b', gcmId: '%b'",
+                            "session: '%b', gcmId: '%b'",
                     username != null,
                     gitUsername != null,
                     firstName != null,
@@ -75,7 +75,7 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
                     mainJob != null,
                     projects != null,
                     pushes != null,
-                    SessionId != null,
+                    session != null,
                     gcmId != null
             );
         }
