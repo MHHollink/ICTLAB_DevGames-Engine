@@ -4,7 +4,7 @@ public class Commit extends Model {
 
     private String commitId;
     private String commitMsg;
-    private long timeStamp;
+    private long timestamp;
 
     public Commit() {
 
@@ -13,7 +13,7 @@ public class Commit extends Model {
     public Commit(String commitId, String commitMsg, long timeStamp) {
         this.commitId = commitId;
         this.commitMsg = commitMsg;
-        this.timeStamp = timeStamp;
+        this.timestamp = timestamp;
     }
 
     public String getCommitId() {
@@ -33,11 +33,11 @@ public class Commit extends Model {
     }
 
     public long getTimeStamp() {
-        return timeStamp;
+        return timestamp;
     }
 
     public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
+        this.timestamp = timestamp;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class Commit extends Model {
         return "Commit{" +
                 "commitId='" + commitId + '\'' +
                 ", commitMsg='" + commitMsg + '\'' +
-                ", timeStamp=" + timeStamp +
+                ", timestamp=" + timestamp +
                 "} " + super.toString();
     }
 

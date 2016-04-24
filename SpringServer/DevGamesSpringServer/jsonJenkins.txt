@@ -1,0 +1,42 @@
+{
+	projectName: "DevGames",
+	result: "SUCCESS",
+	timestamp: ...,
+	author: "Evert-Jan Heilema",
+	items: [{
+		commitId: "81f5429a5145a25001ae2510ad860d04e11a8460",
+		commitMsg: "remove test files",
+		timestamp: "123456"
+	}, {
+		commitId: "879a0ba220f5c1441cfc6ac5d8d521f5df0dfee7",
+		commitMsg: "folders",
+		timestamp: "123456"
+	}],
+	issues: [{
+		severity: "MAJOR",
+		component: "nl.evertjanheilema.testprojects:TestProject:src/main/java/Application.java",
+		startLine: 7,
+		endLine: 20,
+		status: "OPEN",
+		resolution: "FIXED",
+		message: "Add a private constructor to hide the implicit public one.",
+		debt: "30",
+		creationDate: "2345678",
+		updateDate: "2345678",
+		closeDate: "2345678"
+	}],
+	duplications: [{
+		files: [{
+				file: "src/nl/evertjanheilema/Main.java",
+				beginLine: 119,
+				endLine: 125,
+				size: 16
+			},
+			{
+				file: "src/nl/evertjanheilema/Controllers/MainScreenController.java",
+				beginLine: 221,
+				endLine: 127,
+				size: 15
+			}]
+	}]
+}

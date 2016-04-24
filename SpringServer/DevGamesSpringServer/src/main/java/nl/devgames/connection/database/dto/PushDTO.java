@@ -7,6 +7,7 @@ import nl.devgames.model.Duplication;
 import nl.devgames.model.Issue;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
+import nl.devgames.utils.L;
 
 import java.util.Set;
 
@@ -23,12 +24,38 @@ public class PushDTO extends ModelDTO<PushDTO, Push> {
 
     @Override
     public Push toModel() {
-        return null;
+        Push push = new Push();
+
+        push.setProject(this.project);
+        push.setCommits(this.commits);
+        push.setIssues(this.issues);
+        push.setDuplications(this.duplications);
+        push.setTimestamp(this.timestamp);
+
+        return push;
     }
 
     @Override
     public boolean isValid() {
-        return false;
+        boolean valid = project != null &&
+                commits != null &&
+                issues != null &&
+                duplications != null &&
+                timestamp != 0d;
+
+        if(!valid) {
+            L.w("Push is not valid! False indicates a problem: " +
+                            "project:'%b', commits:'%b', issues:'%b', " +
+                            "duplications: '%b', timesatmp: '%b'",
+                    project != null,
+                    commits != null,
+                    issues != null,
+                    duplications != null,
+                    timestamp != 0d
+            );
+        }
+
+        return valid;
     }
 
     @Override

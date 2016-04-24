@@ -10,6 +10,7 @@ public class Push extends Model {
     private Set<Duplication> duplications;
 
     private long timestamp;
+    private double score;
 
     public Push() {
     }

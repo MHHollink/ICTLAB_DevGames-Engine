@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
+import nl.devgames.utils.L;
 
 import java.util.Set;
 
@@ -28,28 +29,58 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
 
     @Override
     public User toModel() {
-
         User user = new User();
 
-        user.setId(id);
-        user.setUsername(username);
-        user.setGitUsername(gitUsername);
-        user.setFirstName(firstName);
-        user.setTween(tween);
-        user.setLastName(lastName);
-        user.setAge(age);
-        user.setMainJob(mainJob);
-        user.setProjects(projects);
-        user.setPushes(pushes);
-        user.setSessionId(session);
-        user.setGcmId(gcmId);
+        user.setUsername(this.username);
+        user.setGitUsername(this.gitUsername);
+        user.setFirstName(this.firstName);
+        user.setTween(this.tween);
+        user.setLastName(this.lastName);
+        user.setAge(this.age);
+        user.setMainJob(this.mainJob);
+        user.setProjects(this.projects);
+        user.setPushes(this.pushes);
+        user.setSessionId(this.SessionId);
+        user.setGcmId(this.gcmId);
 
         return user;
     }
 
     @Override
     public boolean isValid() {
-        return false;
+        boolean valid = username != null &&
+                gitUsername != null &&
+                firstName != null &&
+                tween != null &&
+                lastName != null &&
+                age != Integer.MIN_VALUE &&
+                mainJob != null &&
+                projects != null &&
+                pushes != null &&
+                SessionId != null &&
+                gcmId != null;
+
+        if(!valid) {
+            L.w("User is not valid! False indicates a problem: " +
+                            "username:'%b', gitUsername:'%b', firstName:'%b', " +
+                            "tween:'%b', lastName:'%b', age:'%b', " +
+                            "mainJob:'%b', projects:'%b', pushes:'%b', " +
+                            "SessionId: '%b', gcmId: '%b'",
+                    username != null,
+                    gitUsername != null,
+                    firstName != null,
+                    tween != null,
+                    lastName != null,
+                    age != Integer.MIN_VALUE,
+                    mainJob != null,
+                    projects != null,
+                    pushes != null,
+                    SessionId != null,
+                    gcmId != null
+            );
+        }
+
+        return valid;
     }
 
     @Override

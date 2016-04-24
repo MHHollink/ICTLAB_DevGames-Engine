@@ -189,10 +189,9 @@ public class UserController extends BaseController {
 
         List<UserDTO> dtos = new UserDTO().createFromJsonArray(data.get(0).getAsJsonObject().get("row").getAsJsonArray());
         List<User> users = new ArrayList<>();
-        for (UserDTO dto : dtos) {
+        for(UserDTO dto : dtos) {
             users.add(dto.toModel());
         }
-
         return users;
     }
 

@@ -29,12 +29,7 @@ public class Neo4JRestService extends AbsRestService {
      */
     public String post(String json) {
         try {
-            super.post(
-                    json,
-                    new Tuple<>(
-                            "Authorization","Basic bmVvNGo6OTVkMGU3NjIxNzlj"
-                    )
-            );
+            super.post(json, new Tuple<>("Authorization","Basic bmVvNGo6ZGV2Z2FtZXM="));
         } catch (IOException e) {
             e.printStackTrace();
             return null;

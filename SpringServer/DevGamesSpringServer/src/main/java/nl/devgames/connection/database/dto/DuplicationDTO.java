@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Duplication;
 import nl.devgames.model.DuplicationFile;
+import nl.devgames.utils.L;
 
 import java.util.Set;
 
@@ -16,12 +17,25 @@ public class DuplicationDTO extends ModelDTO<DuplicationDTO, Duplication> {
 
     @Override
     public Duplication toModel() {
-        return null;
+        Duplication duplication = new Duplication();
+
+        duplication.setFiles(this.files);
+
+        return duplication;
     }
 
     @Override
     public boolean isValid() {
-        return false;
+        boolean valid = files != null;
+
+        if(!valid) {
+            L.w("Duplication is not valid! False indicates a problem: " +
+                            "files:'%b'",
+                    files != null
+            );
+        }
+
+        return valid;
     }
 
     @Override
