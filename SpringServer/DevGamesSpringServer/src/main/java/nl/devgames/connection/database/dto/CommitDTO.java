@@ -1,6 +1,7 @@
 package nl.devgames.connection.database.dto;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Commit;
 import nl.devgames.utils.L;
@@ -43,5 +44,10 @@ public class CommitDTO extends ModelDTO<CommitDTO, Commit> {
     @Override
     public CommitDTO createFromJsonObject(JsonObject object) {
         return new Gson().fromJson(object, CommitDTO.class);
+    }
+
+    @Override
+    public CommitDTO createFromNeo4jData(JsonObject data) {
+        return null;
     }
 }

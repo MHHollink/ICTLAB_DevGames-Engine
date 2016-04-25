@@ -5,6 +5,7 @@ import nl.devgames.utils.L;
 import nl.devgames.utils.Tuple;
 
 import java.io.IOException;
+import java.net.ConnectException;
 
 public class Neo4JRestService extends AbsRestService {
 
@@ -27,7 +28,7 @@ public class Neo4JRestService extends AbsRestService {
      * @param json string object to send
      * @return response string
      */
-    public String post(String json) {
+    public String post(String json) throws ConnectException {
         try {
             super.post(json, new Tuple<>("Authorization","Basic bmVvNGo6ZGV2Z2FtZXM="));
         } catch (IOException e) {
@@ -61,11 +62,11 @@ public class Neo4JRestService extends AbsRestService {
     /**
      * Post a chipher query to the neo4j database via rest.
      *
-     * @param query query with empty parameter fields as " MATCH n WHERE ID = %d RETURN N"
+     * @param query query with empty parameter fields as "MATCH n WHERE ID = %d RETURN N"
      * @param params all parameters used in the query
      * @return Response String.
      */
-    public String postQuery(String query, Object... params) {
+    public String postQuery(String query, Object... params) throws ConnectException {
         query = String.format(query,params);
         L.d(query);
 

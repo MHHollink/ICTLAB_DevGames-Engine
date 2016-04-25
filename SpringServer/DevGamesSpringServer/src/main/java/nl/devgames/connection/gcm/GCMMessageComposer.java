@@ -9,8 +9,11 @@ import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.rest.errors.NotFoundException;
 import nl.devgames.utils.L;
 
+import java.net.ConnectException;
+
 public class GCMMessageComposer {
-	/*
+	/**
+     * TODO fix javadoc
 	 * method to compose a GCM message
 	 * messageType = type of message to send (see GCMMessageType)
 	 * messageTitle = string to send as message title
@@ -31,6 +34,7 @@ public class GCMMessageComposer {
         return message;
     }
 	/*
+	 * TODO fix javadoc
 	 * Method to send a message via gcm
 	 * messageType = type of message to send (see GCMMessageType)
 	 * messageTitle = string to send as message title
@@ -57,13 +61,19 @@ public class GCMMessageComposer {
         //get list of tokens from neo4j db
         //TODO: for now this gets 2 users, make it work for a list of users or userids
 //        tokenList;
-        String tokenResponseAsString = Neo4JRestService.getInstance().postQuery("Match (n:User) Where ID(n) = 37 Return n.gcmRegId");
+        String tokenResponseAsString = null;
+        try {
+            tokenResponseAsString = Neo4JRestService.getInstance().postQuery("Match (n:User) Where ID(n) = 37 Return n.gcmRegId");
+        } catch (ConnectException e) {
+            L.e(e, "Neo4J Post threw exception, Database might be offline!");
+            throw new KnownInternalServerError(e.getMessage());
+        }
         JsonObject tokenResponseJson = new JsonParser().parse(tokenResponseAsString).getAsJsonObject(); //parse neo4j response
         JsonArray errorsArray = tokenResponseJson.get("errors").getAsJsonArray(); //get list of errors
 
         //Trhrows exception if there are errors
         if (errorsArray.size() != 0) { 
-            for (JsonElement error : errorsArray) L.og(error.getAsString());
+            for (JsonElement error : errorsArray) L.w(error.getAsString());
             throw new KnownInternalServerError("InternalServerError: " + errorsArray.getAsString());
         }
         //get data

@@ -4,14 +4,16 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import nl.devgames.model.Model;
 import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.utils.L;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ModelDTO<D extends ModelDTO, M extends Model> {
+public abstract class ModelDTO<
+        ModelDTO extends nl.devgames.connection.database.dto.ModelDTO,
+        Model extends nl.devgames.model.Model>
+{
 
     /**
      * This represents the ID that is used in the Neo4J database;
@@ -22,7 +24,7 @@ public abstract class ModelDTO<D extends ModelDTO, M extends Model> {
      * Method that can be used on all the DTO's to get a Model class from the respective DTO
      * @return Object specified as respective Model class
      */
-    public abstract M toModel();
+    public abstract Model toModel();
 
     /**
      * A Valid check that is used to check if all fields for a DTO are not-null
@@ -36,16 +38,22 @@ public abstract class ModelDTO<D extends ModelDTO, M extends Model> {
      * @param object A Json object that contains the fields from the DTO
      * @return DTO with specified fields set
      */
-    public abstract D createFromJsonObject(JsonObject object);
+    public abstract ModelDTO createFromJsonObject(JsonObject object);
 
     /**
-     * Creates a list of the {@link M} from a {@link com.google.gson.JsonArray}. The Objects are converted via {@link #createFromJsonObject(JsonObject)}
+     * @param data
+     * @return
+     */
+    public abstract ModelDTO createFromNeo4jData(JsonObject data);
+
+    /**
+     * Creates a list of the {@link Model} from a {@link com.google.gson.JsonArray}. The Objects are converted via {@link #createFromJsonObject(JsonObject)}
      *
      * @param array JSON array from Gson
      * @return List of objects from the given model type
      */
-    public List<D> createFromJsonArray(JsonArray array) {
-        List<D> list = new ArrayList<>();
+    public List<ModelDTO> createFromJsonArray(JsonArray array) {
+        List<ModelDTO> list = new ArrayList<>();
         for (int i = 0; i < array.size(); i++) {
             list.add(
                     createFromJsonObject(
@@ -96,4 +104,9 @@ public abstract class ModelDTO<D extends ModelDTO, M extends Model> {
                 .getAsJsonArray();
     }
 
+    public static JsonObject findFirst(String json) {
+        return getNeo4JData(json).get(0).getAsJsonObject().get("data")
+                .getAsJsonArray().get(0).getAsJsonObject().get("row")
+                .getAsJsonArray().get(0).getAsJsonObject();
+    }
 }

@@ -5,12 +5,14 @@ import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.rest.errors.BadRequestException;
+import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.ConnectException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -35,11 +37,17 @@ public class AuthController extends BaseController{
             L.d("Throwing BadRequestException, Username or password was missing...");
             throw new BadRequestException("Username or password was missing");
         }
-        String jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:User) WHERE n.username = '%s' AND n.password = '%s' RETURN n.username",
-                username,
-                password
-        );
+        String jsonResponseString;
+        try {
+            jsonResponseString = Neo4JRestService.getInstance().postQuery(
+                    "MATCH (n:User) WHERE n.username = '%s' AND n.password = '%s' RETURN n.username",
+                    username,
+                    password
+            );
+        } catch (ConnectException e) {
+            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+            throw new KnownInternalServerError(e.getMessage());
+        }
 
         JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject();
 
@@ -60,11 +68,16 @@ public class AuthController extends BaseController{
             String sessionID = String.valueOf(UUID.randomUUID());
             result.put(Application.SESSION_HEADER_KEY, sessionID);
 
-            Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:User {username : '%s'}) SET n.session = '%s'",
-                    username,
-                    sessionID
-            );
+            try {
+                Neo4JRestService.getInstance().postQuery(
+                        "MATCH (n:User {username : '%s'}) SET n.session = '%s'",
+                        username,
+                        sessionID
+                );
+            } catch (ConnectException e) {
+                L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+                throw new KnownInternalServerError(e.getMessage());
+            }
 
             return result;
         }

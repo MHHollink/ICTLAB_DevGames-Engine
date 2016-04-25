@@ -10,9 +10,11 @@ import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
 import nl.devgames.model.UserWithPassword;
+import nl.devgames.utils.L;
 import org.junit.After;
 import org.junit.Before;
 
+import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -27,9 +29,14 @@ public abstract class DevGamesTests {
 
     @Before
     public void setUp() throws Exception {
-        if(!isSetup)
-            setUpDb();
-        isSetup = true;
+        try {
+            if (!isSetup)
+                setUpDb();
+            isSetup = true;
+        } catch (ConnectException e) {
+            L.e(e, "Exeption was thown in setup");
+            System.exit(-1);
+        }
     }
 
     @After
@@ -37,12 +44,9 @@ public abstract class DevGamesTests {
 
     }
 
-    private void setUpDb() {
-        Project[] projects = {
-                new Project("Clarity","AR app for the Port of Rotterdam."),
-                new Project("Adventure Track", "Geolocation based Rol playing game."),
-                new Project("DevGames","Programming gamificated to ensure you code better")
-        };
+    private void setUpDb() throws ConnectException {
+        Project[] projects = {new Project("Clarity","AR app for the Port of Rotterdam."), new Project("Adventure Track", "Geolocation based Rol playing game."),
+                new Project("DevGames","Programming gamificated to ensure you code better")};
 
         UserWithPassword[] users = {
                 new UserWithPassword("Marcel","Mjollnir94","Marcel",null,"Hollink",22,"App Developer", null, null ,null, null, "admin"),
@@ -50,33 +54,23 @@ public abstract class DevGamesTests {
                 new UserWithPassword("Joris","Jorikito","Jorik",null,"Schouten",22,"Backend developer", null, null, null, null, "admin"),
         };
 
-        Business[] businesses = {
-                new Business("DevGames", new HashSet<User>(Arrays.asList(users)){}, new HashSet<>(Arrays.asList(projects)))
-        };
+        Business[] businesses = {new Business("DevGames", new HashSet<User>(Arrays.asList(users)){}, new HashSet<>(Arrays.asList(projects)))};
 
         Commit[] commits = {
                 new Commit("b699883e3ccf7afbed8573d5c8add56e12f8393e", "Added .gitattributes & .gitignore files", 1455217086),
                 new Commit("58c38eb08dce96f734644a0aa17c8ff8939b531e", "Fixed SDK versions in Android gradle", 1455994686)
         };
 
-        Push[] pushes = {
-                new Push(projects[2], new HashSet<>(Arrays.asList(commits)), new HashSet<>(), new HashSet<>(), 1455994686)
-        };
+        Push[] pushes = {new Push(projects[2], new HashSet<>(Arrays.asList(commits)), new HashSet<>(), new HashSet<>(), 1455994686)};
 
         Duplication[] duplications = {
-                new Duplication(new HashSet<DuplicationFile>(){{
-                    add(new DuplicationFile("filename", 10,17,7));
-                    add(new DuplicationFile("filename", 10,17,7));
-                    add(new DuplicationFile("filename", 10,17,7));
-                }})
+                new Duplication(new HashSet<DuplicationFile>(){{add(new DuplicationFile("filename", 10,17,7));add(new DuplicationFile("filename", 10,17,7));
+                    add(new DuplicationFile("filename", 10,17,7));}})
         };
 
-        Issue[] issues = {
-                new Issue(213456, "MAJOR", "nl.devgames.Application", 11, 13, "OPEN", null, "This application is still shit", 840, 1455217086, 1459624317, 0)
-        };
+        Issue[] issues = { new Issue(213456, "MAJOR", "nl.devgames.Application", 11, 13, "OPEN", null, "This application is still shit", 840, 1455217086, 1459624317, 0)};
 
         dbService = Neo4JRestService.getInstance();
-
         dbService.postQuery("MATCH n DETACH DELETE n");
 
         for (Push push : pushes)
@@ -108,11 +102,6 @@ public abstract class DevGamesTests {
             dbService.postQuery(
                     "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmRegId: '%s' }) ",
                     user.getUsername(), user.getGitUsername(), user.getFirstName(), user.getLastName(), user.getAge(), user.getMainJob(), user.getPassword(), user.getGcmId());
-
-
-
-        dbService.postQuery("CREATE (n:User { id: '1', username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmRegId: '%s' }) ");
-
 
         dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'DevGames' }) CREATE (a)-[:is_developing]->(b)");
         dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Clarity' }) CREATE (a)-[:is_developing]->(b)");

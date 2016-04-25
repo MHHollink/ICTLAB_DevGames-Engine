@@ -13,6 +13,7 @@ import nl.devgames.model.Push;
 import nl.devgames.model.User;
 import nl.devgames.model.UserWithPassword;
 import nl.devgames.rest.errors.BadRequestException;
+import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.rest.errors.NotFoundException;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -153,20 +155,27 @@ public class UserController extends BaseController {
      * @return a user found by the {@param query}
      */
     private User getUserFromQuery(String query, Object... params) {
-        String jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                query,
-                params
-        ); // Request to neo4j
+        String jsonResponseString = null; // Request to neo4j
+        try {
+            jsonResponseString = Neo4JRestService.getInstance().postQuery(
+                    query,
+                    params
+            );
+        } catch (ConnectException e) {
+            e.printStackTrace();
+        }
 
-        JsonArray data = UserDTO.getNeo4JData(jsonResponseString);
+        User user;
+        try{
+            user = new UserDTO().createFromNeo4jData(
+                    UserDTO.findFirst(jsonResponseString)
+            ).toModel();
+        } catch (IndexOutOfBoundsException e) {
+            L.w(e, "Requested user was not found in database");
+            throw new NotFoundException("User not found");
+        }
 
-        if (data.size() == 0) throw new NotFoundException("The server could not find the requested data...");
-
-        UserDTO userDTO = new UserDTO().createFromJsonObject(
-                data.get(0).getAsJsonObject()
-        );
-
-        return userDTO.toModel();
+        return user;
     }
 
     /**
@@ -177,10 +186,15 @@ public class UserController extends BaseController {
      * @return a list of all users found by the {@param query}
      */
     private List<User> getUsersFromQuery(String query, Object... params) {
-        String jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                query,
-                params
-        ); // Request to neo4j
+        String jsonResponseString = null; // Request to neo4j
+        try {
+            jsonResponseString = Neo4JRestService.getInstance().postQuery(
+                    query,
+                    params
+            );
+        } catch (ConnectException e) {
+            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+        }
 
         JsonArray data = ModelDTO.getNeo4JData(jsonResponseString);
 

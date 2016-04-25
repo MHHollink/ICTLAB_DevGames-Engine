@@ -1,6 +1,7 @@
 package nl.devgames.connection.database.dto;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
@@ -29,8 +30,12 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
 
     @Override
     public User toModel() {
+
+        if(!isValid()) return null;
+
         User user = new User();
 
+        user.setId(this.id);
         user.setUsername(this.username);
         user.setGitUsername(this.gitUsername);
         user.setFirstName(this.firstName);
@@ -51,32 +56,20 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
         boolean valid = username != null &&
                 gitUsername != null &&
                 firstName != null &&
-                tween != null &&
                 lastName != null &&
                 age != Integer.MIN_VALUE &&
-                mainJob != null &&
-                projects != null &&
-                pushes != null &&
-                session != null &&
-                gcmId != null;
+                mainJob != null;
 
         if(!valid) {
             L.w("User is not valid! False indicates a problem: " +
                             "username:'%b', gitUsername:'%b', firstName:'%b', " +
-                            "tween:'%b', lastName:'%b', age:'%b', " +
-                            "mainJob:'%b', projects:'%b', pushes:'%b', " +
-                            "session: '%b', gcmId: '%b'",
+                            "lastName:'%b', age:'%b', mainJob:'%b'",
                     username != null,
                     gitUsername != null,
                     firstName != null,
-                    tween != null,
                     lastName != null,
                     age != Integer.MIN_VALUE,
-                    mainJob != null,
-                    projects != null,
-                    pushes != null,
-                    session != null,
-                    gcmId != null
+                    mainJob != null
             );
         }
 
@@ -86,5 +79,14 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
     @Override
     public UserDTO createFromJsonObject(JsonObject object) {
         return new Gson().fromJson(object, UserDTO.class);
+    }
+
+    @Override
+    public UserDTO createFromNeo4jData(JsonObject data) {
+        UserDTO dto = new UserDTO().createFromJsonObject(
+                data.get("data").getAsJsonObject()
+        );
+        dto.id = data.get("id").getAsLong();
+        return dto;
     }
 }

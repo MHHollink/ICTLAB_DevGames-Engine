@@ -87,7 +87,7 @@ public class SQReportDTO {
 			sqreport.setDuplications(duplicationsList);
 			sqreport.setTimestamp(timestamp);
 //		sqreport.setScore(score);
-			L.og("Done parsing SonarQube report");
+			L.i("Done parsing SonarQube report");
 		}
 		else{
 			//throw exception
@@ -251,7 +251,7 @@ public class SQReportDTO {
 			}
 		}
 		else {
-			L.og("error parsing author");
+			L.i("error parsing author");
 			valid = false;
 		}
 		return author;
@@ -299,7 +299,7 @@ public class SQReportDTO {
 				timestamp = Long.parseLong(buildTimestamp);
 			}
 			catch(Exception e) {
-				L.og("invalid timestamp while parsing the report, set to current time");
+				L.i("invalid timestamp while parsing the report, set to current time");
 				timestamp = System.currentTimeMillis();
 			}
 		}

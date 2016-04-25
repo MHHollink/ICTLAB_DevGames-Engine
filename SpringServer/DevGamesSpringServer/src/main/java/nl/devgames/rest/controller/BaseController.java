@@ -14,12 +14,16 @@ import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.utils.L;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.ConnectException;
 
 /**
  * BaseController contains every method that all other controllers should have access to.
  */
 public abstract class BaseController {
 
+    /**
+     * Checking for headers is done via @RequestHeader annotation
+     */
     @Deprecated
     protected String getSession(HttpServletRequest request) {
         return request.getHeader(Application.SESSION_HEADER_KEY);
@@ -29,16 +33,31 @@ public abstract class BaseController {
         if (session == null || session.isEmpty())
             throw new BadRequestException("Request without session"); // throws exception when session is null or blank
 
-        String jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:User) WHERE n.session = '%s' RETURN {id:id(n), labels: labels(n), data: n}",
-                session
-        ); // Request to neo4j
+        String jsonResponseString = null; // Request to neo4j
+        try {
+            jsonResponseString = Neo4JRestService.getInstance().postQuery(
+                    "MATCH (n:User) WHERE n.session = '%s' RETURN {id:id(n), labels: labels(n), data: n}",
+                    session
+            );
+        } catch (ConnectException e) {
+            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+        }
 
-        return new UserDTO().createFromJsonObject(
-                grabData(jsonResponseString).get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject()
-        ).toModel(); // Returns user object
+        User user;
+        try {
+            user = new UserDTO().createFromNeo4jData(
+                    UserDTO.findFirst(jsonResponseString)
+            ).toModel();
+        } catch (IndexOutOfBoundsException e) {
+            L.e(e, "Getting user with session '%s' threw IndexOutOfBoundsException, session token was probably invalid", session);
+            throw new InvalidSessionException("Request session is not found");
+        }
+        return user;
     }
 
+    /**
+     * Unnecessary method since {@link nl.devgames.connection.database.dto.ModelDTO#getNeo4JData(String)} includes a error check.
+     */
     protected boolean hasErrors(JsonObject json) {
         JsonArray errors = json.get("errors").getAsJsonArray(); // get the list of errors
 
@@ -50,6 +69,10 @@ public abstract class BaseController {
         return false;
     }
 
+    /**
+     * Unnecessary method since {@link nl.devgames.connection.database.dto.ModelDTO#getNeo4JData(String)} does the same but more.
+     */
+    @Deprecated
     protected JsonArray grabData(String json) {
         JsonObject jsonResponse = new JsonParser().parse(json).getAsJsonObject(); // parse neo4j response
 

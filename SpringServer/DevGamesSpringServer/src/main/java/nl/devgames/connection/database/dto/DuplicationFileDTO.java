@@ -1,6 +1,7 @@
 package nl.devgames.connection.database.dto;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import nl.devgames.model.DuplicationFile;
 import nl.devgames.utils.L;
@@ -50,5 +51,10 @@ public class DuplicationFileDTO extends ModelDTO<DuplicationFileDTO, Duplication
     @Override
     public DuplicationFileDTO createFromJsonObject(JsonObject object) {
         return new Gson().fromJson(object, DuplicationFileDTO.class);
+    }
+
+    @Override
+    public DuplicationFileDTO createFromNeo4jData(JsonObject data) {
+        return null;
     }
 }

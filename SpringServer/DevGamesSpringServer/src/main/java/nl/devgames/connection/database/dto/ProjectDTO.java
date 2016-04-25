@@ -1,6 +1,7 @@
 package nl.devgames.connection.database.dto;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Project;
 import nl.devgames.utils.L;
@@ -42,5 +43,10 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
     @Override
     public ProjectDTO createFromJsonObject(JsonObject object) {
         return new Gson().fromJson(object, ProjectDTO.class);
+    }
+
+    @Override
+    public ProjectDTO createFromNeo4jData(JsonObject data) {
+        return null;
     }
 }

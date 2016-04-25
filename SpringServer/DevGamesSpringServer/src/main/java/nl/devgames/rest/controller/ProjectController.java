@@ -4,9 +4,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
+import nl.devgames.rest.errors.KnownInternalServerError;
+import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,11 +41,17 @@ public class ProjectController extends BaseController{
 
         List<String> tokenList = new ArrayList<>();
 
-        String stringResponse = Neo4JRestService.getInstance().postQuery(
-                "MATCH (u:User { username : '%s' }) -[:is_developing]-> (p:Project {name : '%s'}) <-[:is_developing]- (r:User) RETURN r.gcmRegId",
-                username,
-                projectName
-        );
+        String stringResponse = null;
+        try {
+            stringResponse = Neo4JRestService.getInstance().postQuery(
+                    "MATCH (u:User { username : '%s' }) -[:is_developing]-> (p:Project {name : '%s'}) <-[:is_developing]- (r:User) RETURN r.gcmRegId",
+                    username,
+                    projectName
+            );
+        } catch (ConnectException e) {
+            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+            throw new KnownInternalServerError(e.getMessage());
+        }
 
         JsonObject jsonResponse = new JsonParser().parse(stringResponse).getAsJsonObject();
 

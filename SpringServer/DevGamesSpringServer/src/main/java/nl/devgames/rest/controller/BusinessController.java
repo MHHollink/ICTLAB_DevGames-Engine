@@ -4,11 +4,14 @@ import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.BusinessDTO;
 import nl.devgames.model.Business;
+import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.ConnectException;
 
 /**
  * The Bussiness controller contains all rest request used on the `business` resource.
@@ -63,10 +66,16 @@ public class BusinessController extends BaseController{
      * @return
      */
     private Business getBusiness(String session) {
-        String json = Neo4JRestService.getInstance().postQuery(
-                "MATCH (u:User { session : '%s' }) <-[:has_employee]- (b:Business) RETURN {id:id(b), labels: labels(b), data: b}",
-                session
-        );
+        String json = null;
+        try {
+            json = Neo4JRestService.getInstance().postQuery(
+                    "MATCH (u:User { session : '%s' }) <-[:has_employee]- (b:Business) RETURN {id:id(b), labels: labels(b), data: b}",
+                    session
+            );
+        } catch (ConnectException e) {
+            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+            throw new KnownInternalServerError(e.getMessage());
+        }
 
         return new BusinessDTO().createFromJsonObject(
                 grabData(json).get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject()
