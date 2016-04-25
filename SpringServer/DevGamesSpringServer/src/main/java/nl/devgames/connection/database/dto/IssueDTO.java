@@ -5,8 +5,6 @@ import com.google.gson.JsonObject;
 import nl.devgames.model.Issue;
 import nl.devgames.utils.L;
 
-import java.text.SimpleDateFormat;
-
 /**
  * Created by Marcel on 14-4-2016.
  */

@@ -1,13 +1,9 @@
 package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
-import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dto.BusinessDTO;
 import nl.devgames.model.Business;
 import nl.devgames.model.Project;
 import nl.devgames.model.User;
-import nl.devgames.rest.errors.KnownInternalServerError;
-import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -15,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.ConnectException;
 import java.util.Map;
 import java.util.Set;
 

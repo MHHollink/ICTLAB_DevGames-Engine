@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dto.SQReportDTO;
 import nl.devgames.model.Business;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
