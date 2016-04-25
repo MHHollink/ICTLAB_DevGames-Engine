@@ -147,9 +147,10 @@ public class ProjectController extends BaseController{
      * @param id
      * @return
      */
-    @RequestMapping(value = "{id}/users/{uid}", method = RequestMethod.PUT)
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public Project updateProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
-                                 @PathVariable(value = "id") long id)
+                                 @PathVariable(value = "id") long id,
+                                 @RequestBody Project projectWithUpdateFields)
     {
         // TODO : 1 -> check if session is valid, 2 -> check if user has update rights for project, 3 -> update project fields
         throw new UnsupportedOperationException();
