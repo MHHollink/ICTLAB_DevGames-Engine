@@ -8,15 +8,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+
 @RestController
-@RequestMapping(value = "/issues")
-public class IssueController extends BaseController{
+@RequestMapping(value = "/duplications")
+public class DuplicationController extends BaseController {
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public Push getIssueById(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public Push getDuplicationById(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
                                    @PathVariable long id)
     {
-        // TODO : 1 -> check if session is valid, 2 -> return Issue with the given id
+        // TODO : 1 -> check if session is valid, 2 -> return Duplication with the given id
         throw new UnsupportedOperationException();
     }
 
@@ -24,7 +25,7 @@ public class IssueController extends BaseController{
     public Push getPush(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
                         @PathVariable long id)
     {
-        // TODO : 1 -> check if session is valid, 2 -> return push connected to Issue with the given id
+        // TODO : 1 -> check if session is valid, 2 -> return push connected to Duplication with the given id
         throw new UnsupportedOperationException();
     }
 
@@ -32,7 +33,7 @@ public class IssueController extends BaseController{
     public Push getUser(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
                         @PathVariable long id)
     {
-        // TODO : 1 -> check if session is valid, 2 -> return user connected to Issue with the given id
+        // TODO : 1 -> check if session is valid, 2 -> return user connected to Duplication  with the given id
         throw new UnsupportedOperationException();
     }
 
@@ -40,7 +41,7 @@ public class IssueController extends BaseController{
     public Push getProject(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
                            @PathVariable long id)
     {
-        // TODO : 1 -> check if session is valid, 2 -> return project connected to Issue with the given id
+        // TODO : 1 -> check if session is valid, 2 -> return project connected to Duplication  with the given id
         throw new UnsupportedOperationException();
     }
 }

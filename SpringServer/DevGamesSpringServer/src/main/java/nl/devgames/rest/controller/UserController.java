@@ -5,6 +5,7 @@ import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.ModelDTO;
 import nl.devgames.connection.database.dto.UserDTO;
+import nl.devgames.model.Business;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
 import nl.devgames.model.Issue;
@@ -26,6 +27,7 @@ import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/users")
@@ -76,29 +78,22 @@ public class UserController extends BaseController {
 
         if(userWithUpdateFields.getUsername() != null)
             caller.setGitUsername(userWithUpdateFields.getUsername());
-
         if(userWithUpdateFields.getGitUsername() != null)
             caller.setGitUsername(userWithUpdateFields.getGitUsername());
-
         if(userWithUpdateFields.getFirstName() != null)
             caller.setFirstName(userWithUpdateFields.getFirstName());
-
         if(userWithUpdateFields.getTween() != null)
             caller.setTween(userWithUpdateFields.getTween());
-
         if(userWithUpdateFields.getLastName() != null)
             caller.setLastName(userWithUpdateFields.getLastName());
-
         if(userWithUpdateFields.getGcmId() != null )
             caller.setGcmId(userWithUpdateFields.getGcmId());
-
         if(userWithUpdateFields.getAge() != 0 )
             caller.setAge(userWithUpdateFields.getAge());
-
         if(userWithUpdateFields.getMainJob() != null)
             caller.setMainJob(userWithUpdateFields.getMainJob());
 
-        // TODO, update it in neo and return 200
+        // todo : update the node in the database and return status code 200
 
         throw new UnsupportedOperationException("This will return the updated user");
     }
@@ -111,40 +106,52 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}/projects", method = RequestMethod.GET)
-    public List<Project> getProjects(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Project> getProjects(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                      @PathVariable Long id)
     {
+        // TODO : 1 -> check if session is valid, 2 -> get a list of projects from the user id
         throw new UnsupportedOperationException("This will return an list containing all projects the user is involved in");
     }
 
     @RequestMapping(value = "{id}/pushes", method = RequestMethod.GET)
-    public List<Push> getPushes(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Push> getPushes(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                 @PathVariable Long id)
     {
+        // TODO : 1 -> check if session is valid, 2 -> get a list of pushes from the user id
         throw new UnsupportedOperationException("This will return an list containing all pushes under the user");
     }
 
     @RequestMapping(value = "{id}/commits", method = RequestMethod.GET)
-    public List<Commit> getCommits(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Commit> getCommits(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                    @PathVariable Long id)
     {
+        // TODO : 1 -> check if session is valid, 2 -> get a list of commits from the user id
         throw new UnsupportedOperationException("This will return an list containing all commits under the user");
     }
 
     @RequestMapping(value = "{id}/issues", method = RequestMethod.GET)
-    public List<Issue> getIssues(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Issue> getIssues(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                  @PathVariable Long id)
     {
+        // TODO : 1 -> check if session is valid, 2 -> get a list of issues linked to the user id
         throw new UnsupportedOperationException("This will return an list containing all issues the user created");
     }
 
     @RequestMapping(value = "{id}/duplications", method = RequestMethod.GET)
-    public List<Duplication> getDuplications(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Duplication> getDuplications(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                 @PathVariable Long id)
     {
+        // TODO : 1 -> check if session is valid, 2 -> get a list of duplications with files linked to the user id
         throw new UnsupportedOperationException("This will return an list containing all duplications the user created");
     }
 
+    @RequestMapping(value = "{id}/businesses", method = RequestMethod.GET)
+    public Set<Business> getBusinesses(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+                                       @PathVariable Long id)
+    {
+        // TODO : 1 -> check if session is valid, 2 -> get a list of Businesses with files linked to the user id
+        throw new UnsupportedOperationException("This will return an list containing all duplications the user created");
+    }
 
     /**
      * This private method is used to extract a user object from a database query

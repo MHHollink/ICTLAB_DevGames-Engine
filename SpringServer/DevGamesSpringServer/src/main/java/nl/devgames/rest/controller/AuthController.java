@@ -49,6 +49,7 @@ public class AuthController extends BaseController{
             throw new KnownInternalServerError(e.getMessage());
         }
 
+        // todo : use different method for this
         JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject();
 
         if (hasErrors(jsonResponse)) return null;
@@ -62,8 +63,7 @@ public class AuthController extends BaseController{
             L.i("User %s has successfully logged in, generating session token...", username);
 
             java.util.Map<String, String> result = new java.util.HashMap<>();
-            // TODO, user some real session management stuff
-
+            // todo : user some real session management stuff
 
             String sessionID = String.valueOf(UUID.randomUUID());
             result.put(Application.SESSION_HEADER_KEY, sessionID);

@@ -58,6 +58,7 @@ public abstract class BaseController {
     /**
      * Unnecessary method since {@link nl.devgames.connection.database.dto.ModelDTO#getNeo4JData(String)} includes a error check.
      */
+    @Deprecated
     protected boolean hasErrors(JsonObject json) {
         JsonArray errors = json.get("errors").getAsJsonArray(); // get the list of errors
 
