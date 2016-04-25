@@ -4,6 +4,7 @@ import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.BusinessDTO;
 import nl.devgames.model.Business;
+import nl.devgames.model.Project;
 import nl.devgames.model.User;
 import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.utils.L;
@@ -58,6 +59,7 @@ public class BusinessController extends BaseController{
     /**
      *
      * @param session
+     * @param id
      * @return
      */
     @RequestMapping(value = "{id}/users", method = RequestMethod.GET)
@@ -71,10 +73,12 @@ public class BusinessController extends BaseController{
     /**
      *
      * @param session
+     * @param id
+     * @param uid
      * @return
      */
     @RequestMapping(value = "{id}/users/{uid}", method = RequestMethod.PUT)
-    public Business addEmployeeToBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Map addEmployeeToBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                           @PathVariable(value = "id") long id,
                                           @PathVariable(value = "uid") long uid)
     {
@@ -85,11 +89,12 @@ public class BusinessController extends BaseController{
     /**
      *
      * @param session
+     * @param id
      * @return
      */
     @RequestMapping(value = "{id}/projects", method = RequestMethod.GET)
-    public Set<User> getProjects(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
-                                  @PathVariable(value = "id") long id)
+    public Set<Project> getProjects(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+                                    @PathVariable(value = "id") long id)
     {
         // TODO : 1 -> check if session is valid, 2 -> return all projects that have a relation
         throw new UnsupportedOperationException();
@@ -98,10 +103,12 @@ public class BusinessController extends BaseController{
     /**
      *
      * @param session
+     * @param id
+     * @param pid
      * @return
      */
     @RequestMapping(value = "{id}/projects/{pid}", method = RequestMethod.PUT)
-    public Business addProjectToBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Map addProjectToBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                          @PathVariable(value = "id") long id,
                                          @PathVariable(value = "pid") long pid)
     {

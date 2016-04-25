@@ -164,15 +164,4 @@ public class UserControllerTest extends DevGamesTests{
         User user = controller.getUser(sessionToken, -1L);
         assertNull(user);
     }
-
-
-
-
-
-
-
-
-
-
-
 }
