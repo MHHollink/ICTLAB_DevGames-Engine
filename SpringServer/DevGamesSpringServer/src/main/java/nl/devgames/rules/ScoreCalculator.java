@@ -1,9 +1,9 @@
 package nl.devgames.rules;
 
 import com.google.gson.JsonObject;
-import nl.devgames.model.Issue;
 import nl.devgames.connection.database.dto.ReportResultType;
 import nl.devgames.connection.database.dto.SQReportDTO;
+import nl.devgames.model.Issue;
 
 import java.util.List;
 

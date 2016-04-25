@@ -13,7 +13,6 @@ import nl.devgames.model.Push;
 import nl.devgames.model.User;
 import nl.devgames.model.UserWithPassword;
 import nl.devgames.rest.errors.BadRequestException;
-import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.rest.errors.NotFoundException;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.PathVariable;

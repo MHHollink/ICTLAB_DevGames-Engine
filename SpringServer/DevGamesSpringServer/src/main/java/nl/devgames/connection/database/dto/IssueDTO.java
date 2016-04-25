@@ -1,7 +1,6 @@
 package nl.devgames.connection.database.dto;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Issue;
 import nl.devgames.utils.L;
