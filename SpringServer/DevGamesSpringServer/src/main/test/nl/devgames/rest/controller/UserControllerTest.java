@@ -1,10 +1,8 @@
-package nl.devgames.controllers;
+package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
 import nl.devgames.DevGamesTests;
 import nl.devgames.model.User;
-import nl.devgames.rest.controller.AuthController;
-import nl.devgames.rest.controller.UserController;
 import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.NotFoundException;

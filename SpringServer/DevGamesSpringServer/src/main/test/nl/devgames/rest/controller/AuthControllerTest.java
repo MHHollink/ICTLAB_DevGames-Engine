@@ -1,8 +1,7 @@
-package nl.devgames.controllers;
+package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
 import nl.devgames.DevGamesTests;
-import nl.devgames.rest.controller.AuthController;
 import nl.devgames.rest.errors.BadRequestException;
 import org.junit.After;
 import org.junit.Before;
