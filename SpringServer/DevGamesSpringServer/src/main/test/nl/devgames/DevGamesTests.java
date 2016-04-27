@@ -122,7 +122,9 @@ public abstract class DevGamesTests {
         dbService.postQuery("MATCH (a:Business { name: 'DevGames' }), (b:Project { name: 'DevGames' }) CREATE (a)-[:has_project]->(b)");
         dbService.postQuery("MATCH (a:Push { timestamp: '1455994686' }), (b:Project { name: 'DevGames' }) CREATE (a)-[:pushed_to]->(b)");
 
-
+        dbService.postQuery("MATCH (a:User { username: 'Marcel' }), (b:Project { name: 'DevGames' }) CREATE (b)-[:is_lead_by]->(a)");
+        dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Clarity' }) CREATE (b)-[:is_lead_by]->(a)");
+        dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Adventure Track' }) CREATE (b)-[:is_lead_by]->(a)");
     }
 
 }

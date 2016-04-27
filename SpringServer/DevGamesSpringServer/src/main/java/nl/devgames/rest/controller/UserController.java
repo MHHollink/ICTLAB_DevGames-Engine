@@ -14,6 +14,7 @@ import nl.devgames.model.Push;
 import nl.devgames.model.User;
 import nl.devgames.model.UserWithPassword;
 import nl.devgames.rest.errors.BadRequestException;
+import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.rest.errors.NotFoundException;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -78,24 +79,49 @@ public class UserController extends BaseController {
 
         if(userWithUpdateFields.getUsername() != null)
             caller.setGitUsername(userWithUpdateFields.getUsername());
+
         if(userWithUpdateFields.getGitUsername() != null)
             caller.setGitUsername(userWithUpdateFields.getGitUsername());
+
         if(userWithUpdateFields.getFirstName() != null)
             caller.setFirstName(userWithUpdateFields.getFirstName());
+
         if(userWithUpdateFields.getTween() != null)
             caller.setTween(userWithUpdateFields.getTween());
+
         if(userWithUpdateFields.getLastName() != null)
             caller.setLastName(userWithUpdateFields.getLastName());
+
         if(userWithUpdateFields.getGcmId() != null )
             caller.setGcmId(userWithUpdateFields.getGcmId());
+
         if(userWithUpdateFields.getAge() != 0 )
             caller.setAge(userWithUpdateFields.getAge());
+
         if(userWithUpdateFields.getMainJob() != null)
             caller.setMainJob(userWithUpdateFields.getMainJob());
 
-        // todo : update the node in the database and return status code 200
 
-        throw new UnsupportedOperationException("This will return the updated user");
+        try {
+            Neo4JRestService.getInstance().postQuery(
+                    "MATCH (n:User) WHERE ID(n) = %d " +
+                            "SET n.username = '%s', n.gcmRegId = '%s', n.firstName = '%s', n.tween = '%s', n.lastName = '%s'" +
+                                "n.session = '%s', n.mainJob = '%s', n.gitUsername = '%s' " +
+                            "RETURN {id:id(n), labels: labels(n), data: n}",
+                    caller.getUsername(),
+                    caller.getGcmId(),
+                    caller.getFirstName(),
+                    caller.getTween(),
+                    caller.getLastName(),
+                    caller.getSessionId(),
+                    caller.getMainJob(),
+                    caller.getGitUsername()
+            );
+        } catch (ConnectException e) {
+            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+            throw new KnownInternalServerError("Server database refused connection");
+        }
+        return getOwnUser(session);
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
@@ -200,6 +226,7 @@ public class UserController extends BaseController {
             );
         } catch (ConnectException e) {
             L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+            throw new KnownInternalServerError("Server database refused connection");
         }
 
         JsonArray data = ModelDTO.getNeo4JData(jsonResponseString);
