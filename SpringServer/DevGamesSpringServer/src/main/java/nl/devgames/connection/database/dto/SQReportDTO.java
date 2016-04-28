@@ -578,7 +578,7 @@ public class SQReportDTO {
 		this.duplications = duplications;
 	}
 	
-	public double getScore() {
+	public Double getScore() {
 		return score;
 	}
 

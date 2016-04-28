@@ -7,6 +7,8 @@ import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.*;
+import nl.devgames.connection.gcm.GCMMessageComposer;
+import nl.devgames.connection.gcm.GCMMessageType;
 import nl.devgames.model.Business;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
@@ -124,6 +126,8 @@ public class ProjectController extends BaseController{
                 testReport.setScore(new ScoreCalculator(settings).calculateScoreFromReport(testReport));
                 //save report
                 testReport.saveReportToDatabase();
+                //message the user who pushed the build
+                GCMMessageComposer.sendMessage(GCMMessageType.NEW_SCORES, "TITLE", Integer.toString(testReport.getScore().intValue()));
             } catch (Exception e) {
                 L.e(e, "Error when parsing report");
                 throw new KnownInternalServerError(e.getMessage());
