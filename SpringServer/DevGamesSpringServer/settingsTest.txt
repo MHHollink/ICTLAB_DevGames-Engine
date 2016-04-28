@@ -1,0 +1,8 @@
+{
+    projectName: "DevGames",
+    scoreMethod: "SUB",
+    pointStealing: "false",
+    issuesPerCommitThreshold: "10.0",
+    negativeScores: "false"
+
+}
