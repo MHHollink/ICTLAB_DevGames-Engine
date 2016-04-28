@@ -10,6 +10,8 @@ import nl.devgames.rest.errors.NotFoundException;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GCMMessageComposer {
 	/**
@@ -41,29 +43,25 @@ public class GCMMessageComposer {
 	 * messageText = string to send as message text
 	 */
 	public static void sendMessage(GCMMessageType messageType, String messageTitle, String messageText) {
-    	System.out.println( "Sending POST to GCM" );
+    	L.i( "Sending POST to GCM" );
 
     	//create message
     	GCMMessage message = createGCMMessage(messageType, messageTitle, messageText);
-    	
-//    	//api key devGames
-//    	String apiKey = "AIzaSyC9G357o3fykQPsbANNtn6KXOkHJi6_kwA";
-    	
-//    	//jorik project test
-//        String apiKey = "AIzaSyAYYJpgR6yk4AePQioLiMKVNsOVyMrcKVU";
-    	
-//      //marcels tel test
-//      tokenList.add("APA91bH9_5pjDv1TIDorZoRcm8Ye_bTGJK6eFTKQuVJI1lGf12EdSXfwmv1wtc9hXFj82eHb8O5b_ta7zxDlfbtCGiRdMxugCZ3N1e_WfPWSbZYBlaT15VpZuGxgKW_t77FrEM8jcIln");
-      
-//      //joriks tel test
-//      tokenList.add("ctUfXcOYkEw:APA91bHchgJZU-hMRxXuwxFbKQsIOKAl82HORl53EQZGzjPbdlccufAYPBwiO3d9-YkikxW41VitbwisaqJHjXmzTe5IIZD08PXYHVlIOzHtXOHyLu7E6x3qtHg6g7BHM_TDG7IrIYjy");
-        
+
         //get list of tokens from neo4j db
         //TODO: for now this gets 2 users, make it work for a list of users or userids
-//        tokenList;
+
+//        String tokenResponseAsString = null;
+//        try {
+//            tokenResponseAsString = Neo4JRestService.getInstance().postQuery("Match (n:User) Where ID(n) = 37 Return n.gcmRegId");
+//        } catch (ConnectException e) {
+//            L.e(e, "Neo4J Post threw exception, Database might be offline!");
+//            throw new KnownInternalServerError(e.getMessage());
+//        }
+
         String tokenResponseAsString = null;
         try {
-            tokenResponseAsString = Neo4JRestService.getInstance().postQuery("Match (n:User) Where ID(n) = 37 Return n.gcmRegId");
+            tokenResponseAsString = Neo4JRestService.getInstance().postQuery("Match (n:User) Return n.gcmRegId");
         } catch (ConnectException e) {
             L.e(e, "Neo4J Post threw exception, Database might be offline!");
             throw new KnownInternalServerError(e.getMessage());
@@ -83,12 +81,16 @@ public class GCMMessageComposer {
             throw new NotFoundException("The server could not find the requested data...");
         }
         //get actual tokens
-        JsonArray tokensAsJsonArray = data.get(0).getAsJsonObject().get("row").getAsJsonArray();
-
-        //add tokens
-        for(JsonElement token : tokensAsJsonArray) {
-        	message.addToken(token.toString());
+        List<String> tokenList = new ArrayList<>();
+        for(JsonElement element : data) {
+            String token = element.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsString();
+            if(token!=null) {
+                tokenList.add(token);
+            }
         }
+
+        //add tokens to message
+        message.addToken(tokenList);
         
         GCMRestService.getInstance().postMessage(
               message
