@@ -1,9 +1,6 @@
 package nl.devgames.connection.database.dto;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
@@ -100,35 +97,47 @@ public class SQReportDTO {
      * Saves the report data to the neo4j database
      */
 	public void saveReportToDatabase() throws Exception {
+		//TODO: create nodes and relationships between them IN ONE CYPHER QUERY
 		if(valid) {
-//			NODES
+			//=====================NODES================
             //push push to database
-			 Neo4JRestService.getInstance().postQuery(
+			String pushResponseString = Neo4JRestService.getInstance().postQuery(
 	                 "CREATE (n:Push { " +
-	                         "id: '%d', timestamp: '%d', score: '%f'})",
+	                         "id: '%d', timestamp: '%d', score: '%f'}) " +
+							 "RETURN ID(n)",
 					 this.getId(),
 					 this.getTimestamp(),
 					 this.getScore()
 	         );
+			//return neo id to establish relationships
+			long pushId = new JsonParser().parse(pushResponseString).getAsJsonObject().get("results").getAsJsonArray()
+					.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
+			setId(pushId);
 		    //push commits to database
 			for (Commit commit : this.getCommits()) {
-                Neo4JRestService.getInstance().postQuery(
+                String commitResponseString = Neo4JRestService.getInstance().postQuery(
                         "CREATE (n:Commit { " +
-                                "commitId: '%s', commitMsg: '%s', timestamp: %d })",
+                                "commitId: '%s', commitMsg: '%s', timestamp: %d })" +
+								"RETURN ID(n)",
                         commit.getCommitId(),
                         commit.getCommitMsg(),
                         commit.getTimeStamp()
                 );
+				//return neo id to establish relationships
+				long commitId = new JsonParser().parse(commitResponseString).getAsJsonObject().get("results").getAsJsonArray()
+						.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
+				commit.setId(commitId);
             }
             //push issues to database
             for (Issue issue : this.getIssues()) {
-                Neo4JRestService.getInstance().postQuery(
+				String issueResponseString = Neo4JRestService.getInstance().postQuery(
                         "CREATE (n:Issue { " +
 								"issueId: '%d', " +
                                 "severity: '%s', component: '%s', message: '%s', " +
                                 "status: '%s', resolution: '%s', dept: %d, " +
                                 "startLine: %d, endLine: %d, creationDate : %d," +
-                                "updateData: %d, closeData: %d })",
+                                "updateData: %d, closeData: %d }) " +
+								"RETURN ID(n)",
                         issue.getId(),
 						issue.getSeverity(),
                         issue.getComponent(),
@@ -142,35 +151,57 @@ public class SQReportDTO {
                         issue.getUpdateDate(),
                         issue.getCloseDate()
                 );
+				//return neo id to establish relationships
+				long issueId = new JsonParser().parse(issueResponseString).getAsJsonObject().get("results").getAsJsonArray()
+						.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
+				issue.setId(issueId);
             }
             //push duplications to neo4j database
             for (Duplication duplication : this.getDuplications()) {
-                Neo4JRestService.getInstance().postQuery(
+                String duplicationResponseString = Neo4JRestService.getInstance().postQuery(
                         "CREATE (n:Duplication { " +
-								"id: '%d' })",
+								"id: '%d' }) " +
+								"RETURN ID(n)",
 						duplication.getId()
                 );
+				//return neo id to establish relationships
+				long duplicationId = new JsonParser().parse(duplicationResponseString).getAsJsonObject().get("results").getAsJsonArray()
+						.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
+				duplication.setId(duplicationId);
+
                 //push duplication files to neo4j database
                 for (DuplicationFile duplicationFile : duplication.getFiles()) {
-                    Neo4JRestService.getInstance().postQuery(
-                            "CREATE (n:DuplicationFile)"
+                    String duplicationFileResponseString = Neo4JRestService.getInstance().postQuery(
+                            "CREATE (n:DuplicationFile { " +
+									"file: '%s', beginLine: '%d', endLine: '%d', size: '%d'}) " +
+									"RETURN ID(n)",
+							duplicationFile.getFile(),
+							duplicationFile.getBeginLine(),
+							duplicationFile.getEndLine(),
+							duplicationFile.getSize()
                     );
+					//return neo id to establish relationships
+					long duplicationFileId = new JsonParser().parse(duplicationFileResponseString).getAsJsonObject().get("results").getAsJsonArray()
+							.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
+					duplicationFile.setId(duplicationFileId);
                 }
             }
-//			RELATIONSHIPS
+ 			//======================RELATIONSHIPS===================
 			//push push relations to database
 			for (Commit commit : this.getCommits()) {
 				Neo4JRestService.getInstance().postQuery(
-						"MATCH (a:Push { id: '%d' }), (b:Commit { id: '%s' }) " +
+						"MATCH (a:Push), (b:Commit) " +
+								"WHERE ID(a) = %d AND ID(b) = %d " +
 								"CREATE (a)-[:contains_commits]->(b)",
 						this.getId(),
-						commit.getCommitId()
+						commit.getId()
 				);
 			}
 			//push issue relations to database
 			for (Issue issue : this.getIssues()) {
 				Neo4JRestService.getInstance().postQuery(
-						"MATCH (a:Push { id: '%d' }), (b:Issue { id: '%d' }) " +
+						"MATCH (a:Push), (b:Issue) " +
+								"WHERE ID(a) = %d AND ID(b) = %d " +
 								"CREATE (a)-[:contains_issues]->(b)",
 						this.getId(),
 						issue.getId()
@@ -179,7 +210,8 @@ public class SQReportDTO {
 			//push duplication to database
 			for(Duplication duplication : this.getDuplications()) {
 				Neo4JRestService.getInstance().postQuery(
-						"MATCH (a:Push { id: '%d' }), (b:Duplication { id: '%d' }) " +
+						"MATCH (a:Push), (b:Duplication) " +
+								"WHERE ID(a) = %d AND ID(b) = %d " +
 								"CREATE (a)-[:contains_duplications]->(b)",
 						this.getId(),
 						duplication.getId()
@@ -187,7 +219,8 @@ public class SQReportDTO {
 				//push duplication files to database
 				for(DuplicationFile duplicationFile : duplication.getFiles()) {
 					Neo4JRestService.getInstance().postQuery(
-							"MATCH (a:Duplication { id: '%d' }), (b:DuplicationFile { id: '%d' }) " +
+							"MATCH (a:Duplication), (b:DuplicationFile) " +
+									"WHERE ID(a) = %d AND ID(b) = %d " +
 									"CREATE (a)-[:contains_files]->(b)",
 							duplication.getId(),
 							duplicationFile.getId()
