@@ -7,6 +7,8 @@ import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.*;
+import nl.devgames.connection.gcm.GCMMessageComposer;
+import nl.devgames.connection.gcm.GCMMessageType;
 import nl.devgames.model.Business;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
@@ -103,18 +105,22 @@ public class ProjectController extends BaseController{
         String responseString = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:Project) " +
                         "WHERE n.token = '%s' " +
-                        "RETURN n",
+                        "RETURN {id:id(n), labels: labels(n), data: n}",
                 token
         );
 
         java.util.Map<String, String> result = new java.util.HashMap<>();
 
-        if(new JsonParser().parse(responseString).getAsJsonObject().get("results").getAsJsonArray().size() > 0) {
+        ProjectDTO projectDTO = new ProjectDTO().createFromNeo4jData(
+                ProjectDTO.findFirst(responseString)
+        );
+
+        if(projectDTO.isValid()) {
             //token is valid
             JsonObject reportAsJson = new JsonParser().parse(json).getAsJsonObject();
             try {
                 SQReportDTO testReport = new SQReportDTO().buildFromJson(reportAsJson);
-                //TODO: get settings for project, temp testing solution below
+                //todo: get settings for project, temp testing solution below
                 File testSettingsFile = new File("settingsTest.txt");
                 Scanner scanner = new Scanner(testSettingsFile);
                 String settingsAsString = scanner.useDelimiter("\\Z").next();
@@ -124,6 +130,13 @@ public class ProjectController extends BaseController{
                 testReport.setScore(new ScoreCalculator(settings).calculateScoreFromReport(testReport));
                 //save report
                 testReport.saveReportToDatabase();
+
+
+                GCMMessageComposer.sendMessage(
+                        GCMMessageType.NEW_SCORES,
+                        "",
+                        String.valueOf(testReport.getScore().intValue())
+                );
             } catch (Exception e) {
                 L.e(e, "Error when parsing report");
                 throw new KnownInternalServerError(e.getMessage());

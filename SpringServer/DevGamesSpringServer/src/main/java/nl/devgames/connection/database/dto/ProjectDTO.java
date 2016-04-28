@@ -46,6 +46,10 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
 
     @Override
     public ProjectDTO createFromNeo4jData(JsonObject data) {
-        return null;
+        ProjectDTO dto = new ProjectDTO().createFromJsonObject(
+                data.get("data").getAsJsonObject()
+        );
+        dto.id = data.get("id").getAsLong();
+        return dto;
     }
 }

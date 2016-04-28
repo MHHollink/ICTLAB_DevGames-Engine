@@ -284,7 +284,7 @@ public class SQReportDTO {
 			}
 		}
 		else {
-			L.i("error parsing author");
+			L.e("error parsing author");
 			valid = false;
 		}
 		return author;
@@ -578,7 +578,7 @@ public class SQReportDTO {
 		this.duplications = duplications;
 	}
 	
-	public double getScore() {
+	public Double getScore() {
 		return score;
 	}
 
