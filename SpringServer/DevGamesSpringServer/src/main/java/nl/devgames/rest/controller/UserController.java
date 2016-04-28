@@ -101,13 +101,15 @@ public class UserController extends BaseController {
         if(userWithUpdateFields.getMainJob() != null)
             caller.setMainJob(userWithUpdateFields.getMainJob());
 
-
+        // TODO check for neo4J errors ect.
+        String response;
         try {
-            Neo4JRestService.getInstance().postQuery(
+            response = Neo4JRestService.getInstance().postQuery(
                     "MATCH (n:User) WHERE ID(n) = %d " +
-                            "SET n.username = '%s', n.gcmRegId = '%s', n.firstName = '%s', n.tween = '%s', n.lastName = '%s'" +
+                            "SET n.username = '%s', n.gcmRegId = '%s', n.firstName = '%s', n.tween = '%s', n.lastName = '%s', " +
                                 "n.session = '%s', n.mainJob = '%s', n.gitUsername = '%s' " +
                             "RETURN {id:id(n), labels: labels(n), data: n}",
+                    id,
                     caller.getUsername(),
                     caller.getGcmId(),
                     caller.getFirstName(),
@@ -121,6 +123,9 @@ public class UserController extends BaseController {
             L.e(e, "Neo4J Post threw exeption, Database might be offline!");
             throw new KnownInternalServerError("Server database refused connection");
         }
+
+
+
         return getOwnUser(session);
     }
 
