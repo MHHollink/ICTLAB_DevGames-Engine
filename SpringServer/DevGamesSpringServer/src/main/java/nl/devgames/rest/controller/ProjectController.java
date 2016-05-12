@@ -101,6 +101,7 @@ public class ProjectController extends BaseController{
     @RequestMapping(value = "/{token}/build", method = RequestMethod.POST)
     public Map startCalculator(@PathVariable("token") String token,
                                @RequestBody String json) throws ConnectException {
+        java.util.Map<String, String> result = new java.util.HashMap<>();
         //check if token is valid
         String responseString = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:Project) " +
@@ -109,7 +110,6 @@ public class ProjectController extends BaseController{
                 token
         );
 
-        java.util.Map<String, String> result = new java.util.HashMap<>();
 
         ProjectDTO projectDTO = new ProjectDTO().createFromNeo4jData(
                 ProjectDTO.findFirst(responseString)
@@ -135,7 +135,8 @@ public class ProjectController extends BaseController{
                 GCMMessageComposer.sendMessage(
                         GCMMessageType.NEW_SCORES,
                         "",
-                        String.valueOf(testReport.getScore().intValue())
+                        String.valueOf(testReport.getScore().intValue()),
+                        496L
                 );
             } catch (Exception e) {
                 L.e(e, "Error when parsing report");
