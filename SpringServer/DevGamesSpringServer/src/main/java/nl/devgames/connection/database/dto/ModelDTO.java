@@ -109,4 +109,18 @@ public abstract class ModelDTO<
                 .getAsJsonArray().get(0).getAsJsonObject().get("row")
                 .getAsJsonArray().get(0).getAsJsonObject();
     }
+
+    public static List<JsonObject> findAll(String json) {
+        List<JsonObject> objects = new ArrayList<>();
+
+        JsonArray array = getNeo4JData(json).get(0).getAsJsonObject().get("data").getAsJsonArray();
+
+        for (int i = 0; i < array.size(); i++ ) {
+            objects.add(array.get(i).getAsJsonObject().get("row")
+                     .getAsJsonArray().get(0).getAsJsonObject()
+            );
+        }
+
+        return objects;
+    }
 }

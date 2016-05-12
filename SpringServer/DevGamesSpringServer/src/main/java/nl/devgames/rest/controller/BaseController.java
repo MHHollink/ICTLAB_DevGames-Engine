@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
+import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Business;
 import nl.devgames.model.Commit;
@@ -48,26 +49,15 @@ public abstract class BaseController {
         if (session == null || session.isEmpty())
             throw new BadRequestException("Request without session"); // throws exception when session is null or blank
 
-        String jsonResponseString = null; // Request to neo4j
-        try {
-            jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:User) WHERE n.session = '%s' RETURN {id:id(n), labels: labels(n), data: n}",
-                    session
-            );
-        } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
-        }
 
-        User user;
-        try {
-            user = new UserDTO().createFromNeo4jData(
-                    UserDTO.findFirst(jsonResponseString)
-            ).toModel();
-        } catch (IndexOutOfBoundsException e) {
-            L.e(e, "Getting user with session '%s' threw IndexOutOfBoundsException, session token was probably invalid", session);
-            throw new InvalidSessionException("Request session is not found");
-        }
-        return user;
+//        User user;
+//        try {
+//            user =
+//        } catch (IndexOutOfBoundsException e) {
+//            L.e(e, "Getting user with session '%s' threw IndexOutOfBoundsException, session token was probably invalid", session);
+//            throw new InvalidSessionException("Request session is not found");
+//        }
+        return new UserDao().queryForField("session", session).get(0);
     }
 
     /**

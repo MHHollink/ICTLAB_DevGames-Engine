@@ -1,12 +1,16 @@
 package nl.devgames.connection.database.dto;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
 import nl.devgames.utils.L;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 public class UserDTO extends ModelDTO<UserDTO, User> {
@@ -56,7 +60,7 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
                 gitUsername != null &&
                 firstName != null &&
                 lastName != null &&
-                age != Integer.MIN_VALUE &&
+                age != 0 &&
                 mainJob != null;
 
         if(!valid) {
@@ -67,7 +71,7 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
                     gitUsername != null,
                     firstName != null,
                     lastName != null,
-                    age != Integer.MIN_VALUE,
+                    age != 0,
                     mainJob != null
             );
         }

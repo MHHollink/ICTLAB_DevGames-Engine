@@ -1,11 +1,14 @@
 package nl.devgames.connection.database.dao;
 
+import com.google.gson.JsonObject;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.User;
+import nl.devgames.utils.L;
 
 import javax.jws.soap.SOAPBinding;
 import java.net.ConnectException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +49,29 @@ public class UserDao implements Dao<User, Long> {
 
     @Override
     public List<User> queryForField(String fieldName, Object value) {
+        try {
+            String queryFormat;
+            if(value instanceof Number)
+                queryFormat = "MATCH (n:User) WHERE n.%s =  %s  RETURN {id:id(n), labels: labels(n), data: n}";
+            else
+                queryFormat = "MATCH (n:User) WHERE n.%s = '%s' RETURN {id:id(n), labels: labels(n), data: n}";
+
+            String r = Neo4JRestService.getInstance().postQuery(
+                                queryFormat,
+                                fieldName,
+                                value
+            );
+
+            List<User> response = new ArrayList<>();
+            for (JsonObject object : UserDTO.findAll(r)) {
+                response.add(new UserDTO().createFromNeo4jData(object).toModel());
+            }
+            return response;
+
+        }
+        catch (ConnectException e) {
+            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+        }
         return null;
     }
 
