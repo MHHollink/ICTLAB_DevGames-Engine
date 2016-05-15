@@ -6,7 +6,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dto.*;
+import nl.devgames.connection.database.dto.BusinessDTO;
+import nl.devgames.connection.database.dto.CommitDTO;
+import nl.devgames.connection.database.dto.DuplicationDTO;
+import nl.devgames.connection.database.dto.IssueDTO;
+import nl.devgames.connection.database.dto.ProjectDTO;
+import nl.devgames.connection.database.dto.SQReportDTO;
+import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.connection.gcm.GCMMessageComposer;
 import nl.devgames.connection.gcm.GCMMessageType;
 import nl.devgames.model.Business;
@@ -31,7 +37,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.net.ConnectException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/projects")

@@ -7,7 +7,6 @@ import nl.devgames.model.Commit;
 import nl.devgames.model.Issue;
 import nl.devgames.utils.L;
 
-import java.util.DoubleSummaryStatistics;
 import java.util.List;
 
 public class ScoreCalculator {

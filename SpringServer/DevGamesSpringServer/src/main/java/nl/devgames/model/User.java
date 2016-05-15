@@ -1,7 +1,10 @@
 package nl.devgames.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Set;
 
+@JsonIgnoreProperties({"password"})
 public class User extends Model {
 
     private String username;
@@ -20,6 +23,8 @@ public class User extends Model {
     private String sessionId;
     private String gcmId;
 
+    private String password;
+
     public User() {
     }
 
@@ -35,6 +40,21 @@ public class User extends Model {
         this.pushes = pushes;
         this.sessionId = sessionId;
         this.gcmId = gcmId;
+    }
+
+    public User(String username, String gitUsername, String firstName, String tween, String lastName, int age, String mainJob, Set<Project> projects, Set<Push> pushes, String sessionId, String gcmId, String password) {
+        this.username = username;
+        this.gitUsername = gitUsername;
+        this.firstName = firstName;
+        this.tween = tween;
+        this.lastName = lastName;
+        this.age = age;
+        this.mainJob = mainJob;
+        this.projects = projects;
+        this.pushes = pushes;
+        this.sessionId = sessionId;
+        this.gcmId = gcmId;
+        this.password = password;
     }
 
     public String getUsername() {
@@ -123,6 +143,14 @@ public class User extends Model {
 
     public void setGcmId(String gcmId) {
         this.gcmId = gcmId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override

@@ -12,7 +12,6 @@ import nl.devgames.model.Issue;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
-import nl.devgames.model.UserWithPassword;
 import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.rest.errors.NotFoundException;
@@ -35,7 +34,7 @@ import java.util.Set;
 public class UserController extends BaseController {
 
     @RequestMapping(method = RequestMethod.POST)
-    public User createNewUser(@RequestBody UserWithPassword user) {
+    public User createNewUser(@RequestBody User user) {
         L.i("Called");
         throw new UnsupportedOperationException("This shall be used to create users");
     }

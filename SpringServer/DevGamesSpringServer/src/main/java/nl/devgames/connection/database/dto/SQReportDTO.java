@@ -1,6 +1,10 @@
 package nl.devgames.connection.database.dto;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;

@@ -4,18 +4,13 @@ import com.google.gson.JsonObject;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.User;
-import nl.devgames.utils.L;
 
-import javax.jws.soap.SOAPBinding;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Marcel on 12-5-2016.
- */
 public class UserDao implements Dao<User, Long> {
 
     @Override
@@ -35,7 +30,6 @@ public class UserDao implements Dao<User, Long> {
                             )
                     )
                     .toModel();
-
         } catch (ConnectException e) {
             e.printStackTrace();
             return null;
@@ -48,45 +42,59 @@ public class UserDao implements Dao<User, Long> {
     }
 
     @Override
-    public List<User> queryForField(String fieldName, Object value) {
-        try {
-            String queryFormat;
-            if(value instanceof Number)
-                queryFormat = "MATCH (n:User) WHERE n.%s =  %s  RETURN {id:id(n), labels: labels(n), data: n}";
-            else
-                queryFormat = "MATCH (n:User) WHERE n.%s = '%s' RETURN {id:id(n), labels: labels(n), data: n}";
+    public List<User> queryByField(String fieldName, Object value) throws ConnectException {
+        String queryFormat;
+        if(value instanceof Number)
+            queryFormat = "MATCH (n:User) WHERE n.%s =  %s  RETURN {id:id(n), labels: labels(n), data: n}";
+        else
+            queryFormat = "MATCH (n:User) WHERE n.%s = '%s' RETURN {id:id(n), labels: labels(n), data: n}";
 
-            String r = Neo4JRestService.getInstance().postQuery(
-                                queryFormat,
-                                fieldName,
-                                value
-            );
+        String r = Neo4JRestService.getInstance().postQuery(
+                            queryFormat,
+                            fieldName,
+                            value
+        );
 
-            List<User> response = new ArrayList<>();
-            for (JsonObject object : UserDTO.findAll(r)) {
-                response.add(new UserDTO().createFromNeo4jData(object).toModel());
-            }
-            return response;
-
+        List<User> response = new ArrayList<>();
+        for (JsonObject object : UserDTO.findAll(r)) {
+            response.add(new UserDTO().createFromNeo4jData(object).toModel());
         }
-        catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
-        }
+        return response;
+    }
+
+    @Override
+    public List<User> queryByFields(Map<String, Object> fieldValues) {
         return null;
     }
 
     @Override
-    public List<User> queryForFieldValues(Map<String, Object> fieldValues) {
-        return null;
+    public User queryForSameId(User data) throws ConnectException {
+        return new UserDTO()
+                .createFromNeo4jData(
+                        UserDTO.findFirst(
+                                Neo4JRestService
+                                        .getInstance()
+                                        .postQuery(
+                                                "MATCH (n:User) " +
+                                                        "WHERE ID(n) = %d " +
+                                                        "RETURN {id:id(n), labels: labels(n), data: n}",
+                                                data.getId()
+                                        )
+                        )
+                )
+                .toModel();
     }
 
     @Override
-    public User queryForSameId(User data) {
-        return null;
-    }
-
-    @Override
-    public int create(User data) {
+    public int create(User data) throws ConnectException {
+        Neo4JRestService.getInstance().postQuery(
+                "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmRegId: '%s' }) ",
+                data.getUsername(),
+                data.getGitUsername(),
+                data.getFirstName(),
+                data.getLastName(),
+                data.getAge(),
+                data.getMainJob(), data.getPassword(), data.getGcmId());
         return 0;
     }
 

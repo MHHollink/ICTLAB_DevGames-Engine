@@ -1,6 +1,6 @@
 package nl.devgames.connection.database.dao;
 
-import java.sql.SQLException;
+import java.net.ConnectException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -30,17 +30,17 @@ public interface Dao<T, ID> extends Iterator<T> {
      *
      * @return A list of the objects in the table that match the fieldName = value;
      */
-    List<T> queryForField(String fieldName, Object value);
+    List<T> queryByField(String fieldName, Object value) throws ConnectException;
 
     /**
      * Query for the rows in the database that matches all of the field to value entries from the map passed in.
      */
-    List<T> queryForFieldValues(Map<String, Object> fieldValues);
+    List<T> queryByFields(Map<String, Object> fieldValues);
 
     /**
      * Query for a data item in the table that has the same id as the data parameter.
      */
-    T queryForSameId(T data);
+    T queryForSameId(T data) throws ConnectException;
 
     /**
      * Create a new row in the database from an object.
@@ -49,7 +49,7 @@ public interface Dao<T, ID> extends Iterator<T> {
      *            The data item that we are creating in the database.
      * @return The number of rows updated in the database. This should be 1.
      */
-    int create(T data);
+    int create(T data) throws ConnectException;
 
     /**
      * This is a convenience method to creating a data item but only if the ID does not already exist in the table. This

@@ -13,7 +13,6 @@ import nl.devgames.utils.L;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 public class GCMMessageComposer {
