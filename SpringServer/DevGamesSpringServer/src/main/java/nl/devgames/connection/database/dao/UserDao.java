@@ -26,6 +26,7 @@ public class UserDao implements Dao<User, Long> {
 
     @Override
     public User queryForId(Long id) throws ConnectException, IndexOutOfBoundsException {
+        L.i("Query user with id: %d", id);
         UserDTO dto = null; Set<Project> projects = new HashSet<>(); Set<Push> pushes = new HashSet<>();
         String response = Neo4JRestService.getInstance().postQuery(
                             "MATCH (a:User)-[r]->(b) " +
@@ -73,6 +74,7 @@ public class UserDao implements Dao<User, Long> {
 
     @Override
     public List<User> queryForAll() throws ConnectException {
+        L.i("Query user all users");
         String r = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:User) RETURN n"
         );
@@ -86,6 +88,7 @@ public class UserDao implements Dao<User, Long> {
 
     @Override
     public List<User> queryByField(String fieldName, Object value) throws ConnectException, IndexOutOfBoundsException {
+        L.i("Query users with %s: %s", value);
         String queryFormat;
         if(value instanceof Number)
             queryFormat = "MATCH (n:User) WHERE n.%s =  %s  RETURN {id:id(n), labels: labels(n), data: n}";
@@ -111,6 +114,7 @@ public class UserDao implements Dao<User, Long> {
 
     @Override
     public List<User> queryByFields(Map<String, Object> fieldValues) throws ConnectException {
+        L.i("Query users with fields: %s", fieldValues.toString());
         String queryFormat = "MATCH (n:User) WHERE ";
 
         Iterator<String> iterator = fieldValues.keySet().iterator();
@@ -146,21 +150,23 @@ public class UserDao implements Dao<User, Long> {
 
     @Override
     public User queryForSameId(User user) throws ConnectException {
+        L.i("Query user with same id as user: %s", user);
         return queryForId(user.getId());
     }
 
     @Override
-    public int create(User data) throws ConnectException {
+    public int create(User user) throws ConnectException {
+        L.i("Creating user: %s", user);
         String response = Neo4JRestService.getInstance().postQuery(
                 "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmRegId: '%s' }) RETURN n ",
-                data.getUsername(),
-                data.getGitUsername(),
-                data.getFirstName(),
-                data.getLastName(),
-                data.getAge(),
-                data.getMainJob(),
-                data.getPassword(),
-                data.getGcmId()
+                user.getUsername(),
+                user.getGitUsername(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getAge(),
+                user.getMainJob(),
+                user.getPassword(),
+                user.getGcmId()
         );
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
@@ -170,19 +176,21 @@ public class UserDao implements Dao<User, Long> {
     }
 
     @Override
-    public User createIfNotExists(User data) throws ConnectException {
-        User user = queryForId(data.getId());
-        if (user == null || !user.equals(data)) {
-            int inserted = create(data);
+    public User createIfNotExists(User user) throws ConnectException {
+        L.i("Creating user if it does not exist: %s", user);
+        User u = queryForId(user.getId());
+        if (u == null || !u.equals(user)) {
+            int inserted = create(user);
             if (inserted == 0)
                 return null;
             L.d("Created %d rows", inserted);
-            return data;
-        } else return user;
+            return user;
+        } else return u;
     }
 
     @Override
     public int update(User user) throws ConnectException {
+        L.i("Updating user: %s", user);
         if(user != null && queryForId(user.getId()) != null) {
 
             String response = Neo4JRestService.getInstance().postQuery(
@@ -214,11 +222,13 @@ public class UserDao implements Dao<User, Long> {
 
     @Override
     public int delete(User user) throws ConnectException {
+        L.i("Deleting user: %s", user);
         return deleteById(user.getId());
     }
 
     @Override
     public int deleteById(Long id) throws ConnectException {
+        L.i("Deleting user with id: %d", id);
         if(queryForId(id) == null) return 0;
         String response = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:User) " +
@@ -237,6 +247,7 @@ public class UserDao implements Dao<User, Long> {
 
     @Override
     public int delete(Collection<User> users) throws ConnectException {
+        L.i("Deleting users: %s", users);
         int changed = 0;
         for(User user : users)
             changed += delete(user);
@@ -245,6 +256,7 @@ public class UserDao implements Dao<User, Long> {
 
     @Override
     public int deleteIds(Collection<Long> ids) throws ConnectException {
+        L.i("Deleting users with ids: %d", ids);
         int changed = 0;
         for(Long id : ids)
             changed += deleteById(id);
