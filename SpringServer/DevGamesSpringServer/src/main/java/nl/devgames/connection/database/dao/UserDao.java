@@ -204,8 +204,8 @@ public class UserDao implements Dao<User, Long> {
         String response = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:User) " +
                         "WHERE ID(n) = %d " +
-                        "SET n.username = NULL AND n.password = NULL AND " +
-                            "n.firstName = NULL AND n.lastName = NULL AND n.age = NULL " + // TODO: 16-5-2016 More field to null?
+                        "SET n.username = NULL, n.password = NULL, " +
+                            "n.firstName = NULL, n.lastName = NULL, n.age = NULL " + // TODO: 16-5-2016 More field to null?
                         "RETURN n",
                 id
         );
