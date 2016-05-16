@@ -107,9 +107,8 @@ public class SQReportDTO {
             //push push to database
 			String pushResponseString = Neo4JRestService.getInstance().postQuery(
 	                 "CREATE (n:Push { " +
-	                         "id: '%d', timestamp: '%d', score: '%f'}) " +
+	                         "timestamp: '%d', score: '%f'}) " +
 							 "RETURN ID(n)",
-					 this.getId(),
 					 this.getTimestamp(),
 					 this.getScore()
 	         );

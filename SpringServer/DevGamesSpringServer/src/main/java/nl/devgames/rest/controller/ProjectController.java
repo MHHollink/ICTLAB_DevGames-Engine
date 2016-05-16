@@ -176,18 +176,18 @@ public class ProjectController extends BaseController{
         //check if session is valid
         if (session == null || session.isEmpty())
             throw new BadRequestException("Request without session"); // throws exception when session is null or blank
-
-        String sessionResponseString = null;
-        try {
-            sessionResponseString = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:Project) " +
-                            "WHERE n.session = '%s' " +
-                            "RETURN n",
-                    session
-            );
-        } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
-        }
+//
+//        String sessionResponseString = null;
+//        try {
+//            sessionResponseString = Neo4JRestService.getInstance().postQuery(
+//                    "MATCH (n:Project) " +
+//                            "WHERE n.session = '%s' " +
+//                            "RETURN n",
+//                    session
+//            );
+//        } catch (ConnectException e) {
+//            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+//        }
         String jsonResponseString = null;
         try {
             jsonResponseString = Neo4JRestService.getInstance().postQuery(
@@ -200,17 +200,27 @@ public class ProjectController extends BaseController{
         } catch (ConnectException e) {
             L.e(e, "Cannot create project");
         }
-        //session valid
-        try {
-            returnProject = new ProjectDTO().createFromNeo4jData(
-                    ProjectDTO.findFirst(jsonResponseString)
-            ).toModel();
+        ProjectDTO projectDTO = new ProjectDTO().createFromNeo4jData(
+                ProjectDTO.findFirst(jsonResponseString)
+        );
+        if(projectDTO.isValid()) {
+            returnProject = projectDTO.toModel();
         }
-        //session invalid
-        catch (IndexOutOfBoundsException e) {
-            L.e(e, "Getting project with session '%s' threw IndexOutOfBoundsException, session token was probably invalid", session);
+        else {
+            //session invalid
             throw new InvalidSessionException("Request session is not found");
         }
+//        //session valid
+//        try {
+//            returnProject = new ProjectDTO().createFromNeo4jData(
+//                    ProjectDTO.findFirst(jsonResponseString)
+//            ).toModel();
+//        }
+//        //session invalid
+//        catch (IndexOutOfBoundsException e) {
+//            L.e(e, "Getting project with session '%s' threw IndexOutOfBoundsException, session token was probably invalid", session);
+//            throw new InvalidSessionException("Request session is not found");
+//        }
 
         return returnProject;
     }
