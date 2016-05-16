@@ -160,7 +160,8 @@ public class UserDao implements Dao<User, Long> {
                 data.getAge(),
                 data.getMainJob(),
                 data.getPassword(),
-                data.getGcmId());
+                data.getGcmId()
+        );
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
         if(json.get("errors").getAsJsonArray().size() != 0)
@@ -184,10 +185,28 @@ public class UserDao implements Dao<User, Long> {
     public int update(User user) throws ConnectException {
         if(user != null && queryForId(user.getId()) != null) {
 
-            // TODO: 16-5-2016
-            return 0;
+            String response = Neo4JRestService.getInstance().postQuery(
+                    "MATCH (n:User) " +
+                            "WHERE ID(n) = %d " +
+                            "SET n.username = '%s', n.password = '%s', n.firstName = '%s', n.lastName = '%s', n.age = %d, " +
+                                "n.gcmId = '%s', n.session = '%s', n.mainJob = '%s', n.gitUsername = '%s' " +
+                            "RETURN n",
+                    user.getId(),
+                    user.getUsername(),
+                    user.getPassword(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getAge(),
+                    user.getGcmId(),
+                    user.getSessionId(),
+                    user.getMainJob(),
+                    user.getGitUsername()
+            );
 
-            // return 1;
+            JsonObject json = new JsonParser().parse(response).getAsJsonObject();
+            if(json.get("errors").getAsJsonArray().size() != 0)
+                L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
+            return json.get("results").getAsJsonArray().size();
         }
         L.w("User is null or has no id that is present in the database");
         return 0;
@@ -229,7 +248,6 @@ public class UserDao implements Dao<User, Long> {
         int changed = 0;
         for(Long id : ids)
             changed += deleteById(id);
-
         return changed;
     }
 }

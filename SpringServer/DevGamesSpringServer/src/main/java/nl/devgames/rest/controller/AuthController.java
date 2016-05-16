@@ -1,11 +1,11 @@
 package nl.devgames.rest.controller;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import nl.devgames.Application;
-import nl.devgames.connection.database.Neo4JRestService;
+import nl.devgames.connection.database.dao.UserDao;
+import nl.devgames.model.User;
 import nl.devgames.rest.errors.BadRequestException;
-import nl.devgames.rest.errors.KnownInternalServerError;
+import nl.devgames.rest.errors.DatabaseOfflineException;
+import nl.devgames.rest.errors.UnknownInternalServerError;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.ConnectException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -33,54 +35,47 @@ public class AuthController extends BaseController{
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public Map<String,String> login(@RequestParam(value="username") String username, @RequestParam(value="password") String password) {
+
         L.i("Called");
+
         if (password == null || password.isEmpty() || username == null || username.isEmpty()) {
             L.d("Throwing BadRequestException, Username or password was missing...");
             throw new BadRequestException("Username or password was missing");
         }
-        String jsonResponseString;
+
         try {
-            jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:User) WHERE n.username = '%s' AND n.password = '%s' RETURN n.username",
-                    username,
-                    password
-            );
-        } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
-            throw new KnownInternalServerError(e.getMessage());
-        }
+            Map<String, Object> fields = new HashMap<>();
+            fields.put("username", username);
+            fields.put("password", password);
 
-        // todo : use different method for this
-        JsonObject jsonResponse = new JsonParser().parse(jsonResponseString).getAsJsonObject();
+            UserDao dao = new UserDao();
 
-        if (hasErrors(jsonResponse)) return null;
+            List<User> users = dao.queryByFields(fields);
 
-        int users = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray().size();
+            if (users.size() == 0) {
+                L.w("login attempt failed, no user with given combo");
+                throw new BadRequestException("This username-password combination is not found");
+            } else {
+                if(users.size() == 2) L.e("WAIT! what?! multiple users were returned by username '%s'", username);
 
-        if (users == 0) {
-            L.w("login attempt failed, no user with given combo");
-            throw new BadRequestException("This username-password combination is not found");
-        } else {
-            L.i("User %s has successfully logged in, generating session token...", username);
+                Map<String, String> result = new java.util.HashMap<>();
+                String sessionID = String.valueOf(UUID.randomUUID());
+                // todo : user some real session management stuff
 
-            java.util.Map<String, String> result = new java.util.HashMap<>();
-            // todo : user some real session management stuff
+                result.put(Application.SESSION_HEADER_KEY, sessionID);
+                User user = users.get(0);
+                if(user == null) throw new UnknownInternalServerError("Something strange happened while logging in...");
 
-            String sessionID = String.valueOf(UUID.randomUUID());
-            result.put(Application.SESSION_HEADER_KEY, sessionID);
+                user.setSessionId(sessionID);
 
-            try {
-                Neo4JRestService.getInstance().postQuery(
-                        "MATCH (n:User {username : '%s'}) SET n.session = '%s'",
-                        username,
-                        sessionID
-                );
-            } catch (ConnectException e) {
-                L.e(e, "Neo4J Post threw exeption, Database might be offline!");
-                throw new KnownInternalServerError(e.getMessage());
+                dao.update(user);
+
+                return result;
             }
 
-            return result;
+        } catch (ConnectException e) {
+            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+            throw new DatabaseOfflineException("Database service offline!");
         }
     }
 }
