@@ -2,11 +2,10 @@ package nl.devgames.connection.database.dao;
 
 import java.net.ConnectException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public interface Dao<T, ID> extends Iterator<T> {
+public interface Dao<T, ID>{
 
     /**
      * Retrieves an object associated with a specific ID.
@@ -22,7 +21,7 @@ public interface Dao<T, ID> extends Iterator<T> {
      *
      * @return A list of all of the objects in the table.
      */
-    List<T> queryForAll();
+    List<T> queryForAll() throws ConnectException;
 
     /**
      * Query for the items in the object table that match a simple where with a single field = value type of WHERE
@@ -35,7 +34,7 @@ public interface Dao<T, ID> extends Iterator<T> {
     /**
      * Query for the rows in the database that matches all of the field to value entries from the map passed in.
      */
-    List<T> queryByFields(Map<String, Object> fieldValues);
+    List<T> queryByFields(Map<String, Object> fieldValues) throws ConnectException;
 
     /**
      * Query for a data item in the table that has the same id as the data parameter.
@@ -59,7 +58,7 @@ public interface Dao<T, ID> extends Iterator<T> {
      * @return Either the data parameter if it was inserted (now with the ID field set via the create method) or the
      *         data element that existed already in the database.
      */
-    T createIfNotExists(T data);
+    T createIfNotExists(T data) throws ConnectException;
 
     /**
      * Store the fields from an object to the database row corresponding to the id from the data parameter. If you have
@@ -70,7 +69,7 @@ public interface Dao<T, ID> extends Iterator<T> {
      *            The data item that we are updating in the database.
      * @return The number of rows updated in the database. This should be 1.
      */
-    int update(T data);
+    int update(T data) throws ConnectException;
 
     /**
      * Delete the database row corresponding to the id from the data parameter.
@@ -79,7 +78,7 @@ public interface Dao<T, ID> extends Iterator<T> {
      *            The data item that we are deleting from the database.
      * @return The number of rows updated in the database. This should be 1.
      */
-    int delete(T data);
+    int delete(T data) throws ConnectException;
 
     /**
      * Delete an object from the database that has an id.
@@ -88,7 +87,7 @@ public interface Dao<T, ID> extends Iterator<T> {
      *            The id of the item that we are deleting from the database.
      * @return The number of rows updated in the database. This should be 1.
      */
-    int deleteById(ID id);
+    int deleteById(ID id) throws ConnectException;
 
     /**
      * Delete a collection of objects from the database using an IN SQL clause. The ids are extracted from the datas
@@ -98,7 +97,7 @@ public interface Dao<T, ID> extends Iterator<T> {
      *            A collection of data items to be deleted.
      * @return The number of rows updated in the database. This should be the size() of the collection.
      */
-    int delete(Collection<T> datas);
+    int delete(Collection<T> datas) throws ConnectException;
 
     /**
      * Delete the objects that match the collection of ids from the database using an IN SQL clause.
@@ -107,5 +106,5 @@ public interface Dao<T, ID> extends Iterator<T> {
      *            A collection of data ids to be deleted.
      * @return The number of rows updated in the database. This should be the size() of the collection.
      */
-    int deleteIds(Collection<ID> ids);
+    int deleteIds(Collection<ID> ids) throws ConnectException;
 }

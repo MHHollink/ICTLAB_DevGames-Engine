@@ -17,21 +17,13 @@ import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class UserDao implements Dao<User, Long> {
 
-    /**
-     * Returns one complete user with all the outgoing relations;
-     *
-     *      {@link User#pushes}, {@link User#projects}
-     *
-     *
-     * @param id
-     * @return
-     */
     @Override
     public User queryForId(Long id) throws ConnectException, IndexOutOfBoundsException {
         UserDTO dto = null; Set<Project> projects = new HashSet<>(); Set<Push> pushes = new HashSet<>();
@@ -80,8 +72,16 @@ public class UserDao implements Dao<User, Long> {
     }
 
     @Override
-    public List<User> queryForAll() {
-        return null;
+    public List<User> queryForAll() throws ConnectException {
+        String r = Neo4JRestService.getInstance().postQuery(
+                "MATCH (n:User) RETURN n"
+        );
+
+        List<User> response = new ArrayList<>();
+        for (JsonObject object : UserDTO.findAll(r)) {
+            response.add(new UserDTO().createFromNeo4jData(object).toModel());
+        }
+        return response;
     }
 
     @Override
@@ -106,32 +106,45 @@ public class UserDao implements Dao<User, Long> {
     }
 
     @Override
-    public List<User> queryByFields(Map<String, Object> fieldValues) {
-        return null;
+    public List<User> queryByFields(Map<String, Object> fieldValues) throws ConnectException {
+        String queryFormat = "MATCH (n:User) WHERE ";
+
+        Iterator<String> iterator = fieldValues.keySet().iterator();
+        while (iterator.hasNext()) {
+            String field = iterator.next();
+            Object value = fieldValues.get(field);
+
+            if(value instanceof Number)
+                queryFormat += String.format("n.%s = %s ", field, value);
+            else
+                queryFormat += String.format("n.%s = '%s' ", field, value);
+
+            if (iterator.hasNext())
+                queryFormat += "AND ";
+        }
+
+        queryFormat += " RETURN {id:id(n), labels: labels(n), data: n}";
+
+        String r = Neo4JRestService.getInstance().postQuery(
+                queryFormat
+        );
+
+        List<User> response = new ArrayList<>();
+        for (JsonObject object : UserDTO.findAll(r)) {
+            response.add(new UserDTO().createFromNeo4jData(object).toModel());
+        }
+        return response;
     }
 
     @Override
-    public User queryForSameId(User data) throws ConnectException {
-        return new UserDTO()
-                .createFromNeo4jData(
-                        UserDTO.findFirst(
-                                Neo4JRestService
-                                        .getInstance()
-                                        .postQuery(
-                                                "MATCH (n:User) " +
-                                                        "WHERE ID(n) = %d " +
-                                                        "RETURN {id:id(n), labels: labels(n), data: n}",
-                                                data.getId()
-                                        )
-                        )
-                )
-                .toModel();
+    public User queryForSameId(User user) throws ConnectException {
+        return queryForId(user.getId());
     }
 
     @Override
     public int create(User data) throws ConnectException {
         String response = Neo4JRestService.getInstance().postQuery(
-                "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmRegId: '%s' }) ",
+                "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmRegId: '%s' }) RETURN n ",
                 data.getUsername(),
                 data.getGitUsername(),
                 data.getFirstName(),
@@ -142,49 +155,72 @@ public class UserDao implements Dao<User, Long> {
                 data.getGcmId());
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
+        if(json.get("errors").getAsJsonArray().size() != 0)
+            L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
+        return json.get("results").getAsJsonArray().size();
+    }
 
+    @Override
+    public User createIfNotExists(User data) throws ConnectException {
+        User user = queryForId(data.getId());
+        if (user == null || !user.equals(data)) {
+            int inserted = create(data);
+            if (inserted == 0)
+                return null;
+            L.d("Created %d rows", inserted);
+            return data;
+        } else return user;
+    }
 
+    @Override
+    public int update(User user) throws ConnectException {
+        if(user != null && queryForId(user.getId()) != null) {
 
+            // TODO: 16-5-2016
+            return 0;
+
+            // return 1;
+        }
+        L.w("User is null or has no id that is present in the database");
         return 0;
     }
 
     @Override
-    public User createIfNotExists(User data) {
-        return null;
+    public int delete(User user) throws ConnectException {
+        return deleteById(user.getId());
     }
 
     @Override
-    public int update(User data) {
-        return 0;
+    public int deleteById(Long id) throws ConnectException {
+        if(queryForId(id) == null) return 0;
+        String response = Neo4JRestService.getInstance().postQuery(
+                "MATCH (n:User) " +
+                        "WHERE ID(n) == %d " +
+                        "SET n.username = NULL AND n.password = NULL" + // TODO: 16-5-2016 More field to null?
+                        "RETURN n",
+                id
+        );
+
+        JsonObject json = new JsonParser().parse(response).getAsJsonObject();
+        if(json.get("errors").getAsJsonArray().size() != 0)
+            L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
+        return json.get("results").getAsJsonArray().size();
     }
 
     @Override
-    public int delete(User data) {
-        return 0;
+    public int delete(Collection<User> users) throws ConnectException {
+        int changed = 0;
+        for(User user : users)
+            changed += delete(user);
+        return changed;
     }
 
     @Override
-    public int deleteById(Long aLong) {
-        return 0;
-    }
+    public int deleteIds(Collection<Long> ids) throws ConnectException {
+        int changed = 0;
+        for(Long id : ids)
+            changed += deleteById(id);
 
-    @Override
-    public int delete(Collection<User> datas) {
-        return 0;
-    }
-
-    @Override
-    public int deleteIds(Collection<Long> longs) {
-        return 0;
-    }
-
-    @Override
-    public boolean hasNext() {
-        return false;
-    }
-
-    @Override
-    public User next() {
-        return null;
+        return changed;
     }
 }

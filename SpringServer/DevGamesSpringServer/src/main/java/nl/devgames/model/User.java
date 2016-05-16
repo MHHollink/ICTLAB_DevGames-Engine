@@ -170,4 +170,25 @@ public class User extends Model {
                 "} " + super.toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        if (!super.equals(o)) return false;
+
+        User user = (User) o;
+
+        if (age != user.age) return false;
+        if (!username.equals(user.username)) return false;
+        if (!gitUsername.equals(user.gitUsername)) return false;
+        if (firstName != null ? !firstName.equals(user.firstName) : user.firstName != null) return false;
+        if (tween != null ? !tween.equals(user.tween) : user.tween != null) return false;
+        if (lastName != null ? !lastName.equals(user.lastName) : user.lastName != null) return false;
+        if (mainJob != null ? !mainJob.equals(user.mainJob) : user.mainJob != null) return false;
+        if (projects != null ? !projects.equals(user.projects) : user.projects != null) return false;
+        if (pushes != null ? !pushes.equals(user.pushes) : user.pushes != null) return false;
+        if (sessionId != null ? !sessionId.equals(user.sessionId) : user.sessionId != null) return false;
+        if (gcmId != null ? !gcmId.equals(user.gcmId) : user.gcmId != null) return false;
+        return password.equals(user.password);
+    }
 }

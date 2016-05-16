@@ -40,11 +40,7 @@ public class UserController extends BaseController {
         L.i("Called");
         try {
 
-            if (new UserDao().create(user) == 1) {
-                return user;
-            } else {
-                return null; // TODO: 16-5-2016 What do we return here?
-            }
+            return new UserDao().createIfNotExists(user);
 
         } catch (ConnectException e) {
             L.e("Database service is ofline");
