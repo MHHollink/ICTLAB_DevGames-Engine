@@ -21,7 +21,7 @@ public interface Dao<T, ID>{
      *
      * @return A list of all of the objects in the table.
      */
-    List<T> queryForAll() throws ConnectException;
+    List<T> queryForAll() throws ConnectException, IndexOutOfBoundsException;
 
     /**
      * Query for the items in the object table that match a simple where with a single field = value type of WHERE
@@ -29,17 +29,17 @@ public interface Dao<T, ID>{
      *
      * @return A list of the objects in the table that match the fieldName = value;
      */
-    List<T> queryByField(String fieldName, Object value) throws ConnectException;
+    List<T> queryByField(String fieldName, Object value) throws ConnectException, IndexOutOfBoundsException;
 
     /**
      * Query for the rows in the database that matches all of the field to value entries from the map passed in.
      */
-    List<T> queryByFields(Map<String, Object> fieldValues) throws ConnectException;
+    List<T> queryByFields(Map<String, Object> fieldValues) throws ConnectException, IndexOutOfBoundsException;
 
     /**
      * Query for a data item in the table that has the same id as the data parameter.
      */
-    T queryForSameId(T data) throws ConnectException;
+    T queryForSameId(T data) throws ConnectException, IndexOutOfBoundsException;
 
     /**
      * Create a new row in the database from an object.
@@ -48,7 +48,7 @@ public interface Dao<T, ID>{
      *            The data item that we are creating in the database.
      * @return The number of rows updated in the database. This should be 1.
      */
-    int create(T data) throws ConnectException;
+    int create(T data) throws ConnectException, IndexOutOfBoundsException;
 
     /**
      * This is a convenience method to creating a data item but only if the ID does not already exist in the table. This
@@ -58,7 +58,7 @@ public interface Dao<T, ID>{
      * @return Either the data parameter if it was inserted (now with the ID field set via the create method) or the
      *         data element that existed already in the database.
      */
-    T createIfNotExists(T data) throws ConnectException;
+    T createIfNotExists(T data) throws ConnectException, IndexOutOfBoundsException;
 
     /**
      * Store the fields from an object to the database row corresponding to the id from the data parameter. If you have
@@ -69,7 +69,7 @@ public interface Dao<T, ID>{
      *            The data item that we are updating in the database.
      * @return The number of rows updated in the database. This should be 1.
      */
-    int update(T data) throws ConnectException;
+    int update(T data) throws ConnectException, IndexOutOfBoundsException;
 
     /**
      * Delete the database row corresponding to the id from the data parameter.
@@ -78,7 +78,7 @@ public interface Dao<T, ID>{
      *            The data item that we are deleting from the database.
      * @return The number of rows updated in the database. This should be 1.
      */
-    int delete(T data) throws ConnectException;
+    int delete(T data) throws ConnectException, IndexOutOfBoundsException;
 
     /**
      * Delete an object from the database that has an id.
@@ -87,7 +87,7 @@ public interface Dao<T, ID>{
      *            The id of the item that we are deleting from the database.
      * @return The number of rows updated in the database. This should be 1.
      */
-    int deleteById(ID id) throws ConnectException;
+    int deleteById(ID id) throws ConnectException, IndexOutOfBoundsException;
 
     /**
      * Delete a collection of objects from the database using an IN SQL clause. The ids are extracted from the datas
@@ -97,7 +97,7 @@ public interface Dao<T, ID>{
      *            A collection of data items to be deleted.
      * @return The number of rows updated in the database. This should be the size() of the collection.
      */
-    int delete(Collection<T> datas) throws ConnectException;
+    int delete(Collection<T> datas) throws ConnectException, IndexOutOfBoundsException;
 
     /**
      * Delete the objects that match the collection of ids from the database using an IN SQL clause.
@@ -106,5 +106,5 @@ public interface Dao<T, ID>{
      *            A collection of data ids to be deleted.
      * @return The number of rows updated in the database. This should be the size() of the collection.
      */
-    int deleteIds(Collection<ID> ids) throws ConnectException;
+    int deleteIds(Collection<ID> ids) throws ConnectException, IndexOutOfBoundsException;
 }
