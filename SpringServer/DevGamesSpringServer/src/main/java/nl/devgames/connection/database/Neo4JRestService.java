@@ -35,7 +35,7 @@ public class Neo4JRestService extends AbsRestService {
             e.printStackTrace();
             return null;
         }
-        L.d("Recieved response: %s", response);
+        L.t("Recieved response: %s", response);
         return response;
     }
 
@@ -68,7 +68,7 @@ public class Neo4JRestService extends AbsRestService {
      */
     public String postQuery(String query, Object... params) throws ConnectException {
         query = String.format(query,params);
-        L.d(query);
+        L.t(query);
 
         return post(
                 queryToJson(
