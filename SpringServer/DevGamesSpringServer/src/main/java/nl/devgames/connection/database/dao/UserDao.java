@@ -100,7 +100,11 @@ public class UserDao implements Dao<User, Long> {
 
         List<User> response = new ArrayList<>();
         for (JsonObject object : UserDTO.findAll(r)) {
-            response.add(new UserDTO().createFromNeo4jData(object).toModel());
+            response.add(
+                    queryForId(
+                            new UserDTO().createFromNeo4jData(object).toModel().getId()
+                    )
+            );
         }
         return response;
     }
@@ -131,7 +135,11 @@ public class UserDao implements Dao<User, Long> {
 
         List<User> response = new ArrayList<>();
         for (JsonObject object : UserDTO.findAll(r)) {
-            response.add(new UserDTO().createFromNeo4jData(object).toModel());
+            response.add(
+                    queryForId(
+                            new UserDTO().createFromNeo4jData(object).toModel().getId()
+                    )
+            );
         }
         return response;
     }
@@ -195,8 +203,9 @@ public class UserDao implements Dao<User, Long> {
         if(queryForId(id) == null) return 0;
         String response = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:User) " +
-                        "WHERE ID(n) == %d " +
-                        "SET n.username = NULL AND n.password = NULL" + // TODO: 16-5-2016 More field to null?
+                        "WHERE ID(n) = %d " +
+                        "SET n.username = NULL AND n.password = NULL AND " +
+                            "n.firstName = NULL AND n.lastName = NULL AND n.age = NULL " + // TODO: 16-5-2016 More field to null?
                         "RETURN n",
                 id
         );

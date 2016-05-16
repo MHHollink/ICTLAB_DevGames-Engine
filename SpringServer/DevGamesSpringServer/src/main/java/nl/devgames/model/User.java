@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Set;
 
-@JsonIgnoreProperties({"password"})
+@JsonIgnoreProperties({"password", "sessionId"})
 public class User extends Model {
 
     private String username;
@@ -179,8 +179,8 @@ public class User extends Model {
         User user = (User) o;
 
         if (age != user.age) return false;
-        if (!username.equals(user.username)) return false;
-        if (!gitUsername.equals(user.gitUsername)) return false;
+        if (username != null ? !username.equals(user.username) : user.username != null) return false;
+        if (gitUsername != null ? !gitUsername.equals(user.gitUsername) : user.gitUsername != null) return false;
         if (firstName != null ? !firstName.equals(user.firstName) : user.firstName != null) return false;
         if (tween != null ? !tween.equals(user.tween) : user.tween != null) return false;
         if (lastName != null ? !lastName.equals(user.lastName) : user.lastName != null) return false;
@@ -189,6 +189,7 @@ public class User extends Model {
         if (pushes != null ? !pushes.equals(user.pushes) : user.pushes != null) return false;
         if (sessionId != null ? !sessionId.equals(user.sessionId) : user.sessionId != null) return false;
         if (gcmId != null ? !gcmId.equals(user.gcmId) : user.gcmId != null) return false;
-        return password.equals(user.password);
+        return password != null ? password.equals(user.password) : user.password == null;
+
     }
 }

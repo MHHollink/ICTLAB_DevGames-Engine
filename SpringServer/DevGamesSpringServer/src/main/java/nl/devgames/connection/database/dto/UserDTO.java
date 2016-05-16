@@ -53,25 +53,15 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
         return user;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public boolean isValid() {
-        boolean valid = username != null &&
-                gitUsername != null &&
-                firstName != null &&
-                lastName != null &&
-                age != 0 &&
-                mainJob != null;
+        boolean valid = gitUsername != null;
 
         if(!valid) {
             L.w("User is not valid! False indicates a problem: " +
-                            "username:'%b', gitUsername:'%b', firstName:'%b', " +
-                            "lastName:'%b', age:'%b', mainJob:'%b'",
-                    username != null,
-                    gitUsername != null,
-                    firstName != null,
-                    lastName != null,
-                    age != 0,
-                    mainJob != null
+                            "gitUsername:'%b'",
+                    gitUsername != null
             );
         }
 
@@ -94,7 +84,7 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
 
     @Override
     public boolean equalsInContent(UserDTO other) {
-        return false;
+        return toModel().equals(other.toModel());
     }
 
     @Override
