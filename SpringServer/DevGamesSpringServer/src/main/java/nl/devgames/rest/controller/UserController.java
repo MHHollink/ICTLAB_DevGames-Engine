@@ -3,6 +3,7 @@ package nl.devgames.rest.controller;
 import com.google.gson.JsonArray;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
+import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.connection.database.dto.ModelDTO;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Business;
@@ -13,6 +14,7 @@ import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
 import nl.devgames.rest.errors.BadRequestException;
+import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.rest.errors.NotFoundException;
 import nl.devgames.utils.L;
@@ -36,7 +38,18 @@ public class UserController extends BaseController {
     @RequestMapping(method = RequestMethod.POST)
     public User createNewUser(@RequestBody User user) {
         L.i("Called");
-        throw new UnsupportedOperationException("This shall be used to create users");
+        try {
+
+            if (new UserDao().create(user) == 1) {
+                return user;
+            } else {
+                return null; // TODO: 16-5-2016 What do we return here?
+            }
+
+        } catch (ConnectException e) {
+            L.e("Database service is ofline");
+            throw new KnownInternalServerError("Database service is ofline!");
+        }
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -52,7 +65,15 @@ public class UserController extends BaseController {
     {
         User caller = getUserFromSession( session );
         L.i("Called");
-        return getUserFromQuery("MATCH (n:User) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}", id);
+        try {
+            return new UserDao().queryForId(id);
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new KnownInternalServerError("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("User was not found");
+            throw new InvalidSessionException("Session invalid!");
+        }
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)

@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.model.Business;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -34,31 +32,18 @@ import java.util.HashSet;
 @RestController
 public abstract class BaseController {
 
-    /**
-     * Checking for headers is done via @RequestHeader annotation
-     */
-    @Deprecated
-    protected String getSession(HttpServletRequest request) {
-        return request.getHeader(Application.SESSION_HEADER_KEY);
-    }
-
     protected User getUserFromSession(String session) {
         if (session == null || session.isEmpty())
             throw new BadRequestException("Request without session"); // throws exception when session is null or blank
 
-
-//        User user;
-//        try {
-//            user =
-//        } catch (IndexOutOfBoundsException e) {
-//            L.e(e, "Getting user with session '%s' threw IndexOutOfBoundsException, session token was probably invalid", session);
-//            throw new InvalidSessionException("Request session is not found");
-//        }
         try {
             return new UserDao().queryByField("session", session).get(0);
         } catch (ConnectException e) {
-            e.printStackTrace();
+            L.e("Database service is offline!");
             throw new KnownInternalServerError("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("User was not found");
+            throw new InvalidSessionException("Session invalid!");
         }
     }
 
@@ -99,7 +84,7 @@ public abstract class BaseController {
 
 
     @RequestMapping(value = "/test/insert", method = RequestMethod.POST)
-    public void setUpDb() throws ConnectException {
+    public boolean setUpDb() throws ConnectException {
         Project[] projects = {new Project("Clarity","AR app for the Port of Rotterdam."), new Project("Adventure Track", "Geolocation based Rol playing game."),
                 new Project("DevGames","Programming gamificated to ensure you code better")};
 
@@ -180,5 +165,7 @@ public abstract class BaseController {
         dbService.postQuery("MATCH (a:User { username: 'Marcel' }), (b:Project { name: 'DevGames' }) CREATE (b)-[:is_lead_by]->(a)");
         dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Clarity' }) CREATE (b)-[:is_lead_by]->(a)");
         dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Adventure Track' }) CREATE (b)-[:is_lead_by]->(a)");
+
+        return true;
     }
 }

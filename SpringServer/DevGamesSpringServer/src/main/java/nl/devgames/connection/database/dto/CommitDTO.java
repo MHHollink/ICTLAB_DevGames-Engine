@@ -49,4 +49,9 @@ public class CommitDTO extends ModelDTO<CommitDTO, Commit> {
     public CommitDTO createFromNeo4jData(JsonObject data) {
         return null;
     }
+
+    @Override
+    public boolean equalsInContent(CommitDTO other) {
+        return false;
+    }
 }

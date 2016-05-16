@@ -65,6 +65,15 @@ public class PushDTO extends ModelDTO<PushDTO, Push> {
 
     @Override
     public PushDTO createFromNeo4jData(JsonObject data) {
-        return null;
+        PushDTO dto = new PushDTO().createFromJsonObject(
+                data.get("data").getAsJsonObject()
+        );
+        dto.id = data.get("id").getAsLong();
+        return dto;
+    }
+
+    @Override
+    public boolean equalsInContent(PushDTO other) {
+        return false;
     }
 }

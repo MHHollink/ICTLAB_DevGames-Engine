@@ -91,4 +91,27 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
         dto.id = data.get("id").getAsLong();
         return dto;
     }
+
+    @Override
+    public boolean equalsInContent(UserDTO other) {
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "UserDTO{" +
+                "username='" + username + '\'' +
+                ", gitUsername='" + gitUsername + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", tween='" + tween + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", age=" + age +
+                ", mainJob='" + mainJob + '\'' +
+                ", projects=" + projects +
+                ", pushes=" + pushes +
+                ", session='" + session + '\'' +
+                ", gcmId='" + gcmId + '\'' +
+                ", password='" + password + '\'' +
+                "} " + super.toString();
+    }
 }

@@ -46,6 +46,9 @@ public abstract class ModelDTO<
      */
     public abstract ModelDTO createFromNeo4jData(JsonObject data);
 
+
+    public abstract boolean equalsInContent(ModelDTO other);
+
     /**
      * Creates a list of the {@link Model} from a {@link com.google.gson.JsonArray}. The Objects are converted via {@link #createFromJsonObject(JsonObject)}
      *

@@ -15,7 +15,7 @@ public interface Dao<T, ID> extends Iterator<T> {
      *            Identifier that matches a specific row in the database to find and return.
      * @return The object that has the ID field which equals id or null if no matches.
      */
-    T queryForId(ID id);
+    T queryForId(ID id) throws ConnectException, IndexOutOfBoundsException;
 
     /**
      * Query for all of the items in the object table.
