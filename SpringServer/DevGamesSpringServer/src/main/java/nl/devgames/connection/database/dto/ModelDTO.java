@@ -46,6 +46,9 @@ public abstract class ModelDTO<
      */
     public abstract ModelDTO createFromNeo4jData(JsonObject data);
 
+
+    public abstract boolean equalsInContent(ModelDTO other);
+
     /**
      * Creates a list of the {@link Model} from a {@link com.google.gson.JsonArray}. The Objects are converted via {@link #createFromJsonObject(JsonObject)}
      *
@@ -108,5 +111,19 @@ public abstract class ModelDTO<
         return getNeo4JData(json).get(0).getAsJsonObject().get("data")
                 .getAsJsonArray().get(0).getAsJsonObject().get("row")
                 .getAsJsonArray().get(0).getAsJsonObject();
+    }
+
+    public static List<JsonObject> findAll(String json) {
+        List<JsonObject> objects = new ArrayList<>();
+
+        JsonArray array = getNeo4JData(json).get(0).getAsJsonObject().get("data").getAsJsonArray();
+
+        for (int i = 0; i < array.size(); i++ ) {
+            objects.add(array.get(i).getAsJsonObject().get("row")
+                     .getAsJsonArray().get(0).getAsJsonObject()
+            );
+        }
+
+        return objects;
     }
 }

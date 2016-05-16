@@ -3,6 +3,7 @@ package nl.devgames.rest.controller;
 import com.google.gson.JsonArray;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
+import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.connection.database.dto.ModelDTO;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Business;
@@ -12,8 +13,9 @@ import nl.devgames.model.Issue;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
-import nl.devgames.model.UserWithPassword;
 import nl.devgames.rest.errors.BadRequestException;
+import nl.devgames.rest.errors.DatabaseOfflineException;
+import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.rest.errors.NotFoundException;
 import nl.devgames.utils.L;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.ConnectException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,9 +38,14 @@ import java.util.Set;
 public class UserController extends BaseController {
 
     @RequestMapping(method = RequestMethod.POST)
-    public User createNewUser(@RequestBody UserWithPassword user) {
+    public User createNewUser(@RequestBody User user) {
         L.i("Called");
-        throw new UnsupportedOperationException("This shall be used to create users");
+        try {
+            return new UserDao().createIfNotExists(user);
+        } catch (ConnectException e) {
+            L.e("Database service is ofline");
+            throw new DatabaseOfflineException("Database service is ofline!");
+        }
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -53,7 +61,15 @@ public class UserController extends BaseController {
     {
         User caller = getUserFromSession( session );
         L.i("Called");
-        return getUserFromQuery("MATCH (n:User) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}", id);
+        try {
+            return new UserDao().queryForId(id);
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("User was not found");
+            throw new InvalidSessionException("Session invalid!");
+        }
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
@@ -62,20 +78,14 @@ public class UserController extends BaseController {
                               @RequestBody User userWithUpdateFields)
     {
         L.i("Called");
+
         if(userWithUpdateFields == null) {
             L.w("Update user received with empty body");
             throw new BadRequestException("No body was passed with the request");
         }
-        User caller = getUserFromSession( session );
 
-        if(caller.getId() != id) {
-            throw new BadRequestException(
-                    String.format(
-                            "Session does not match session for user with id '%d'",
-                            id
-                    )
-            );
-        }
+        User caller = getUserFromSession( session );
+        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         if(userWithUpdateFields.getUsername() != null)
             caller.setGitUsername(userWithUpdateFields.getUsername());
@@ -101,39 +111,36 @@ public class UserController extends BaseController {
         if(userWithUpdateFields.getMainJob() != null)
             caller.setMainJob(userWithUpdateFields.getMainJob());
 
-        // TODO check for neo4J errors ect.
-        String response;
+        // TODO: 16-5-2016 all fields?
+
         try {
-            response = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:User) WHERE ID(n) = %d " +
-                            "SET n.username = '%s', n.gcmRegId = '%s', n.firstName = '%s', n.tween = '%s', n.lastName = '%s', " +
-                                "n.session = '%s', n.mainJob = '%s', n.gitUsername = '%s' " +
-                            "RETURN {id:id(n), labels: labels(n), data: n}",
-                    id,
-                    caller.getUsername(),
-                    caller.getGcmId(),
-                    caller.getFirstName(),
-                    caller.getTween(),
-                    caller.getLastName(),
-                    caller.getSessionId(),
-                    caller.getMainJob(),
-                    caller.getGitUsername()
-            );
+            int updated = new UserDao().update(caller);
+            if(updated != 1) throw new KnownInternalServerError("update own user failed. updated rows = %d", updated);
+            return caller;
         } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
-            throw new KnownInternalServerError("Server database refused connection");
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
         }
-
-
-
-        return getOwnUser(session);
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     public Map deleteUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
-                          @PathVariable Long id)
+                          @PathVariable long id)
     {
-        throw new UnsupportedOperationException("This will return an empty map if the user is deleted");
+        L.i("Called");
+
+        User caller = getUserFromSession( session );
+        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
+
+        try {
+            int deleted = new UserDao().delete(caller);
+            if (deleted != 1) throw new KnownInternalServerError("delete user failed. deleted rows = %d", deleted);
+            return new HashMap<>();
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        }
+
     }
 
     @RequestMapping(value = "{id}/projects", method = RequestMethod.GET)
@@ -191,6 +198,7 @@ public class UserController extends BaseController {
      * @param params    Optional parameters used in the {@param query}
      * @return a user found by the {@param query}
      */
+    @Deprecated
     private User getUserFromQuery(String query, Object... params) {
         String jsonResponseString = null; // Request to neo4j
         try {
@@ -222,6 +230,7 @@ public class UserController extends BaseController {
      * @param params    Optional parameters used in the {@param query}
      * @return a list of all users found by the {@param query}
      */
+    @Deprecated
     private List<User> getUsersFromQuery(String query, Object... params) {
         String jsonResponseString = null; // Request to neo4j
         try {

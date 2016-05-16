@@ -57,4 +57,9 @@ public class BusinessDTO extends ModelDTO<BusinessDTO, Business>{
     public BusinessDTO createFromNeo4jData(JsonObject data) {
         return null;
     }
+
+    @Override
+    public boolean equalsInContent(BusinessDTO other) {
+        return false;
+    }
 }

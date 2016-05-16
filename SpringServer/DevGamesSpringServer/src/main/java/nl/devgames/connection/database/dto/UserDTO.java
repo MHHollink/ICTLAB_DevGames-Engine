@@ -27,6 +27,8 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
     public String session;
     public String gcmId;
 
+    public String password;
+
     @Override
     public User toModel() {
 
@@ -46,29 +48,20 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
         user.setPushes(this.pushes);
         user.setSessionId(this.session);
         user.setGcmId(this.gcmId);
+        user.setPassword(password);
 
         return user;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public boolean isValid() {
-        boolean valid = username != null &&
-                gitUsername != null &&
-                firstName != null &&
-                lastName != null &&
-                age != Integer.MIN_VALUE &&
-                mainJob != null;
+        boolean valid = gitUsername != null;
 
         if(!valid) {
             L.w("User is not valid! False indicates a problem: " +
-                            "username:'%b', gitUsername:'%b', firstName:'%b', " +
-                            "lastName:'%b', age:'%b', mainJob:'%b'",
-                    username != null,
-                    gitUsername != null,
-                    firstName != null,
-                    lastName != null,
-                    age != Integer.MIN_VALUE,
-                    mainJob != null
+                            "gitUsername:'%b'",
+                    gitUsername != null
             );
         }
 
@@ -87,5 +80,28 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
         );
         dto.id = data.get("id").getAsLong();
         return dto;
+    }
+
+    @Override
+    public boolean equalsInContent(UserDTO other) {
+        return toModel().equals(other.toModel());
+    }
+
+    @Override
+    public String toString() {
+        return "UserDTO{" +
+                "username='" + username + '\'' +
+                ", gitUsername='" + gitUsername + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", tween='" + tween + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", age=" + age +
+                ", mainJob='" + mainJob + '\'' +
+                ", projects=" + projects +
+                ", pushes=" + pushes +
+                ", session='" + session + '\'' +
+                ", gcmId='" + gcmId + '\'' +
+                ", password='" + password + '\'' +
+                "} " + super.toString();
     }
 }

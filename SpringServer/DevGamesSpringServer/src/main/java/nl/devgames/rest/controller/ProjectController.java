@@ -6,7 +6,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dto.*;
+import nl.devgames.connection.database.dto.BusinessDTO;
+import nl.devgames.connection.database.dto.CommitDTO;
+import nl.devgames.connection.database.dto.DuplicationDTO;
+import nl.devgames.connection.database.dto.IssueDTO;
+import nl.devgames.connection.database.dto.ProjectDTO;
+import nl.devgames.connection.database.dto.SQReportDTO;
+import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.connection.gcm.GCMMessageComposer;
 import nl.devgames.connection.gcm.GCMMessageType;
 import nl.devgames.model.Business;
@@ -31,7 +37,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.net.ConnectException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/projects")
@@ -101,6 +112,7 @@ public class ProjectController extends BaseController{
     @RequestMapping(value = "/{token}/build", method = RequestMethod.POST)
     public Map startCalculator(@PathVariable("token") String token,
                                @RequestBody String json) throws ConnectException {
+        java.util.Map<String, String> result = new java.util.HashMap<>();
         //check if token is valid
         String responseString = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:Project) " +
@@ -109,7 +121,6 @@ public class ProjectController extends BaseController{
                 token
         );
 
-        java.util.Map<String, String> result = new java.util.HashMap<>();
 
         ProjectDTO projectDTO = new ProjectDTO().createFromNeo4jData(
                 ProjectDTO.findFirst(responseString)
@@ -135,7 +146,8 @@ public class ProjectController extends BaseController{
                 GCMMessageComposer.sendMessage(
                         GCMMessageType.NEW_SCORES,
                         "",
-                        String.valueOf(testReport.getScore().intValue())
+                        String.valueOf(testReport.getScore().intValue()),
+                        496L
                 );
             } catch (Exception e) {
                 L.e(e, "Error when parsing report");

@@ -9,7 +9,6 @@ import nl.devgames.model.Issue;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
-import nl.devgames.model.UserWithPassword;
 import nl.devgames.utils.L;
 import org.junit.After;
 import org.junit.Before;
@@ -48,10 +47,10 @@ public abstract class DevGamesTests {
         Project[] projects = {new Project("Clarity","AR app for the Port of Rotterdam."), new Project("Adventure Track", "Geolocation based Rol playing game."),
                 new Project("DevGames","Programming gamificated to ensure you code better")};
 
-        UserWithPassword[] users = {
-                new UserWithPassword("Marcel","Mjollnir94","Marcel",null,"Hollink",22,"App Developer", null, null ,null, null, "admin"),
-                new UserWithPassword("Evestar","Evestar01","Evert-Jan",null,"Heilema",22,"Backend developer", null, null, null, null, "admin"),
-                new UserWithPassword("Joris","Jorikito","Jorik",null,"Schouten",22,"Backend developer", null, null, null, null, "admin"),
+        User[] users = {
+                new User("Marcel","Mjollnir94","Marcel",null,"Hollink",22,"App Developer", null, null ,null, null, "admin"),
+                new User("Evestar","Evestar01","Evert-Jan",null,"Heilema",22,"Backend developer", null, null, null, null, "admin"),
+                new User("Joris","Jorikito","Jorik",null,"Schouten",22,"Backend developer", null, null, null, null, "admin"),
         };
 
         Business[] businesses = {new Business("DevGames", new HashSet<User>(Arrays.asList(users)){}, new HashSet<>(Arrays.asList(projects)))};
@@ -98,7 +97,7 @@ public abstract class DevGamesTests {
             dbService.postQuery(
                     "CREATE (n:Project { name: '%s', description: '%s' })", project.getName(), project.getDescription());
 
-        for (UserWithPassword user : users)
+        for (User user : users)
             dbService.postQuery(
                     "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmRegId: '%s' }) ",
                     user.getUsername(), user.getGitUsername(), user.getFirstName(), user.getLastName(), user.getAge(), user.getMainJob(), user.getPassword(), user.getGcmId());

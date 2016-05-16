@@ -88,4 +88,9 @@ public class IssueDTO extends ModelDTO<IssueDTO, Issue> {
     public IssueDTO createFromNeo4jData(JsonObject data) {
         return null;
     }
+
+    @Override
+    public boolean equalsInContent(IssueDTO other) {
+        return false;
+    }
 }

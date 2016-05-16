@@ -1,7 +1,10 @@
 package nl.devgames.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Set;
 
+@JsonIgnoreProperties({"password", "sessionId"})
 public class User extends Model {
 
     private String username;
@@ -20,6 +23,8 @@ public class User extends Model {
     private String sessionId;
     private String gcmId;
 
+    private String password;
+
     public User() {
     }
 
@@ -35,6 +40,21 @@ public class User extends Model {
         this.pushes = pushes;
         this.sessionId = sessionId;
         this.gcmId = gcmId;
+    }
+
+    public User(String username, String gitUsername, String firstName, String tween, String lastName, int age, String mainJob, Set<Project> projects, Set<Push> pushes, String sessionId, String gcmId, String password) {
+        this.username = username;
+        this.gitUsername = gitUsername;
+        this.firstName = firstName;
+        this.tween = tween;
+        this.lastName = lastName;
+        this.age = age;
+        this.mainJob = mainJob;
+        this.projects = projects;
+        this.pushes = pushes;
+        this.sessionId = sessionId;
+        this.gcmId = gcmId;
+        this.password = password;
     }
 
     public String getUsername() {
@@ -125,6 +145,14 @@ public class User extends Model {
         this.gcmId = gcmId;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -142,4 +170,26 @@ public class User extends Model {
                 "} " + super.toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        if (!super.equals(o)) return false;
+
+        User user = (User) o;
+
+        if (age != user.age) return false;
+        if (username != null ? !username.equals(user.username) : user.username != null) return false;
+        if (gitUsername != null ? !gitUsername.equals(user.gitUsername) : user.gitUsername != null) return false;
+        if (firstName != null ? !firstName.equals(user.firstName) : user.firstName != null) return false;
+        if (tween != null ? !tween.equals(user.tween) : user.tween != null) return false;
+        if (lastName != null ? !lastName.equals(user.lastName) : user.lastName != null) return false;
+        if (mainJob != null ? !mainJob.equals(user.mainJob) : user.mainJob != null) return false;
+        if (projects != null ? !projects.equals(user.projects) : user.projects != null) return false;
+        if (pushes != null ? !pushes.equals(user.pushes) : user.pushes != null) return false;
+        if (sessionId != null ? !sessionId.equals(user.sessionId) : user.sessionId != null) return false;
+        if (gcmId != null ? !gcmId.equals(user.gcmId) : user.gcmId != null) return false;
+        return password != null ? password.equals(user.password) : user.password == null;
+
+    }
 }

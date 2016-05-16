@@ -56,4 +56,9 @@ public class DuplicationFileDTO extends ModelDTO<DuplicationFileDTO, Duplication
     public DuplicationFileDTO createFromNeo4jData(JsonObject data) {
         return null;
     }
+
+    @Override
+    public boolean equalsInContent(DuplicationFileDTO other) {
+        return false;
+    }
 }

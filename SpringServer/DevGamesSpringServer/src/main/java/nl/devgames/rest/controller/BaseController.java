@@ -4,9 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dto.UserDTO;
+import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.model.Business;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
@@ -15,17 +14,14 @@ import nl.devgames.model.Issue;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
-import nl.devgames.model.UserWithPassword;
 import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.utils.L;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -36,38 +32,19 @@ import java.util.HashSet;
 @RestController
 public abstract class BaseController {
 
-    /**
-     * Checking for headers is done via @RequestHeader annotation
-     */
-    @Deprecated
-    protected String getSession(HttpServletRequest request) {
-        return request.getHeader(Application.SESSION_HEADER_KEY);
-    }
-
     protected User getUserFromSession(String session) {
         if (session == null || session.isEmpty())
             throw new BadRequestException("Request without session"); // throws exception when session is null or blank
 
-        String jsonResponseString = null; // Request to neo4j
         try {
-            jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:User) WHERE n.session = '%s' RETURN {id:id(n), labels: labels(n), data: n}",
-                    session
-            );
+            return new UserDao().queryByField("session", session).get(0);
         } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
-        }
-
-        User user;
-        try {
-            user = new UserDTO().createFromNeo4jData(
-                    UserDTO.findFirst(jsonResponseString)
-            ).toModel();
+            L.e("Database service is offline!");
+            throw new KnownInternalServerError("Database service offline!");
         } catch (IndexOutOfBoundsException e) {
-            L.e(e, "Getting user with session '%s' threw IndexOutOfBoundsException, session token was probably invalid", session);
-            throw new InvalidSessionException("Request session is not found");
+            L.w("User was not found");
+            throw new InvalidSessionException("Session invalid!");
         }
-        return user;
     }
 
     /**
@@ -107,14 +84,14 @@ public abstract class BaseController {
 
 
     @RequestMapping(value = "/test/insert", method = RequestMethod.POST)
-    public void setUpDb() throws ConnectException {
+    public boolean setUpDb() throws ConnectException {
         Project[] projects = {new Project("Clarity","AR app for the Port of Rotterdam."), new Project("Adventure Track", "Geolocation based Rol playing game."),
                 new Project("DevGames","Programming gamificated to ensure you code better")};
 
-        UserWithPassword[] users = {
-                new UserWithPassword("Marcel","Mjollnir94","Marcel",null,"Hollink",22,"App Developer", null, null ,null, null, "admin"),
-                new UserWithPassword("Evestar","Evestar01","Evert-Jan",null,"Heilema",22,"Backend developer", null, null, null, null, "admin"),
-                new UserWithPassword("Joris","Jorikito","Jorik",null,"Schouten",22,"Backend developer", null, null, null, null, "admin"),
+        User[] users = {
+                new User("Marcel","Mjollnir94","Marcel",null,"Hollink",22,"App Developer", null, null ,null, null, "admin"),
+                new User("Evestar","Evestar01","Evert-Jan",null,"Heilema",22,"Backend developer", null, null, null, null, "admin"),
+                new User("Joris","Jorikito","Jorik",null,"Schouten",22,"Backend developer", null, null, null, null, "admin"),
         };
 
         Business[] businesses = {new Business("DevGames", new HashSet<User>(Arrays.asList(users)){}, new HashSet<>(Arrays.asList(projects)))};
@@ -162,7 +139,7 @@ public abstract class BaseController {
             dbService.postQuery(
                     "CREATE (n:Project { name: '%s', description: '%s' })", project.getName(), project.getDescription());
 
-        for (UserWithPassword user : users)
+        for (User user : users)
             dbService.postQuery(
                     "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmRegId: '%s' }) ",
                     user.getUsername(), user.getGitUsername(), user.getFirstName(), user.getLastName(), user.getAge(), user.getMainJob(), user.getPassword(), user.getGcmId());
@@ -188,5 +165,7 @@ public abstract class BaseController {
         dbService.postQuery("MATCH (a:User { username: 'Marcel' }), (b:Project { name: 'DevGames' }) CREATE (b)-[:is_lead_by]->(a)");
         dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Clarity' }) CREATE (b)-[:is_lead_by]->(a)");
         dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Adventure Track' }) CREATE (b)-[:is_lead_by]->(a)");
+
+        return true;
     }
 }

@@ -52,4 +52,9 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
         dto.id = data.get("id").getAsLong();
         return dto;
     }
+
+    @Override
+    public boolean equalsInContent(ProjectDTO other) {
+        return false;
+    }
 }
