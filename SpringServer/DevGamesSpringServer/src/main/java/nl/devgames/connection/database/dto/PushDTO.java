@@ -76,4 +76,15 @@ public class PushDTO extends ModelDTO<PushDTO, Push> {
     public boolean equalsInContent(PushDTO other) {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "PushDTO{" +
+                "project=" + project +
+                ", commits=" + commits +
+                ", issues=" + issues +
+                ", duplications=" + duplications +
+                ", timestamp=" + timestamp +
+                "} " + super.toString();
+    }
 }

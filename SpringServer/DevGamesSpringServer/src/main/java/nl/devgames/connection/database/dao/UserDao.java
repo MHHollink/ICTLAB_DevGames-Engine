@@ -2,6 +2,7 @@ package nl.devgames.connection.database.dao;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
@@ -29,11 +30,14 @@ public class UserDao implements Dao<User, Long> {
         L.i("Query user with id: %d", id);
         UserDTO dto = null; Set<Project> projects = new HashSet<>(); Set<Push> pushes = new HashSet<>();
         String response = Neo4JRestService.getInstance().postQuery(
-                            "MATCH (a:User)-[r]->(b) " +
+                            "MATCH (a:User) " +
                                     "WHERE ID(a) = %d " +
+                                    "OPTIONAL " +
+                                        "MATCH a-[]->(b) " +
+                                        "WHERE ID(a) = %d " +
                                     "RETURN {id:id(a), labels: labels(a), data: a}," +
-                                    "       {id:id(b), labels: labels(b), data: b}",
-                id);
+                                           "{id:id(b), labels: labels(b), data: b}",
+                id, id);
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
 
@@ -45,7 +49,9 @@ public class UserDao implements Dao<User, Long> {
             JsonArray rows = element.getAsJsonObject().get("row").getAsJsonArray();
 
             for ( JsonElement row : rows) {
-                String label = row.getAsJsonObject().get("labels").getAsJsonArray().get(0).getAsString();
+                JsonElement labels = row.getAsJsonObject().get("labels");
+                if (labels instanceof JsonNull) continue;
+                String label = labels.getAsJsonArray().get(0).getAsString();
 
                 switch (label) {
                     case "User" :
@@ -81,7 +87,7 @@ public class UserDao implements Dao<User, Long> {
 
         List<User> response = new ArrayList<>();
         for (JsonObject object : UserDTO.findAll(r)) {
-            response.add(new UserDTO().createFromNeo4jData(object).toModel());
+            response.add(new UserDTO().createFromJsonObject(object).toModel());
         }
         return response;
     }

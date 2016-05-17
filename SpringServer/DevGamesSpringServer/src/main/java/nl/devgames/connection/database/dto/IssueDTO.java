@@ -93,4 +93,21 @@ public class IssueDTO extends ModelDTO<IssueDTO, Issue> {
     public boolean equalsInContent(IssueDTO other) {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "IssueDTO{" +
+                "severity='" + severity + '\'' +
+                ", component='" + component + '\'' +
+                ", startLine=" + startLine +
+                ", endLine=" + endLine +
+                ", status='" + status + '\'' +
+                ", resolution='" + resolution + '\'' +
+                ", message='" + message + '\'' +
+                ", debt=" + debt +
+                ", creationDate=" + creationDate +
+                ", updateDate=" + updateDate +
+                ", closeDate=" + closeDate +
+                "} " + super.toString();
+    }
 }

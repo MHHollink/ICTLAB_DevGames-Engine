@@ -62,4 +62,13 @@ public class BusinessDTO extends ModelDTO<BusinessDTO, Business>{
     public boolean equalsInContent(BusinessDTO other) {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "BusinessDTO{" +
+                "name='" + name + '\'' +
+                ", employees=" + employees +
+                ", projects=" + projects +
+                "} " + super.toString();
+    }
 }

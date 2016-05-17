@@ -6,6 +6,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -32,11 +35,11 @@ public class UserDaoTest {
     @Test
     public void testQueryForId() throws Exception {
         assertThat(
-                loggedInUser,
+                userDao.queryForId(
+                        loggedInUser.getId()
+                ),
                 equalTo(
-                        userDao.queryForId(
-                                loggedInUser.getId()
-                        )
+                        loggedInUser
                 )
         );
     }
@@ -51,36 +54,93 @@ public class UserDaoTest {
 
     @Test
     public void testQueryByField() throws Exception {
-
+        assertThat(
+                userDao.queryByField(
+                        "gitUsername",
+                        loggedInUser.getGitUsername()
+                ).get(0),
+                equalTo(
+                        loggedInUser
+                )
+        );
     }
 
     @Test
     public void testQueryByFields() throws Exception {
+        Map<String,Object> fields = new HashMap<>();
 
+        fields.put("username", loggedInUser.getUsername());
+        fields.put("password", loggedInUser.getPassword());
+        fields.put("age", loggedInUser.getAge());
+
+        assertThat(
+                userDao.queryByFields(
+                        fields
+                ).get(0),
+                equalTo(
+                        loggedInUser
+                )
+        );
     }
 
     @Test
     public void testQueryForSameId() throws Exception {
-
+        assertThat(
+                userDao.queryForSameId(
+                        loggedInUser
+                ),
+                equalTo(
+                        loggedInUser
+                )
+        );
     }
 
     @Test
     public void testCreate() throws Exception {
-        assertThat(userDao.create(loggedInUser), equalTo(1));
+        assertThat(
+                userDao.create(loggedInUser)
+                ,equalTo(1)
+        );
     }
 
     @Test
     public void testCreateIfNotExists() throws Exception {
-
+        assertThat(
+                userDao.createIfNotExists(
+                        loggedInUser
+                ),
+                equalTo(
+                        loggedInUser
+                )
+        );
     }
 
     @Test
     public void testUpdate() throws Exception {
 
+        loggedInUser.setSessionId("someSession");
+
+        assertThat(
+                userDao.update(
+                        loggedInUser
+                ),
+                equalTo(
+                        1
+                )
+        );
+
+        assertThat(
+                userDao.queryForSameId(
+                        loggedInUser
+                ).getSessionId(),
+                equalTo(
+                        "someSession"
+                )
+        );
     }
 
     @Test
-    public void testDelete() throws Exception {
+    public void testDeleteByUser() throws Exception {
 
     }
 
@@ -90,7 +150,7 @@ public class UserDaoTest {
     }
 
     @Test
-    public void testDelete1() throws Exception {
+    public void testDeleteByUsers() throws Exception {
 
     }
 
