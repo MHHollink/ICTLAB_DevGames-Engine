@@ -21,7 +21,7 @@ public abstract class AbsRestService {
         try {
             this.url = new URL(url);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            L.e(e, "Given url syntax was incorrect");
         }
     }
 
@@ -59,15 +59,15 @@ public abstract class AbsRestService {
         );
 
         String inputLine;
-        StringBuilder response = new StringBuilder();
+        StringBuilder responseBuilder = new StringBuilder();
 
         while ((inputLine = in.readLine()) != null)
-            response.append(inputLine);
+            responseBuilder.append(inputLine);
 
         in.close();
 
-        this.response = response.toString();
-        return this.response;
+        response = responseBuilder.toString();
+        return response;
     }
 
     protected String put() {

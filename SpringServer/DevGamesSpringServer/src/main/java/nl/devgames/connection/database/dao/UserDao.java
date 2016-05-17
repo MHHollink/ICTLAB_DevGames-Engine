@@ -26,9 +26,11 @@ import java.util.Set;
 public class UserDao implements Dao<User, Long> {
 
     @Override
-    public User queryForId(Long id) throws ConnectException, IndexOutOfBoundsException {
+    public User queryForId(Long id) throws ConnectException {
         L.i("Query user with id: %d", id);
-        UserDTO dto = null; Set<Project> projects = new HashSet<>(); Set<Push> pushes = new HashSet<>();
+        UserDTO dto = null;
+        Set<Project> projects = new HashSet<>();
+        Set<Push> pushes = new HashSet<>();
         String response = Neo4JRestService.getInstance().postQuery(
                             "MATCH (a:User) " +
                                     "WHERE ID(a) = %d " +
@@ -50,12 +52,14 @@ public class UserDao implements Dao<User, Long> {
 
             for ( JsonElement row : rows) {
                 JsonElement labels = row.getAsJsonObject().get("labels");
-                if (labels instanceof JsonNull) continue;
+                if (labels instanceof JsonNull)
+                    continue;
                 String label = labels.getAsJsonArray().get(0).getAsString();
 
                 switch (label) {
                     case "User" :
-                        if(dto == null) dto = new UserDTO().createFromNeo4jData(row.getAsJsonObject());
+                        if(dto == null)
+                            dto = new UserDTO().createFromNeo4jData(row.getAsJsonObject());
                         else {
                             UserDTO uTemp = new UserDTO().createFromNeo4jData(row.getAsJsonObject());
                             if(!dto.equalsInContent(uTemp))
@@ -73,8 +77,10 @@ public class UserDao implements Dao<User, Long> {
                 }
             }
         }
-        if(dto == null) return null;
-        dto.projects = projects; dto.pushes = pushes;
+        if(dto == null)
+            return null;
+        dto.projects = projects;
+        dto.pushes = pushes;
         return dto.toModel();
     }
 
@@ -93,7 +99,7 @@ public class UserDao implements Dao<User, Long> {
     }
 
     @Override
-    public List<User> queryByField(String fieldName, Object value) throws ConnectException, IndexOutOfBoundsException {
+    public List<User> queryByField(String fieldName, Object value) throws ConnectException {
         L.i("Query users with %s: %s", fieldName, value);
         String queryFormat;
         if(value instanceof Number)
@@ -235,7 +241,8 @@ public class UserDao implements Dao<User, Long> {
     @Override
     public int deleteById(Long id) throws ConnectException {
         L.i("Deleting user with id: %d", id);
-        if(queryForId(id) == null) return 0;
+        if(queryForId(id) == null)
+            return 0;
         String response = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:User) " +
                         "WHERE ID(n) = %d " +

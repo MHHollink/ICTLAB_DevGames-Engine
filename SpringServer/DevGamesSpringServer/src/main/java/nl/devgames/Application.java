@@ -8,10 +8,10 @@ public class Application {
 
     public static final String SESSION_HEADER_KEY = "SESSION_ID";
 
+    protected Application() {}
+
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
-
-    private Application() {}
 
 }
