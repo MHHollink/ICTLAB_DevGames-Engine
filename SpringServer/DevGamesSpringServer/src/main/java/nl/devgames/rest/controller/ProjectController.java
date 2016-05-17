@@ -373,7 +373,7 @@ public class ProjectController extends BaseController{
             jsonResponseString = Neo4JRestService.getInstance().postQuery(
                     "MATCH (n:Project), (m:User) " +
                             "WHERE n.session = '%s' AND ID(n) = '%d' " +
-                            "RETURN m-[works_on]-n",
+                            "RETURN m-[is_developing]-n",
                     session,
                     id
             );

@@ -88,7 +88,7 @@ public class UserDao implements Dao<User, Long> {
 
     @Override
     public List<User> queryByField(String fieldName, Object value) throws ConnectException, IndexOutOfBoundsException {
-        L.i("Query users with %s: %s", value);
+        L.i("Query users with %s: %s", fieldName, value);
         String queryFormat;
         if(value instanceof Number)
             queryFormat = "MATCH (n:User) WHERE n.%s =  %s  RETURN {id:id(n), labels: labels(n), data: n}";
