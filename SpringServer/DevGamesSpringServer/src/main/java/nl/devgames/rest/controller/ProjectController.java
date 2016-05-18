@@ -1,19 +1,15 @@
 package nl.devgames.rest.controller;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.Application;
-import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dao.*;
-import nl.devgames.connection.database.dto.BusinessDTO;
-import nl.devgames.connection.database.dto.CommitDTO;
-import nl.devgames.connection.database.dto.DuplicationDTO;
-import nl.devgames.connection.database.dto.IssueDTO;
-import nl.devgames.connection.database.dto.ProjectDTO;
+import nl.devgames.connection.database.dao.CommitDao;
+import nl.devgames.connection.database.dao.DuplicationDao;
+import nl.devgames.connection.database.dao.IssueDao;
+import nl.devgames.connection.database.dao.ProjectDao;
+import nl.devgames.connection.database.dao.PushDao;
+import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.connection.database.dto.SQReportDTO;
-import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.connection.gcm.GCMMessageComposer;
 import nl.devgames.connection.gcm.GCMMessageType;
 import nl.devgames.model.Business;
@@ -23,7 +19,11 @@ import nl.devgames.model.Issue;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
-import nl.devgames.rest.errors.*;
+import nl.devgames.rest.errors.BadRequestException;
+import nl.devgames.rest.errors.DatabaseOfflineException;
+import nl.devgames.rest.errors.InvalidSessionException;
+import nl.devgames.rest.errors.KnownInternalServerError;
+import nl.devgames.rest.errors.NotFoundException;
 import nl.devgames.rules.ScoreCalculator;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,8 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.net.ConnectException;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -110,16 +110,21 @@ public class ProjectController extends BaseController{
      */
     @RequestMapping(value = "/{token}/build", method = RequestMethod.POST)
     public Map startCalculator(@PathVariable("token") String token,
-                               @RequestBody String json) throws ConnectException {
+                               @RequestBody String json) {
         L.d("Called");
 
         java.util.Map<String, String> result = new java.util.HashMap<>();
 
-        List<Project> projects = new ProjectDao().queryByField("token", token);
-        //check if token is invalid
-        if(projects.get(0)==null)
-            throw new NotFoundException("project with token not found!");
+        try {
+            List<Project> projects = new ProjectDao().queryByField("token", token);
+            //check if token is invalid
+            if (projects.get(0) == null)
+                throw new NotFoundException("project with token not found!");
 
+        } catch (ConnectException e) {
+            L.e("Database is offline");
+            throw new DatabaseOfflineException("Database might be ofline");
+        }
         try {
             //parse build as SQReportDTO
             JsonObject reportAsJson = new JsonParser().parse(json).getAsJsonObject();
@@ -136,7 +141,7 @@ public class ProjectController extends BaseController{
             testReport.saveReportToDatabase();
             //send message
             GCMMessageComposer.sendMessage(
-                    GCMMessageType.NEW_SCORES,
+                    GCMMessageType.NEW_PUSH_RECEIVED,
                     "",
                     String.valueOf(testReport.getScore().intValue()),
                     496L
@@ -159,7 +164,7 @@ public class ProjectController extends BaseController{
      */
     @RequestMapping(method = RequestMethod.POST)
     public Project createProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
-                                 @RequestBody Project project) throws ConnectException {
+                                 @RequestBody Project project) {
         L.d("Called");
 
         //check if session is valid
@@ -205,7 +210,7 @@ public class ProjectController extends BaseController{
      */
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     public Map deleteProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
-                                 @PathVariable(value = "id") long id) throws ConnectException {
+                                 @PathVariable(value = "id") long id) {
         L.d("Called");
 
         java.util.Map<String, String> result = new java.util.HashMap<>();
@@ -236,7 +241,7 @@ public class ProjectController extends BaseController{
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public Project updateProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                  @PathVariable(value = "id") long id,
-                                 @RequestBody Project projectWithUpdateFields) throws ConnectException {
+                                 @RequestBody Project projectWithUpdateFields) {
         L.d("Called");
 
         if(projectWithUpdateFields == null) {
@@ -254,15 +259,21 @@ public class ProjectController extends BaseController{
             throw new BadRequestException("User with id '%d' has no rights to update the project!", id);
         }
 
-        Project project = new ProjectDao().queryForId(id);
+        Project project = null;
+        try {
+            project = new ProjectDao().queryForId(id);
 
-        //update project fields
-        if(projectWithUpdateFields.getName() != null)
-            project.setName(projectWithUpdateFields.getName());
+            //update project fields
+            if(projectWithUpdateFields.getName() != null)
+                project.setName(projectWithUpdateFields.getName());
 
-        if(projectWithUpdateFields.getDescription() != null)
-            project.setDescription(projectWithUpdateFields.getDescription());
+            if(projectWithUpdateFields.getDescription() != null)
+                project.setDescription(projectWithUpdateFields.getDescription());
 
+        } catch (ConnectException e) {
+            L.e("database is offline");
+            throw new DatabaseOfflineException("Database might be offline");
+        }
         // TODO: 17-5-2016 all fields?
 
         //update in db
@@ -316,7 +327,7 @@ public class ProjectController extends BaseController{
     @RequestMapping(value = "{id}/users/{uid}", method = RequestMethod.PUT)
     public Map addDeveloperToProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                          @PathVariable(value = "id") long id,
-                                         @PathVariable(value = "uid") long uid) throws ConnectException {
+                                         @PathVariable(value = "uid") long uid) {
         L.d("Called");
 
         java.util.Map<String, String> result = new java.util.HashMap<>();
@@ -331,9 +342,14 @@ public class ProjectController extends BaseController{
             throw new BadRequestException("User with id '%d' has no rights to update the project!", id);
         }
         //add user to project
-        int updated = new ProjectDao().addUserToProject(uid, id);
-        result.put("message", String.format("succesfully updated %d user(s)", updated));
-        return result;
+        try {
+            int updated = new ProjectDao().addUserToProject(uid, id);
+            result.put("message", String.format("succesfully updated %d user(s)", updated));
+            return result;
+        } catch (ConnectException e) {
+            L.e(e, "database is offline!");
+            throw new DatabaseOfflineException("Database might be offline");
+        }
     }
 
     /**

@@ -1,11 +1,9 @@
 package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
-import nl.devgames.DevGamesTests;
 import nl.devgames.model.Issue;
 import nl.devgames.model.Push;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,7 +18,6 @@ public class IssueControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        super.setUp();
         sessionId = new AuthController().login("Joris", "admin").get(Application.SESSION_HEADER_KEY);
         controller = new IssueController();
     }
