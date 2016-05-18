@@ -1,11 +1,10 @@
 package nl.devgames.rest.controller;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dao.UserDao;
+import nl.devgames.connection.gcm.GCMMessage;
+import nl.devgames.connection.gcm.GCMMessageType;
+import nl.devgames.connection.gcm.GCMRestService;
 import nl.devgames.model.Business;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * BaseController contains every method that all other controllers should have access to.
@@ -35,7 +35,6 @@ public abstract class BaseController {
     protected User getUserFromSession(String session) {
         if (session == null || session.isEmpty())
             throw new BadRequestException("Request without session"); // throws exception when session is null or blank
-
         try {
             return new UserDao().queryByField("session", session).get(0);
         } catch (ConnectException e) {
@@ -46,39 +45,6 @@ public abstract class BaseController {
             throw new InvalidSessionException("Session invalid!");
         }
     }
-
-    /**
-     * Unnecessary method since {@link nl.devgames.connection.database.dto.ModelDTO#getNeo4JData(String)} includes a error check.
-     */
-    @Deprecated
-    protected boolean hasErrors(JsonObject json) {
-        JsonArray errors = json.get("errors").getAsJsonArray(); // get the list of errors
-
-        if (errors.size() != 0) { // Check if there are more the 0 errors
-            for (JsonElement error : errors) L.e(error.getAsJsonObject().get("message").getAsString());
-            throw new KnownInternalServerError("InternalServerError: " + errors); // throws exception with errors
-        }
-
-        return false;
-    }
-
-    /**
-     * Unnecessary method since {@link nl.devgames.connection.database.dto.ModelDTO#getNeo4JData(String)} does the same but more.
-     */
-    @Deprecated
-    protected JsonArray grabData(String json) {
-        JsonObject jsonResponse = new JsonParser().parse(json).getAsJsonObject(); // parse neo4j response
-
-        if(hasErrors(jsonResponse)) return null;
-
-        JsonArray data = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
-        if(data.size() == 0) throw new InvalidSessionException("Request session is not found");
-
-        return data;
-    }
-
-
-
 
 
 
@@ -140,9 +106,7 @@ public abstract class BaseController {
                     "CREATE (n:Project { name: '%s', description: '%s' })", project.getName(), project.getDescription());
 
         for (User user : users)
-            dbService.postQuery(
-                    "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmRegId: '%s' }) ",
-                    user.getUsername(), user.getGitUsername(), user.getFirstName(), user.getLastName(), user.getAge(), user.getMainJob(), user.getPassword(), user.getGcmId());
+            new UserDao().create(user);
 
         dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'DevGames' }) CREATE (a)-[:is_developing]->(b)");
         dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Clarity' }) CREATE (a)-[:is_developing]->(b)");
@@ -168,4 +132,19 @@ public abstract class BaseController {
 
         return true;
     }
+
+    @RequestMapping(value = "/test/push", method = RequestMethod.POST)
+    public String gcmTestNotification() throws ConnectException {
+        UserDao dao = new UserDao();
+        List<User> users = dao.queryForAll();
+        GCMMessage message = new GCMMessage();
+        message.createNotification(
+                GCMMessageType.NEW_PUSH_RECEIVED,
+                "",
+                String.valueOf(400)
+        );
+        users.stream().filter(user -> user.getGcmId() != null).forEach( u -> message.addToken(u.getGcmId()) );
+        return GCMRestService.getInstance().postMessage(message);
+    }
+
 }

@@ -37,9 +37,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.net.ConnectException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -111,15 +110,21 @@ public class ProjectController extends BaseController{
      */
     @RequestMapping(value = "/{token}/build", method = RequestMethod.POST)
     public Map startCalculator(@PathVariable("token") String token,
-                               @RequestBody String json) throws ConnectException {
-        java.util.Map<String, String> result = new java.util.HashMap<>();
+                               @RequestBody String json) {
+        L.i("Called");
+        Map<String, String> result = new HashMap<>();
         //check if token is valid
-        String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:Project) " +
-                        "WHERE n.token = '%s' " +
-                        "RETURN {id:id(n), labels: labels(n), data: n}",
-                token
-        );
+        String responseString = null;
+        try {
+            responseString = Neo4JRestService.getInstance().postQuery(
+                    "MATCH (n:Project) " +
+                            "WHERE n.token = '%s' " +
+                            "RETURN {id:id(n), labels: labels(n), data: n}",
+                    token
+            );
+        } catch (ConnectException e) {
+            e.printStackTrace();
+        }
 
 
         ProjectDTO projectDTO = new ProjectDTO().createFromNeo4jData(
@@ -144,7 +149,7 @@ public class ProjectController extends BaseController{
 
 
                 GCMMessageComposer.sendMessage(
-                        GCMMessageType.NEW_SCORES,
+                        GCMMessageType.NEW_PUSH_RECEIVED,
                         "",
                         String.valueOf(testReport.getScore().intValue()),
                         496L
@@ -170,7 +175,9 @@ public class ProjectController extends BaseController{
      */
     @RequestMapping(method = RequestMethod.POST)
     public Project createProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
-                                 @RequestBody Project project) throws ConnectException {
+                                 @RequestBody Project project)
+    {
+        L.i("Called");
         Project returnProject;
 
         //check if session is valid
@@ -225,6 +232,7 @@ public class ProjectController extends BaseController{
     public Project getProjectById(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                   @PathVariable(value = "id") long id)
     {
+        L.i("Called");
         Project returnProject;
         //check if session is valid
         if (session == null || session.isEmpty())
@@ -265,8 +273,10 @@ public class ProjectController extends BaseController{
      */
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     public Map deleteProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
-                                 @PathVariable(value = "id") long id) throws ConnectException {
-        java.util.Map<String, String> result = new java.util.HashMap<>();
+                                 @PathVariable(value = "id") long id) throws ConnectException
+    {
+        L.i("Called");
+        Map<String, String> result = new HashMap<>();
 
         //check if session is valid
         if (session == null || session.isEmpty())
@@ -310,7 +320,9 @@ public class ProjectController extends BaseController{
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public Project updateProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                  @PathVariable(value = "id") long id,
-                                 @RequestBody Project projectWithUpdateFields) throws ConnectException {
+                                 @RequestBody Project projectWithUpdateFields) throws ConnectException
+    {
+        L.i("Called");
         Project returnProject;
         //check if session is valid
         if (session == null || session.isEmpty())
@@ -362,6 +374,7 @@ public class ProjectController extends BaseController{
     public Set<User> getDevelopersFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                               @PathVariable(value = "id") long id)
     {
+        L.i("Called");
         Set<User> returnUserSet = new HashSet<>();
 
         //check if session is valid
@@ -411,6 +424,7 @@ public class ProjectController extends BaseController{
                                          @PathVariable(value = "id") long id,
                                          @PathVariable(value = "uid") long uid)
     {
+        L.i("Called");
         // TODO : 1 -> check if session is valid, 2 -> check if user has rights to add new users to project, 3 -> add user to project
         throw new UnsupportedOperationException();
     }
@@ -425,6 +439,7 @@ public class ProjectController extends BaseController{
     public Set<Issue> getIssuesFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                            @PathVariable(value = "id") long id)
     {
+        L.i("Called");
         Set<Issue> returnIssueSet = new HashSet<>();
 
         //check if session is valid
@@ -472,6 +487,7 @@ public class ProjectController extends BaseController{
     public Set<Duplication> getDuplicationsFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                                        @PathVariable(value = "id") long id)
     {
+        L.i("Called");
         Set<Duplication> returnDuplicationSet = new HashSet<>();
 
         //check if session is valid
@@ -519,7 +535,7 @@ public class ProjectController extends BaseController{
     public Set<Push> getPushesFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                           @PathVariable(value = "id") long id)
     {
-
+        L.i("Called");
         // TODO : 1 -> check if session is valid, 2 ->  return list of pushes (includes commits, issues and duplications) linked to the project
         throw new UnsupportedOperationException();
     }
@@ -534,6 +550,7 @@ public class ProjectController extends BaseController{
     public Set<Commit> getCommitsFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                              @PathVariable(value = "id") long id)
     {
+        L.i("Called");
         Set<Commit> returnCommitSet = new HashSet<>();
 
         //check if session is valid
@@ -581,6 +598,7 @@ public class ProjectController extends BaseController{
     public Set<Business> getBusinessesFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                             @PathVariable(value = "id") long id)
     {
+        L.i("Called");
         Set<Business> returnBusinessSet = new HashSet<>();
 
         //check if session is valid
@@ -617,40 +635,4 @@ public class ProjectController extends BaseController{
 
         return returnBusinessSet;
     }
-
-
-
-    // todo move method to more appropriate class
-    public List<String> getProjectMembersTokens(String username, String projectName) {
-
-        List<String> tokenList = new ArrayList<>();
-
-        String stringResponse;
-        try {
-            stringResponse = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (u:User { username : '%s' }) -[:is_developing]-> (p:Project {name : '%s'}) <-[:is_developing]- (r:User) RETURN r.gcmRegId",
-                    username,
-                    projectName
-            );
-        } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
-            throw new KnownInternalServerError(e.getMessage());
-        }
-
-        // todo use UserDTOs parse method
-        JsonObject jsonResponse = new JsonParser().parse(stringResponse).getAsJsonObject();
-
-        if(hasErrors(jsonResponse)) return null;
-
-        JsonArray rows = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
-        if(rows.size() == 0) return tokenList;
-
-        for (int i = 0; i < rows.size(); i++) {
-            tokenList.add(
-                    rows.get(i).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsString());
-        }
-
-        return tokenList;
-    }
-
 }

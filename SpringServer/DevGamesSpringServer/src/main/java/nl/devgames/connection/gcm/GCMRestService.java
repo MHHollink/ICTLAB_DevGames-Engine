@@ -33,7 +33,7 @@ public class GCMRestService extends AbsRestService {
      * Posts a JSON object as string to the {@link GCMRestService#url}
      * @param json string to post
      */
-    public void post(String json) {
+    public String post(String json) {
         try {
             super.post(json,
                     new Tuple<>(
@@ -44,6 +44,7 @@ public class GCMRestService extends AbsRestService {
             e.printStackTrace();
         }
         L.d("Recieved response: %s", response);
+        return response;
     }
 
     /**
@@ -80,12 +81,13 @@ public class GCMRestService extends AbsRestService {
      *
      * @param message Message object filled with data en tokens.
      */
-    public void postMessage(GCMMessage message) {
+    public String postMessage(GCMMessage message) {
         L.d(message.toString());
         post(
                 messageToJson(
                         message
                 )
         );
+        return response;
     }
 }

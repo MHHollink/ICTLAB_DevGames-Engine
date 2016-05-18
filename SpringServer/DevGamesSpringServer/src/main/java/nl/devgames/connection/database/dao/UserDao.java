@@ -170,7 +170,7 @@ public class UserDao implements Dao<User, Long> {
     public int create(User user) throws ConnectException {
         L.i("Creating user: %s", user);
         String response = Neo4JRestService.getInstance().postQuery(
-                "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmRegId: '%s' }) RETURN n ",
+                "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmId: '%s' }) RETURN n ",
                 user.getUsername(),
                 user.getGitUsername(),
                 user.getFirstName(),
@@ -247,7 +247,7 @@ public class UserDao implements Dao<User, Long> {
                 "MATCH (n:User) " +
                         "WHERE ID(n) = %d " +
                         "SET n.username = NULL, n.password = NULL, " +
-                            "n.firstName = NULL, n.lastName = NULL, n.age = NULL " + // TODO: 16-5-2016 More field to null?
+                            "n.firstName = NULL, n.lastName = NULL, n.age = NULL, n.session = NULL, n.gcmId = NULL, n.deleted = true " + // TODO: 16-5-2016 More field to null?
                         "RETURN n",
                 id
         );

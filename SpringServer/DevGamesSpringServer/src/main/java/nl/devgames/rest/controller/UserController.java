@@ -1,10 +1,7 @@
 package nl.devgames.rest.controller;
 
-import com.google.gson.JsonArray;
 import nl.devgames.Application;
-import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dao.UserDao;
-import nl.devgames.connection.database.dto.ModelDTO;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Business;
 import nl.devgames.model.Commit;
@@ -17,7 +14,7 @@ import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.DatabaseOfflineException;
 import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.KnownInternalServerError;
-import nl.devgames.rest.errors.NotFoundException;
+import nl.devgames.rest.errors.UserAlreadyExistsException;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,9 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.ConnectException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,8 +35,28 @@ public class UserController extends BaseController {
     @RequestMapping(method = RequestMethod.POST)
     public User createNewUser(@RequestBody User user) {
         L.i("Called");
+        L.t("Creating user: %s", user);
         try {
-            return new UserDao().createIfNotExists(user);
+
+            UserDTO dto = new UserDTO(user);
+
+            if( dto.isValid() ) {
+                UserDao dao = new UserDao();
+
+                boolean username = dao.queryByField("username", dto.username).size() != 0;
+                boolean git_user = dao.queryByField("gitUsername", dto.gitUsername).size() != 0;
+
+                if (username && git_user)
+                    throw new UserAlreadyExistsException("Username and Git-Username already in use");
+                else if(username)
+                    throw new UserAlreadyExistsException("Username already in use");
+                else if(git_user)
+                    throw new UserAlreadyExistsException("Git-Username already in use");
+
+                return dao.createIfNotExists(user);
+            } else
+                throw new BadRequestException("Missing fields in created user.");
+
         } catch (ConnectException e) {
             L.e("Database service is ofline");
             throw new DatabaseOfflineException("Database service is ofline!");
@@ -59,7 +74,7 @@ public class UserController extends BaseController {
     public User getUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                         @PathVariable Long id)
     {
-        User caller = getUserFromSession( session );
+        getUserFromSession( session );
         L.i("Called");
         try {
             return new UserDao().queryForId(id);
@@ -147,6 +162,7 @@ public class UserController extends BaseController {
     public Set<Project> getProjects(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                      @PathVariable Long id)
     {
+        L.i("Called");
         // TODO : 1 -> check if session is valid, 2 -> get a list of projects from the user id
         throw new UnsupportedOperationException("This will return an list containing all projects the user is involved in");
     }
@@ -155,6 +171,7 @@ public class UserController extends BaseController {
     public Set<Push> getPushes(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                 @PathVariable Long id)
     {
+        L.i("Called");
         // TODO : 1 -> check if session is valid, 2 -> get a list of pushes from the user id
         throw new UnsupportedOperationException("This will return an list containing all pushes under the user");
     }
@@ -163,6 +180,7 @@ public class UserController extends BaseController {
     public Set<Commit> getCommits(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                    @PathVariable Long id)
     {
+        L.i("Called");
         // TODO : 1 -> check if session is valid, 2 -> get a list of commits from the user id
         throw new UnsupportedOperationException("This will return an list containing all commits under the user");
     }
@@ -171,6 +189,7 @@ public class UserController extends BaseController {
     public Set<Issue> getIssues(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                  @PathVariable Long id)
     {
+        L.i("Called");
         // TODO : 1 -> check if session is valid, 2 -> get a list of issues linked to the user id
         throw new UnsupportedOperationException("This will return an list containing all issues the user created");
     }
@@ -179,6 +198,7 @@ public class UserController extends BaseController {
     public Set<Duplication> getDuplications(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                 @PathVariable Long id)
     {
+        L.i("Called");
         // TODO : 1 -> check if session is valid, 2 -> get a list of duplications with files linked to the user id
         throw new UnsupportedOperationException("This will return an list containing all duplications the user created");
     }
@@ -187,73 +207,8 @@ public class UserController extends BaseController {
     public Set<Business> getBusinesses(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                        @PathVariable Long id)
     {
+        L.i("Called");
         // TODO : 1 -> check if session is valid, 2 -> get a list of Businesses with files linked to the user id
         throw new UnsupportedOperationException("This will return an list containing all duplications the user created");
     }
-
-    /**
-     * This private method is used to extract a user object from a database query
-     *
-     * @param query     String value of a formatted query
-     * @param params    Optional parameters used in the {@param query}
-     * @return a user found by the {@param query}
-     */
-    @Deprecated
-    private User getUserFromQuery(String query, Object... params) {
-        String jsonResponseString = null; // Request to neo4j
-        try {
-            jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                    query,
-                    params
-            );
-        } catch (ConnectException e) {
-            e.printStackTrace();
-        }
-
-        User user;
-        try{
-            user = new UserDTO().createFromNeo4jData(
-                    UserDTO.findFirst(jsonResponseString)
-            ).toModel();
-        } catch (IndexOutOfBoundsException e) {
-            L.w(e, "Requested user was not found in database");
-            throw new NotFoundException("User not found");
-        }
-
-        return user;
-    }
-
-    /**
-     * This private method is used to extract multiple users from a database query
-     *
-     * @param query     String value of a formatted query
-     * @param params    Optional parameters used in the {@param query}
-     * @return a list of all users found by the {@param query}
-     */
-    @Deprecated
-    private List<User> getUsersFromQuery(String query, Object... params) {
-        String jsonResponseString = null; // Request to neo4j
-        try {
-            jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                    query,
-                    params
-            );
-        } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
-            throw new KnownInternalServerError("Server database refused connection");
-        }
-
-        JsonArray data = ModelDTO.getNeo4JData(jsonResponseString);
-
-        if (data.size() == 0)
-            throw new NotFoundException("The server could not find the requested data...");
-
-        List<UserDTO> dtos = new UserDTO().createFromJsonArray(data.get(0).getAsJsonObject().get("row").getAsJsonArray());
-        List<User> users = new ArrayList<>();
-        for(UserDTO dto : dtos) {
-            users.add(dto.toModel());
-        }
-        return users;
-    }
-
 }

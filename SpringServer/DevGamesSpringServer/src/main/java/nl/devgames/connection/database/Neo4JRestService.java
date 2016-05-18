@@ -68,7 +68,7 @@ public class Neo4JRestService extends AbsRestService {
      */
     public String postQuery(String query, Object... params) throws ConnectException {
         String format = String.format(query,params);
-        L.t(query);
+        L.t(query, params);
 
         return post(
                 queryToJson(
