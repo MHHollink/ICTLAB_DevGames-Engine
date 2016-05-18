@@ -60,6 +60,21 @@ public class CommitDao implements Dao<Commit, Long>  {
         return response;
     }
 
+    public List<Commit> getCommitsFromPush(long id) throws ConnectException {
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:Commit)<-[:contains_commits]-(b:Push) " +
+                        "WHERE ID(b) = %d " +
+                        "RETURN a",
+                id
+        );
+
+        List<Commit> response = new ArrayList<>();
+        for (JsonObject object : CommitDTO.findAll(responseString)) {
+            response.add(new CommitDTO().createFromNeo4jData(object).toModel());
+        }
+        return response;
+    }
+
     @Override
     public int create(Commit data) throws ConnectException, IndexOutOfBoundsException {
         return 0;

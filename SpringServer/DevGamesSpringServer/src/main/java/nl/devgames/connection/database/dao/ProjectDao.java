@@ -156,6 +156,18 @@ public class ProjectDao implements Dao<Project, Long> {
         }
     }
 
+    public Project getProjectForPush(long id) throws ConnectException {
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:Project)<-[:pushed_to]-(b:Push) " +
+                        "WHERE ID(b) = %d " +
+                        "RETURN a",
+                id
+        );
+
+        return new ProjectDTO().createFromNeo4jData(ProjectDTO.findFirst(responseString)).toModel();
+    }
+
+
     @Override
     public Project queryForSameId(Project project) throws ConnectException {
         return queryForId(project.getId());

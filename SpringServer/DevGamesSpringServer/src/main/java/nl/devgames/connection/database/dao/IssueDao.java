@@ -60,6 +60,21 @@ public class IssueDao implements Dao<Issue, Long> { {
         return response;
     }
 
+    public List<Issue> getIssuesFromPush(long id) throws ConnectException {
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:Issue)<-[:has_issues]-(b:Push) " +
+                        "WHERE ID(b) = %d " +
+                        "RETURN a",
+                id
+        );
+
+        List<Issue> response = new ArrayList<>();
+        for (JsonObject object : UserDTO.findAll(responseString)) {
+            response.add(new IssueDTO().createFromNeo4jData(object).toModel());
+        }
+        return response;
+    }
+
     @Override
     public int create(Issue data) throws ConnectException, IndexOutOfBoundsException {
         return 0;

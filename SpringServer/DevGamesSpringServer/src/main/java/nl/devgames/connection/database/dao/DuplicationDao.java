@@ -1,18 +1,21 @@
 package nl.devgames.connection.database.dao;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.DuplicationDTO;
+import nl.devgames.connection.database.dto.DuplicationFileDTO;
 import nl.devgames.connection.database.dto.IssueDTO;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Duplication;
+import nl.devgames.model.DuplicationFile;
 import nl.devgames.model.Issue;
+import nl.devgames.utils.L;
 
 import java.net.ConnectException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Jorikito on 18-May-16.
@@ -56,6 +59,54 @@ public class DuplicationDao  implements Dao<Duplication, Long>  {
             response.add(new DuplicationDTO().createFromNeo4jData(object).toModel());
         }
         return response;
+    }
+
+    public List<Duplication> getDuplicationsFromPush(long id) throws ConnectException {
+
+        List<Duplication> duplicationList = new ArrayList<>();
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:DuplicationFile)<-[:has_files]-(b:Duplication)<-[:has_duplications]-(c:Push " +
+                        "WHERE ID(c) = %d " +
+                        "RETURN {id:id(a), labels: labels(a), data: a}," +
+                        "       {id:id(b), labels: labels(b), data: b}",
+                id);
+
+        JsonObject json = new JsonParser().parse(responseString).getAsJsonObject();
+
+        if(json.get("errors").getAsJsonArray().size() != 0)
+            L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
+
+        JsonArray data = json.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
+        for (JsonElement element : data) {
+            JsonArray rows = element.getAsJsonObject().get("row").getAsJsonArray();
+
+            DuplicationDTO dto = null; Set<DuplicationFile> files = new HashSet<>();
+
+            for ( JsonElement row : rows) {
+                String label = row.getAsJsonObject().get("labels").getAsJsonArray().get(0).getAsString();
+
+                switch (label) {
+                    case "Duplication" :
+                        if(dto == null) dto = new DuplicationDTO().createFromNeo4jData(row.getAsJsonObject());
+                        else {
+                            DuplicationDTO dTemp = new DuplicationDTO().createFromNeo4jData(row.getAsJsonObject());
+                            if(!dto.equalsInContent(dTemp))
+                                L.w("Two different DTO's were found in the response. 1:'%s', 2:'%s'", dto, dTemp);
+                        }
+                        break;
+                    case "DuplicationFile" :
+                        files.add(new DuplicationFileDTO().createFromNeo4jData(row.getAsJsonObject()).toModel());
+                        break;
+                    default:
+                        L.w("Unimplemented case detected : '%s'", label);
+                }
+            }
+            if(dto == null) return null;
+            dto.files = files;
+            duplicationList.add(dto.toModel());
+        }
+
+        return duplicationList;
     }
 
     @Override
