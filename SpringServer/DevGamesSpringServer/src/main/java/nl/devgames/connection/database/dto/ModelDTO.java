@@ -126,4 +126,11 @@ public abstract class ModelDTO<
 
         return objects;
     }
+
+    @Override
+    public String toString() {
+        return "ModelDTO{" +
+                "id=" + id +
+                '}';
+    }
 }

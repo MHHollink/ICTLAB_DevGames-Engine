@@ -54,4 +54,13 @@ public class CommitDTO extends ModelDTO<CommitDTO, Commit> {
     public boolean equalsInContent(CommitDTO other) {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "CommitDTO{" +
+                "commitId='" + commitId + '\'' +
+                ", commitMsg='" + commitMsg + '\'' +
+                ", timestamp=" + timestamp +
+                "} " + super.toString();
+    }
 }

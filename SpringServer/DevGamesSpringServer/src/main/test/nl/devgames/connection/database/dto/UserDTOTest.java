@@ -1,23 +1,22 @@
 package nl.devgames.connection.database.dto;
 
-import nl.devgames.DevGamesTests;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Created by Marcel on 26-4-2016.
+ * Created by Marcel on 17-5-2016.
  */
-public class UserDTOTest extends DevGamesTests{
+public class UserDTOTest {
 
     @Before
     public void setUp() throws Exception {
-        super.setUp();
+
     }
 
     @After
     public void tearDown() throws Exception {
-        super.tearDown();
+
     }
 
     @Test
@@ -37,6 +36,11 @@ public class UserDTOTest extends DevGamesTests{
 
     @Test
     public void testCreateFromNeo4jData() throws Exception {
+
+    }
+
+    @Test
+    public void testEqualsInContent() throws Exception {
 
     }
 }

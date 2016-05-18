@@ -29,9 +29,44 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
 
     public String password;
 
+    public boolean deleted;
+
+    public UserDTO() {
+    }
+
+    public UserDTO(String username, String gitUsername, String firstName, String tween, String lastName, int age, String mainJob, Set<Project> projects, Set<Push> pushes, String session, String gcmId, String password) {
+        this.username = username;
+        this.gitUsername = gitUsername;
+        this.firstName = firstName;
+        this.tween = tween;
+        this.lastName = lastName;
+        this.age = age;
+        this.mainJob = mainJob;
+        this.projects = projects;
+        this.pushes = pushes;
+        this.session = session;
+        this.gcmId = gcmId;
+        this.password = password;
+    }
+
+    public UserDTO(User user) {
+        this.id = user.getId();
+        this.username = user.getUsername();
+        this.gitUsername = user.getGitUsername();
+        this.firstName = user.getFirstName();
+        this.tween = user.getTween();
+        this.lastName = user.getLastName();
+        this.age = user.getAge();
+        this.mainJob = user.getMainJob();
+        this.projects = user.getProjects();
+        this.pushes = user.getPushes();
+        this.session = user.getSessionId();
+        this.gcmId = user.getGcmId();
+        this.password = user.getPassword();
+    }
+
     @Override
     public User toModel() {
-
         if(!isValid()) return null;
 
         User user = new User();
@@ -48,7 +83,7 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
         user.setPushes(this.pushes);
         user.setSessionId(this.session);
         user.setGcmId(this.gcmId);
-        user.setPassword(password);
+        user.setPassword(this.password);
 
         return user;
     }
@@ -56,12 +91,19 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
     @SuppressWarnings("ConstantConditions")
     @Override
     public boolean isValid() {
-        boolean valid = gitUsername != null;
+        boolean valid =
+                gitUsername != null &&
+                        (deleted || username != null && password != null && firstName != null && lastName != null);
 
         if(!valid) {
             L.w("User is not valid! False indicates a problem: " +
-                            "gitUsername:'%b'",
-                    gitUsername != null
+                    "deleted: '%b', gitUsername:'%b', {username: '%b', password: '%b', firstName: '%b', lastName: '%b'}",
+                    deleted,
+                    gitUsername != null,
+                    username != null,
+                    password != null,
+                    firstName != null,
+                    lastName != null
             );
         }
 

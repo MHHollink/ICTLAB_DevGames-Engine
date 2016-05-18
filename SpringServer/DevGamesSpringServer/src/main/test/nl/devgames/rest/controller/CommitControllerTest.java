@@ -1,21 +1,22 @@
 package nl.devgames.rest.controller;
 
-import nl.devgames.DevGamesTests;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Created by Marcel on 26-4-2016.
+ * Created by Marcel on 17-5-2016.
  */
-public class CommitControllerTest extends DevGamesTests {
+public class CommitControllerTest {
 
-    @Override
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
+
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
-        super.tearDown();
+
     }
 
     @Test

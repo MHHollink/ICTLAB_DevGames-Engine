@@ -52,4 +52,11 @@ public class DuplicationDTO extends ModelDTO<DuplicationDTO, Duplication> {
     public boolean equalsInContent(DuplicationDTO other) {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "DuplicationDTO{" +
+                "files=" + files +
+                "} " + super.toString();
+    }
 }

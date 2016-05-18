@@ -31,13 +31,16 @@ public class GCMMessage{
         L.d("Created Notification");
         switch(type) {
             case PLAIN_NOTIFICATION:
-            case NEW_DEVICE_REGISTERED:
-            case NEW_SCORES:
+            case REGISTERED_ELSEWHERE:
+            case ACCOUNT_UPDATED:
+            case BROKEN_BUILD:
+            case NEW_PUSH_RECEIVED:
                 data.put("type", type.toString());
                 data.put("title", title);
                 data.put("text", message);
                 break;
             default:
+                L.e("Given type is not implemented, type : %s", type.name());
                 throw new NotImplementedException();
         }
     }

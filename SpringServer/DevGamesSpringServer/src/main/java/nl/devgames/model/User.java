@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Set;
 
-@JsonIgnoreProperties({"password", "sessionId"})
+@JsonIgnoreProperties({"sessionId"})
 public class User extends Model {
 
     private String username;
@@ -167,6 +167,7 @@ public class User extends Model {
                 ", pushes=" + pushes +
                 ", sessionId='" + sessionId + '\'' +
                 ", gcmId='" + gcmId + '\'' +
+                ", password='" + password + '\'' +
                 "} " + super.toString();
     }
 

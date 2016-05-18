@@ -61,4 +61,14 @@ public class DuplicationFileDTO extends ModelDTO<DuplicationFileDTO, Duplication
     public boolean equalsInContent(DuplicationFileDTO other) {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "DuplicationFileDTO{" +
+                "file='" + file + '\'' +
+                ", beginLine=" + beginLine +
+                ", endLine=" + endLine +
+                ", size=" + size +
+                "} " + super.toString();
+    }
 }

@@ -1,23 +1,22 @@
 package nl.devgames.rest.controller;
 
-import nl.devgames.DevGamesTests;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Created by Marcel on 26-4-2016.
+ * Created by Marcel on 17-5-2016.
  */
-public class ProjectControllerTest extends DevGamesTests {
+public class ProjectControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        super.setUp();
+
     }
 
     @After
     public void tearDown() throws Exception {
-        super.tearDown();
+
     }
 
     @Test

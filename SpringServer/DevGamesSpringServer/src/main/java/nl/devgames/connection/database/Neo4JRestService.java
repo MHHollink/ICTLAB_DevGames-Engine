@@ -11,15 +11,15 @@ public class Neo4JRestService extends AbsRestService {
 
     private static Neo4JRestService instance;
 
+    private Neo4JRestService() {
+        super("http://localhost:7474/db/data/transaction/commit");
+    }
+
     public static Neo4JRestService getInstance() {
         if (instance == null) {
             instance = new Neo4JRestService();
         }
         return instance;
-    }
-
-    private Neo4JRestService() {
-        super("http://localhost:7474/db/data/transaction/commit");
     }
 
     /**
@@ -32,10 +32,10 @@ public class Neo4JRestService extends AbsRestService {
         try {
             super.post(json, new Tuple<>("Authorization","Basic bmVvNGo6ZGV2Z2FtZXM="));
         } catch (IOException e) {
-            e.printStackTrace();
+            L.e(e, "Failure in reading response");
             return null;
         }
-        L.d("Recieved response: %s", response);
+        L.t("Recieved response: %s", response);
         return response;
     }
 
@@ -67,12 +67,12 @@ public class Neo4JRestService extends AbsRestService {
      * @return Response String.
      */
     public String postQuery(String query, Object... params) throws ConnectException {
-        query = String.format(query,params);
-        L.d(query);
+        String format = String.format(query,params);
+        L.t(query, params);
 
         return post(
                 queryToJson(
-                        query
+                        format
                 )
         );
     }

@@ -57,4 +57,12 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
     public boolean equalsInContent(ProjectDTO other) {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "ProjectDTO{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                "} " + super.toString();
+    }
 }

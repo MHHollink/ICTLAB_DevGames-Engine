@@ -10,9 +10,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Created by Marcel on 26-4-2016.
+ * Created by Marcel on 17-5-2016.
  */
-public class IssueControllerTest extends DevGamesTests {
+public class IssueControllerTest {
 
     String sessionId = null;
     IssueController controller;
@@ -27,7 +27,7 @@ public class IssueControllerTest extends DevGamesTests {
 
     @After
     public void tearDown() throws Exception {
-        super.tearDown();
+
     }
 
     @Test
