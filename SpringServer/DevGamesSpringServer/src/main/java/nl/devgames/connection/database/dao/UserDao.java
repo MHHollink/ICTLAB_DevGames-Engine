@@ -71,6 +71,37 @@ public class UserDao implements Dao<User, Long> {
         return dto.toModel();
     }
 
+    public List<String> userTokensFromProject(long userId, long projectId) throws ConnectException {
+        List<String> tokenList = new ArrayList<>();
+
+        String stringResponse = Neo4JRestService.getInstance().postQuery(
+                "MATCH (u:User)-[:works_on]->(p:Project) " +
+                        "WHERE ID(u) = %d AND ID(p) = %d " +
+                        "RETURN u",
+                userId,
+                projectId
+        );
+
+        for (JsonObject object : UserDTO.findAll(stringResponse)) {
+            UserDTO userDTO = new UserDTO().createFromNeo4jData(object);
+            tokenList.add(userDTO.toModel().getGcmId());
+        }
+        return tokenList;
+    }
+
+    public User getPusherOfPush(long pushId) throws ConnectException {
+        List<User> userList = new ArrayList<>();
+
+        String stringResponse = Neo4JRestService.getInstance().postQuery(
+                "MATCH (u:User)-[:pushed_by]->(p:Push) " +
+                        "WHERE ID(p) = %d " +
+                        "RETURN u",
+                pushId
+        );
+
+        return new UserDTO().createFromNeo4jData(UserDTO.findFirst(stringResponse)).toModel();
+    }
+
     @Override
     public List<User> queryForAll() throws ConnectException {
         String r = Neo4JRestService.getInstance().postQuery(
@@ -147,6 +178,21 @@ public class UserDao implements Dao<User, Long> {
     @Override
     public User queryForSameId(User user) throws ConnectException {
         return queryForId(user.getId());
+    }
+
+    public List<User> queryFromProject(long id) throws ConnectException {
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:User)-[:works_on]->(b:Project) " +
+                        "WHERE ID(b) = %d " +
+                        "RETURN a",
+                id
+        );
+
+        List<User> response = new ArrayList<>();
+        for (JsonObject object : UserDTO.findAll(responseString)) {
+            response.add(new UserDTO().createFromNeo4jData(object).toModel());
+        }
+        return response;
     }
 
     @Override

@@ -6,8 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dao.ProjectDao;
-import nl.devgames.connection.database.dao.UserDao;
+import nl.devgames.connection.database.dao.*;
 import nl.devgames.connection.database.dto.BusinessDTO;
 import nl.devgames.connection.database.dto.CommitDTO;
 import nl.devgames.connection.database.dto.DuplicationDTO;
@@ -113,6 +112,8 @@ public class ProjectController extends BaseController{
     @RequestMapping(value = "/{token}/build", method = RequestMethod.POST)
     public Map startCalculator(@PathVariable("token") String token,
                                @RequestBody String json) throws ConnectException {
+        L.d("Called");
+
         java.util.Map<String, String> result = new java.util.HashMap<>();
 
         List<Project> projects = new ProjectDao().queryByField("token", token);
@@ -120,7 +121,6 @@ public class ProjectController extends BaseController{
         if(projects.get(0)==null)
             throw new NotFoundException("project with token not found!");
 
-        L.i("Called");
         try {
             //parse build as SQReportDTO
             JsonObject reportAsJson = new JsonParser().parse(json).getAsJsonObject();
@@ -161,9 +161,10 @@ public class ProjectController extends BaseController{
     @RequestMapping(method = RequestMethod.POST)
     public Project createProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                  @RequestBody Project project) throws ConnectException {
+        L.d("Called");
+
         //check if session is valid
         User caller = getUserFromSession( session );
-        L.i("Called");
         try {
             return new ProjectDao().createIfNotExists(project);
         } catch (ConnectException e) {
@@ -182,9 +183,10 @@ public class ProjectController extends BaseController{
     public Project getProjectById(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                   @PathVariable(value = "id") long id)
     {
+        L.d("Called");
+
         //check if session is valid
         User caller = getUserFromSession( session );
-        L.i("Called");
         try {
             return new ProjectDao().queryForId(id);
         } catch (ConnectException e) {
@@ -205,9 +207,10 @@ public class ProjectController extends BaseController{
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     public Map deleteProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                  @PathVariable(value = "id") long id) throws ConnectException {
+        L.d("Called");
+
         java.util.Map<String, String> result = new java.util.HashMap<>();
 
-        L.i("Called");
         //check if session is valid
         User caller = getUserFromSession( session );
         if(caller.getId() != id) throw new BadRequestException( "Session does not match session for project with id '%d'", id );
@@ -235,7 +238,7 @@ public class ProjectController extends BaseController{
     public Project updateProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                  @PathVariable(value = "id") long id,
                                  @RequestBody Project projectWithUpdateFields) throws ConnectException {
-        L.i("Called");
+        L.d("Called");
 
         if(projectWithUpdateFields == null) {
             L.w("Update project received with empty body");
@@ -247,7 +250,11 @@ public class ProjectController extends BaseController{
         if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         //check if user has update rights for project
-        //TODO: check if user has update rights
+        if(!caller.getMainJob().contains("admin")) {
+            L.w("User with id '%d' has no rights to update the project!", id);
+            throw new BadRequestException("User with id '%d' has no rights to update the project!", id);
+        }
+
         Project project = new ProjectDao().queryForId(id);
 
         //update project fields
@@ -282,19 +289,19 @@ public class ProjectController extends BaseController{
     public Set<User> getDevelopersFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                               @PathVariable(value = "id") long id)
     {
-        L.i("Called");
+        L.d("Called");
 
         //check if session is valid
         User caller = getUserFromSession( session );
         if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
-            return new UserDao().(id);
+            return new HashSet<User>(new UserDao().queryFromProject(id));
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException("Database service offline!");
         } catch (IndexOutOfBoundsException e) {
-            L.w("User was not found");
+            L.w("Users was not found");
             throw new InvalidSessionException("Session invalid!");
         }
     }
@@ -310,10 +317,24 @@ public class ProjectController extends BaseController{
     @RequestMapping(value = "{id}/users/{uid}", method = RequestMethod.PUT)
     public Map addDeveloperToProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                          @PathVariable(value = "id") long id,
-                                         @PathVariable(value = "uid") long uid)
-    {
-        // TODO : 1 -> check if session is valid, 2 -> check if user has rights to add new users to project, 3 -> add user to project
-        throw new UnsupportedOperationException();
+                                         @PathVariable(value = "uid") long uid) throws ConnectException {
+        L.d("Called");
+
+        java.util.Map<String, String> result = new java.util.HashMap<>();
+
+        //check if session is valid
+        User caller = getUserFromSession( session );
+        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
+
+        //check if user has update rights for project
+        if(!caller.getMainJob().contains("admin")) {
+            L.w("User with id '%d' has no rights to update the project!", id);
+            throw new BadRequestException("User with id '%d' has no rights to update the project!", id);
+        }
+        //add user to project
+        int updated = new ProjectDao().addUserToProject(uid, id);
+        result.put("message", String.format("succesfully updated %d user(s)", updated));
+        return result;
     }
 
     /**
@@ -326,41 +347,22 @@ public class ProjectController extends BaseController{
     public Set<Issue> getIssuesFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                            @PathVariable(value = "id") long id)
     {
-        Set<Issue> returnIssueSet = new HashSet<>();
+        L.d("Called");
 
         //check if session is valid
-        if (session == null || session.isEmpty())
-            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+        User caller = getUserFromSession( session );
+        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
-        String jsonResponseString = null;
         try {
-            //TODO: get issues of pushes of project with id???
-            jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:Project), (m:Issue) " +
-                            "WHERE n.session = '%s' AND ID(n) = '%d' " +
-                            "RETURN m-[]-n",
-                    session,
-                    id
-            );
+            return new HashSet<Issue>(new IssueDao().queryFromProject(id));
         } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Issues not found");
+            throw new InvalidSessionException("Session invalid!");
         }
 
-        try {
-            JsonArray results = new JsonParser().parse(jsonResponseString).getAsJsonObject().get("results").getAsJsonArray();
-            for(JsonElement element : results) {
-                Issue issue = new IssueDTO().createFromNeo4jData(
-                        ProjectDTO.findFirst(element.getAsString())
-                ).toModel();
-                returnIssueSet.add(issue);
-            }
-        }
-        catch (KnownInternalServerError e){
-            L.e(e + "Cannot get users working on project with session: '%s' ", session);
-            throw new InvalidSessionException("Cannot get users working on project with session");
-        }
-
-        return returnIssueSet;
     }
 
     /**
@@ -373,41 +375,21 @@ public class ProjectController extends BaseController{
     public Set<Duplication> getDuplicationsFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                                        @PathVariable(value = "id") long id)
     {
-        Set<Duplication> returnDuplicationSet = new HashSet<>();
+        L.d("Called");
 
         //check if session is valid
-        if (session == null || session.isEmpty())
-            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+        User caller = getUserFromSession( session );
+        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
-        String jsonResponseString = null;
         try {
-            //TODO: get duplications of pushes of project with id???
-            jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:Project), (m:Duplication) " +
-                            "WHERE n.session = '%s' AND ID(n) = '%d' " +
-                            "RETURN m-[]-n",
-                    session,
-                    id
-            );
+            return new HashSet<Duplication>(new DuplicationDao().queryFromProject(id));
         } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Issues not found");
+            throw new InvalidSessionException("Session invalid!");
         }
-
-        try {
-            JsonArray results = new JsonParser().parse(jsonResponseString).getAsJsonObject().get("results").getAsJsonArray();
-            for(JsonElement element : results) {
-                Duplication duplication = new DuplicationDTO().createFromNeo4jData(
-                        ProjectDTO.findFirst(element.getAsString())
-                ).toModel();
-                returnDuplicationSet.add(duplication);
-            }
-        }
-        catch (KnownInternalServerError e){
-            L.e(e + "Cannot get users working on project with session: '%s' ", session);
-            throw new InvalidSessionException("Cannot get users working on project with session");
-        }
-
-        return returnDuplicationSet;
     }
 
     /**
@@ -420,9 +402,21 @@ public class ProjectController extends BaseController{
     public Set<Push> getPushesFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                           @PathVariable(value = "id") long id)
     {
+        L.d("Called");
 
-        // TODO : 1 -> check if session is valid, 2 ->  return list of pushes (includes commits, issues and duplications) linked to the project
-        throw new UnsupportedOperationException();
+        //check if session is valid
+        User caller = getUserFromSession( session );
+        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
+
+        try {
+            return new HashSet<Push>(new PushDao().queryFromProject(id));
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Issues not found");
+            throw new InvalidSessionException("Session invalid!");
+        }
     }
 
     /**
@@ -435,41 +429,21 @@ public class ProjectController extends BaseController{
     public Set<Commit> getCommitsFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                              @PathVariable(value = "id") long id)
     {
-        Set<Commit> returnCommitSet = new HashSet<>();
+        L.d("Called");
 
         //check if session is valid
-        if (session == null || session.isEmpty())
-            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+        User caller = getUserFromSession( session );
+        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
-        String jsonResponseString = null;
         try {
-            //TODO: get commits of pushes of project with id???
-            jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:Project), (m:Commit) " +
-                            "WHERE n.session = '%s' AND ID(n) = '%d' " +
-                            "RETURN m-[]-n",
-                    session,
-                    id
-            );
+            return new HashSet<Commit>(new CommitDao().queryFromProject(id));
         } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Issues not found");
+            throw new InvalidSessionException("Session invalid!");
         }
-
-        try {
-            JsonArray results = new JsonParser().parse(jsonResponseString).getAsJsonObject().get("results").getAsJsonArray();
-            for(JsonElement element : results) {
-                Commit commit = new CommitDTO().createFromNeo4jData(
-                        ProjectDTO.findFirst(element.getAsString())
-                ).toModel();
-                returnCommitSet.add(commit);
-            }
-        }
-        catch (KnownInternalServerError e){
-            L.e(e + "Cannot get users working on project with session: '%s' ", session);
-            throw new InvalidSessionException("Cannot get users working on project with session");
-        }
-
-        return returnCommitSet;
     }
 
     /**
@@ -482,76 +456,36 @@ public class ProjectController extends BaseController{
     public Set<Business> getBusinessesFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                             @PathVariable(value = "id") long id)
     {
-        Set<Business> returnBusinessSet = new HashSet<>();
+        L.d("Called");
 
         //check if session is valid
-        if (session == null || session.isEmpty())
-            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+        User caller = getUserFromSession( session );
+        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
-        String jsonResponseString = null;
         try {
-            //TODO: get businesses of pushes of project with id???
-            jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:Project), (m:Business) " +
-                            "WHERE n.session = '%s' AND ID(n) = '%d' " +
-                            "RETURN m-[]-n",
-                    session,
-                    id
-            );
+            return new HashSet<Business>(new BusinessDao().queryFromProject(id));
         } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Issues not found");
+            throw new InvalidSessionException("Session invalid!");
         }
-
-        try {
-            JsonArray results = new JsonParser().parse(jsonResponseString).getAsJsonObject().get("results").getAsJsonArray();
-            for(JsonElement element : results) {
-                Business business = new BusinessDTO().createFromNeo4jData(
-                        ProjectDTO.findFirst(element.getAsString())
-                ).toModel();
-                returnBusinessSet.add(business);
-            }
-        }
-        catch (KnownInternalServerError e){
-            L.e(e + "Cannot get users working on project with session: '%s' ", session);
-            throw new InvalidSessionException("Cannot get users working on project with session");
-        }
-
-        return returnBusinessSet;
     }
 
 
 
     // todo move method to more appropriate class
-    public List<String> getProjectMembersTokens(String username, String projectName) {
-
-        List<String> tokenList = new ArrayList<>();
-
-        String stringResponse;
+    public List<String> getProjectMembersTokens(long uid, long projectId) {
         try {
-            stringResponse = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (u:User { username : '%s' }) -[:is_developing]-> (p:Project {name : '%s'}) <-[:is_developing]- (r:User) RETURN r.gcmRegId",
-                    username,
-                    projectName
-            );
+            return new UserDao().userTokensFromProject(uid, projectId);
         } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
-            throw new KnownInternalServerError(e.getMessage());
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Issues not found");
+            throw new InvalidSessionException("Session invalid!");
         }
-
-        // todo use UserDTOs parse method
-        JsonObject jsonResponse = new JsonParser().parse(stringResponse).getAsJsonObject();
-
-        if(hasErrors(jsonResponse)) return null;
-
-        JsonArray rows = jsonResponse.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
-        if(rows.size() == 0) return tokenList;
-
-        for (int i = 0; i < rows.size(); i++) {
-            tokenList.add(
-                    rows.get(i).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsString());
-        }
-
-        return tokenList;
     }
 
 }

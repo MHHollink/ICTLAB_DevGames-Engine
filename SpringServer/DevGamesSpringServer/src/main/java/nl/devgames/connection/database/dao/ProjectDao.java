@@ -136,6 +136,26 @@ public class ProjectDao implements Dao<Project, Long> {
         return response;
     }
 
+    public int addUserToProject(long userId, long projectId) throws ConnectException {
+        String response = Neo4JRestService.getInstance().postQuery(
+                "MATCH (n:User), (m:Project) " +
+                        "WHERE ID(n) = %d AND ID(m) = %d " +
+                        "CREATE (n)-[:works_on]->(m)" +
+                        "RETURN n",
+                userId,
+                projectId
+        );
+
+        JsonObject json = new JsonParser().parse(response).getAsJsonObject();
+        if(json.get("errors").getAsJsonArray().size() != 0) {
+            L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
+            return 0;
+        }
+        else {
+            return json.get("results").getAsJsonArray().size();
+        }
+    }
+
     @Override
     public Project queryForSameId(Project project) throws ConnectException {
         return queryForId(project.getId());

@@ -1,6 +1,9 @@
 package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
+import nl.devgames.connection.database.dao.ProjectDao;
+import nl.devgames.connection.database.dao.PushDao;
+import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
 import nl.devgames.model.Issue;
@@ -8,12 +11,16 @@ import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
 import nl.devgames.rest.errors.BadRequestException;
+import nl.devgames.rest.errors.DatabaseOfflineException;
+import nl.devgames.rest.errors.InvalidSessionException;
+import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.ConnectException;
 import java.util.Set;
 
 @RestController
@@ -24,24 +31,42 @@ public class PushController extends BaseController {
     public Push getPushById(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
                             @PathVariable long id)
     {
-        //check if session is valid
-        if (session == null || session.isEmpty())
-            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+        L.d("Called");
 
-        // TODO : 1 -> check if session is valid, 2 -> return push with the given id
-        throw new UnsupportedOperationException();
+        //check if session is valid
+        User caller = getUserFromSession( session );
+        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
+
+        try {
+            return new PushDao().queryForId(id);
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Project was not found");
+            throw new InvalidSessionException("Session invalid!");
+        }
     }
 
     @RequestMapping(value = "/{id}/users", method = RequestMethod.GET)
     public User getPushPusher(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
                               @PathVariable long id)
     {
-        //check if session is valid
-        if (session == null || session.isEmpty())
-            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+        L.d("Called");
 
-        // TODO : 1 -> check if session is valid, 2 -> return the user who created the push
-        throw new UnsupportedOperationException();
+        //check if session is valid
+        User caller = getUserFromSession( session );
+        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
+
+        try {
+            return new UserDao().getPusherOfPush(id);
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Project was not found");
+            throw new InvalidSessionException("Session invalid!");
+        }
     }
 
     @RequestMapping(value = "/{id}/projects", method = RequestMethod.GET)
