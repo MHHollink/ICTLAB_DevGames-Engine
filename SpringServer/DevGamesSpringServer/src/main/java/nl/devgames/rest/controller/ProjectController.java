@@ -6,6 +6,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
+import nl.devgames.connection.database.dao.ProjectDao;
+import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.connection.database.dto.BusinessDTO;
 import nl.devgames.connection.database.dto.CommitDTO;
 import nl.devgames.connection.database.dto.DuplicationDTO;
@@ -22,10 +24,7 @@ import nl.devgames.model.Issue;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
-import nl.devgames.rest.errors.BadRequestException;
-import nl.devgames.rest.errors.InvalidSessionException;
-import nl.devgames.rest.errors.KnownInternalServerError;
-import nl.devgames.rest.errors.NotFoundException;
+import nl.devgames.rest.errors.*;
 import nl.devgames.rules.ScoreCalculator;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -103,7 +102,9 @@ public class ProjectController extends BaseController{
      *      ]
      *  }
      * </code>
-     *
+     */
+
+     /**
      * @param token
      * @param json
      * @return
@@ -113,52 +114,41 @@ public class ProjectController extends BaseController{
     public Map startCalculator(@PathVariable("token") String token,
                                @RequestBody String json) throws ConnectException {
         java.util.Map<String, String> result = new java.util.HashMap<>();
-        //check if token is valid
-        String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:Project) " +
-                        "WHERE n.token = '%s' " +
-                        "RETURN {id:id(n), labels: labels(n), data: n}",
-                token
-        );
 
+        List<Project> projects = new ProjectDao().queryByField("token", token);
+        //check if token is invalid
+        if(projects.get(0)==null)
+            throw new NotFoundException("project with token not found!");
 
-        ProjectDTO projectDTO = new ProjectDTO().createFromNeo4jData(
-                ProjectDTO.findFirst(responseString)
-        );
-
-        if(projectDTO.isValid()) {
-            //token is valid
+        L.i("Called");
+        try {
+            //parse build as SQReportDTO
             JsonObject reportAsJson = new JsonParser().parse(json).getAsJsonObject();
-            try {
-                SQReportDTO testReport = new SQReportDTO().buildFromJson(reportAsJson);
-                //todo: get settings for project, temp testing solution below
-                File testSettingsFile = new File("settingsTest.txt");
-                Scanner scanner = new Scanner(testSettingsFile);
-                String settingsAsString = scanner.useDelimiter("\\Z").next();
-                scanner.close();
-                JsonObject settings = new JsonParser().parse(settingsAsString).getAsJsonObject();
-                //calculate score with project settings and report
-                testReport.setScore(new ScoreCalculator(settings).calculateScoreFromReport(testReport));
-                //save report
-                testReport.saveReportToDatabase();
+            SQReportDTO testReport = new SQReportDTO().buildFromJson(reportAsJson);
+            //todo: get settings for project, temp testing solution below
+            File testSettingsFile = new File("settingsTest.txt");
+            Scanner scanner = new Scanner(testSettingsFile);
+            String settingsAsString = scanner.useDelimiter("\\Z").next();
+            scanner.close();
+            JsonObject settings = new JsonParser().parse(settingsAsString).getAsJsonObject();
+            //calculate score with project settings and report
+            testReport.setScore(new ScoreCalculator(settings).calculateScoreFromReport(testReport));
+            //save report
+            testReport.saveReportToDatabase();
+            //send message
+            GCMMessageComposer.sendMessage(
+                    GCMMessageType.NEW_SCORES,
+                    "",
+                    String.valueOf(testReport.getScore().intValue()),
+                    496L
+            );
 
+            result.put("message", "successfully parsed and saved report");
+        }catch (Exception e) {
+            L.e(e, "Error when parsing report");
+            throw new KnownInternalServerError(e.getMessage());
+        }
 
-                GCMMessageComposer.sendMessage(
-                        GCMMessageType.NEW_SCORES,
-                        "",
-                        String.valueOf(testReport.getScore().intValue()),
-                        496L
-                );
-            } catch (Exception e) {
-                L.e(e, "Error when parsing report");
-                throw new KnownInternalServerError(e.getMessage());
-            }
-        }
-        else {
-            //token is not valid
-            L.w("token not valid");
-            throw new NotFoundException("Project token not found in database");
-        }
         return result;
     }
 
@@ -171,58 +161,15 @@ public class ProjectController extends BaseController{
     @RequestMapping(method = RequestMethod.POST)
     public Project createProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                  @RequestBody Project project) throws ConnectException {
-        Project returnProject;
-
         //check if session is valid
-        if (session == null || session.isEmpty())
-            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
-//
-//        String sessionResponseString = null;
-//        try {
-//            sessionResponseString = Neo4JRestService.getInstance().postQuery(
-//                    "MATCH (n:Project) " +
-//                            "WHERE n.session = '%s' " +
-//                            "RETURN n",
-//                    session
-//            );
-//        } catch (ConnectException e) {
-//            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
-//        }
-        String jsonResponseString = null;
+        User caller = getUserFromSession( session );
+        L.i("Called");
         try {
-            jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                    "CREATE (n:Project { " +
-                            "name: '%s', descripion: '%s' }) " +
-                            "RETURN {id:id(n), labels: labels(n), data: n}",
-                    project.getName(),
-                    project.getDescription()
-            );
+            return new ProjectDao().createIfNotExists(project);
         } catch (ConnectException e) {
-            L.e(e, "Cannot create project");
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
         }
-        ProjectDTO projectDTO = new ProjectDTO().createFromNeo4jData(
-                ProjectDTO.findFirst(jsonResponseString)
-        );
-        if(projectDTO.isValid()) {
-            returnProject = projectDTO.toModel();
-        }
-        else {
-            //session invalid
-            throw new InvalidSessionException("Request session is not found");
-        }
-//        //session valid
-//        try {
-//            returnProject = new ProjectDTO().createFromNeo4jData(
-//                    ProjectDTO.findFirst(jsonResponseString)
-//            ).toModel();
-//        }
-//        //session invalid
-//        catch (IndexOutOfBoundsException e) {
-//            L.e(e, "Getting project with session '%s' threw IndexOutOfBoundsException, session token was probably invalid", session);
-//            throw new InvalidSessionException("Request session is not found");
-//        }
-
-        return returnProject;
     }
 
     /**
@@ -235,36 +182,18 @@ public class ProjectController extends BaseController{
     public Project getProjectById(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                   @PathVariable(value = "id") long id)
     {
-        Project returnProject;
         //check if session is valid
-        if (session == null || session.isEmpty())
-            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
-
-        String jsonResponseString = null;
+        User caller = getUserFromSession( session );
+        L.i("Called");
         try {
-            jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:Project) " +
-                            "WHERE n.session = '%s' AND ID(n) = '%d' " +
-                            "RETURN {id:id(n), labels: labels(n), data: n}",
-                    session,
-                    id
-            );
+            return new ProjectDao().queryForId(id);
         } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Project was not found");
+            throw new InvalidSessionException("Session invalid!");
         }
-        //session valid
-        try {
-            returnProject = new ProjectDTO().createFromNeo4jData(
-                    ProjectDTO.findFirst(jsonResponseString)
-            ).toModel();
-        }
-        //session invalid
-        catch (IndexOutOfBoundsException e) {
-            L.e(e, "Getting project with session '%s' threw IndexOutOfBoundsException, session token was probably invalid", session);
-            throw new InvalidSessionException("Request session is not found");
-        }
-
-        return returnProject;
     }
 
     /**
@@ -278,36 +207,21 @@ public class ProjectController extends BaseController{
                                  @PathVariable(value = "id") long id) throws ConnectException {
         java.util.Map<String, String> result = new java.util.HashMap<>();
 
+        L.i("Called");
         //check if session is valid
-        if (session == null || session.isEmpty())
-            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+        User caller = getUserFromSession( session );
+        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for project with id '%d'", id );
 
-        String jsonResponseString = null;
         try {
-            jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:Project) " +
-                            "WHERE n.session = '%s' AND ID(n) = '%d' " +
-                            "RETURN {id:id(n), labels: labels(n), data: n}",
-                    session,
-                    id
-            );
+            ProjectDao projectDao = new ProjectDao();
+            Project project = projectDao.queryForId(id);
+            int deleted = projectDao.delete(project);
+            if (deleted != 1) throw new KnownInternalServerError("delete project failed. deleted rows = %d", deleted);
+            result.put("message", "succesfully deleted project");
         } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
         }
-        try {
-            Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:Project) " +
-                            "WHERE n.session = '%s' AND ID(n) = '%d' " +
-                            "DETACH DELETE n",
-                    session,
-                    id
-            );
-        }
-        catch (IndexOutOfBoundsException e) {
-            L.e(e, "Deleting project with session '%s' threw IndexOutOfBoundsException, session token was probably invalid", session);
-            throw new InvalidSessionException("Request session is not found");
-        }
-
         return result;
     }
 
@@ -321,44 +235,40 @@ public class ProjectController extends BaseController{
     public Project updateProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                  @PathVariable(value = "id") long id,
                                  @RequestBody Project projectWithUpdateFields) throws ConnectException {
-        Project returnProject;
+        L.i("Called");
+
+        if(projectWithUpdateFields == null) {
+            L.w("Update project received with empty body");
+            throw new BadRequestException("No body was passed with the request");
+        }
+
         //check if session is valid
-        if (session == null || session.isEmpty())
-            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+        User caller = getUserFromSession( session );
+        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
-        String jsonResponseString = null;
+        //check if user has update rights for project
+        //TODO: check if user has update rights
+        Project project = new ProjectDao().queryForId(id);
+
+        //update project fields
+        if(projectWithUpdateFields.getName() != null)
+            project.setName(projectWithUpdateFields.getName());
+
+        if(projectWithUpdateFields.getDescription() != null)
+            project.setDescription(projectWithUpdateFields.getDescription());
+
+        // TODO: 17-5-2016 all fields?
+
+        //update in db
         try {
-            jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:Project) " +
-                            "WHERE n.session = '%s' AND ID(n) = '%d' " +
-                            "RETURN {id:id(n), labels: labels(n), data: n}",
-                    session,
-                    id
-            );
+            int updated = new ProjectDao().update(project);
+            if(updated != 1) throw new KnownInternalServerError("update project failed. updated rows = %d", updated);
+            return project;
         } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
-        }
-        String newProjectResponseString = null;
-        try {
-            newProjectResponseString = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:Project) " +
-                            "WHERE n.session = '%s' AND ID(n) = '%d' " +
-                            "SET n." +
-                            "RETURN n",
-                    session,
-                    id
-            );
-            returnProject = new ProjectDTO().createFromNeo4jData(
-                    ProjectDTO.findFirst(newProjectResponseString)
-            ).toModel();
-        }
-        catch (IndexOutOfBoundsException e) {
-            L.e(e, "Putting project with session '%s' threw IndexOutOfBoundsException, session token was probably invalid", session);
-            throw new InvalidSessionException("Request session is not found");
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
         }
 
-        return returnProject;
-        // TODO : 2 -> check if user has update rights for project, 3 -> update project fields
     }
 
 
@@ -372,40 +282,21 @@ public class ProjectController extends BaseController{
     public Set<User> getDevelopersFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                               @PathVariable(value = "id") long id)
     {
-        Set<User> returnUserSet = new HashSet<>();
+        L.i("Called");
 
         //check if session is valid
-        if (session == null || session.isEmpty())
-            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+        User caller = getUserFromSession( session );
+        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
-        String jsonResponseString = null;
         try {
-            jsonResponseString = Neo4JRestService.getInstance().postQuery(
-                    "MATCH (n:Project), (m:User) " +
-                            "WHERE n.session = '%s' AND ID(n) = '%d' " +
-                            "RETURN m-[works_on]-n",
-                    session,
-                    id
-            );
+            return new UserDao().(id);
         } catch (ConnectException e) {
-            L.e(e, "Neo4J Post threw exeption, Database might be offline!");
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("User was not found");
+            throw new InvalidSessionException("Session invalid!");
         }
-
-        try {
-            JsonArray results = new JsonParser().parse(jsonResponseString).getAsJsonObject().get("results").getAsJsonArray();
-            for(JsonElement element : results) {
-                User user = new UserDTO().createFromNeo4jData(
-                        ProjectDTO.findFirst(element.getAsString())
-                ).toModel();
-                returnUserSet.add(user);
-            }
-        }
-        catch (KnownInternalServerError e){
-            L.e(e + "Cannot get users working on project with session: '%s' ", session);
-            throw new InvalidSessionException("Cannot get users working on project with session");
-        }
-
-        return returnUserSet;
     }
 
 

@@ -7,6 +7,7 @@ import nl.devgames.model.Issue;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
+import nl.devgames.rest.errors.BadRequestException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,10 @@ public class PushController extends BaseController {
     public Push getPushById(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
                             @PathVariable long id)
     {
+        //check if session is valid
+        if (session == null || session.isEmpty())
+            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+
         // TODO : 1 -> check if session is valid, 2 -> return push with the given id
         throw new UnsupportedOperationException();
     }
@@ -31,6 +36,10 @@ public class PushController extends BaseController {
     public User getPushPusher(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
                               @PathVariable long id)
     {
+        //check if session is valid
+        if (session == null || session.isEmpty())
+            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+
         // TODO : 1 -> check if session is valid, 2 -> return the user who created the push
         throw new UnsupportedOperationException();
     }
@@ -39,6 +48,10 @@ public class PushController extends BaseController {
     public Project getProjectFromPush(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
                            @PathVariable long id)
     {
+        //check if session is valid
+        if (session == null || session.isEmpty())
+            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+
         // TODO : 1 -> check if session is valid, 2 -> return the project that the push is pushed to
         throw new UnsupportedOperationException();
     }
@@ -46,6 +59,10 @@ public class PushController extends BaseController {
     @RequestMapping(value = "/{id}/commits", method = RequestMethod.GET)
     public Set<Commit> getUnderLayingCommits(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
                                              @PathVariable long id) {
+        //check if session is valid
+        if (session == null || session.isEmpty())
+            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+
         // TODO : 1 -> check if session is valid, 2 -> return a set containing all commits connected to the push
         throw new UnsupportedOperationException();
     }
@@ -53,6 +70,10 @@ public class PushController extends BaseController {
     @RequestMapping(value = "/{id}/issues", method = RequestMethod.GET)
     public Set<Issue> getIssuesFromPush(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
                                         @PathVariable long id) {
+        //check if session is valid
+        if (session == null || session.isEmpty())
+            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+
         // TODO : 1 -> check if session is valid, 2 -> return a set containing all issues connected to the push
         throw new UnsupportedOperationException();
     }
@@ -60,6 +81,10 @@ public class PushController extends BaseController {
     @RequestMapping(value = "/{id}/duplications", method = RequestMethod.GET)
     public Set<Duplication> getDuplicationsFromPush(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
                                                     @PathVariable long id) {
+        //check if session is valid
+        if (session == null || session.isEmpty())
+            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+
         // TODO : 1 -> check if session is valid, 2 -> return a set containing all duplications (and files) connected to the push
         throw new UnsupportedOperationException();
     }
