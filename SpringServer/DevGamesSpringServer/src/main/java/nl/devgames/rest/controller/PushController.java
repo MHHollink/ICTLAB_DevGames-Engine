@@ -40,7 +40,7 @@ public class PushController extends BaseController {
             return new PushDao().queryForId(id);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Project was not found");
             throw new InvalidSessionException("Session invalid!");
@@ -61,7 +61,7 @@ public class PushController extends BaseController {
             return new UserDao().getPusherOfPush(id);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Project was not found");
             throw new InvalidSessionException("Session invalid!");
@@ -82,7 +82,7 @@ public class PushController extends BaseController {
             return new ProjectDao().getProjectForPush(id);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Project was not found");
             throw new InvalidSessionException("Session invalid!");
@@ -102,7 +102,7 @@ public class PushController extends BaseController {
             return new HashSet<>(new CommitDao().getCommitsFromPush(id));
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Project was not found");
             throw new InvalidSessionException("Session invalid!");
@@ -122,7 +122,7 @@ public class PushController extends BaseController {
             return new HashSet<>(new IssueDao().getIssuesFromPush(id));
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Project was not found");
             throw new InvalidSessionException("Session invalid!");
@@ -142,7 +142,7 @@ public class PushController extends BaseController {
             return new HashSet<>(new DuplicationDao().getDuplicationsFromPush(id));
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Project was not found");
             throw new InvalidSessionException("Session invalid!");

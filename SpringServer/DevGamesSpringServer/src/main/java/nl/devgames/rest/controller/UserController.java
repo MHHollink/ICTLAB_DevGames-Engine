@@ -59,7 +59,7 @@ public class UserController extends BaseController {
 
         } catch (ConnectException e) {
             L.e("Database service is ofline");
-            throw new DatabaseOfflineException("Database service is ofline!");
+            throw new DatabaseOfflineException();
         }
     }
 
@@ -80,7 +80,7 @@ public class UserController extends BaseController {
             return new UserDao().queryForId(id);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("User was not found");
             throw new InvalidSessionException("Session invalid!");
@@ -134,7 +134,7 @@ public class UserController extends BaseController {
             return caller;
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         }
     }
 
@@ -153,7 +153,7 @@ public class UserController extends BaseController {
             return new HashMap<>();
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         }
 
     }

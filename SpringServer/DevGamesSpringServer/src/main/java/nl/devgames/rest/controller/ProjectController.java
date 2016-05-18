@@ -123,7 +123,7 @@ public class ProjectController extends BaseController{
 
         } catch (ConnectException e) {
             L.e("Database is offline");
-            throw new DatabaseOfflineException("Database might be ofline");
+            throw new DatabaseOfflineException();
         }
         try {
             //parse build as SQReportDTO
@@ -173,7 +173,7 @@ public class ProjectController extends BaseController{
             return new ProjectDao().createIfNotExists(project);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         }
     }
 
@@ -195,7 +195,7 @@ public class ProjectController extends BaseController{
             return new ProjectDao().queryForId(id);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Project was not found");
             throw new InvalidSessionException("Session invalid!");
@@ -227,7 +227,7 @@ public class ProjectController extends BaseController{
             result.put("message", "succesfully deleted project");
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         }
         return result;
     }
@@ -272,7 +272,7 @@ public class ProjectController extends BaseController{
 
         } catch (ConnectException e) {
             L.e("database is offline");
-            throw new DatabaseOfflineException("Database might be offline");
+            throw new DatabaseOfflineException();
         }
         // TODO: 17-5-2016 all fields?
 
@@ -283,7 +283,7 @@ public class ProjectController extends BaseController{
             return project;
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         }
 
     }
@@ -309,7 +309,7 @@ public class ProjectController extends BaseController{
             return new HashSet<User>(new UserDao().queryFromProject(id));
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Users was not found");
             throw new InvalidSessionException("Session invalid!");
@@ -348,7 +348,7 @@ public class ProjectController extends BaseController{
             return result;
         } catch (ConnectException e) {
             L.e(e, "database is offline!");
-            throw new DatabaseOfflineException("Database might be offline");
+            throw new DatabaseOfflineException();
         }
     }
 
@@ -372,7 +372,7 @@ public class ProjectController extends BaseController{
             return new HashSet<Issue>(new IssueDao().queryFromProject(id));
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Issues not found");
             throw new InvalidSessionException("Session invalid!");
@@ -400,7 +400,7 @@ public class ProjectController extends BaseController{
             return new HashSet<Duplication>(new DuplicationDao().queryFromProject(id));
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Issues not found");
             throw new InvalidSessionException("Session invalid!");
@@ -427,7 +427,7 @@ public class ProjectController extends BaseController{
             return new HashSet<Push>(new PushDao().queryFromProject(id));
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Issues not found");
             throw new InvalidSessionException("Session invalid!");
@@ -454,7 +454,7 @@ public class ProjectController extends BaseController{
             return new HashSet<Commit>(new CommitDao().queryFromProject(id));
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Issues not found");
             throw new InvalidSessionException("Session invalid!");
@@ -481,7 +481,7 @@ public class ProjectController extends BaseController{
             return new HashSet<Business>(new BusinessDao().queryFromProject(id));
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Issues not found");
             throw new InvalidSessionException("Session invalid!");
@@ -496,7 +496,7 @@ public class ProjectController extends BaseController{
             return new UserDao().userTokensFromProject(uid, projectId);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Issues not found");
             throw new InvalidSessionException("Session invalid!");
