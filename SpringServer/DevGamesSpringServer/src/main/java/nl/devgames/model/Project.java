@@ -2,9 +2,14 @@ package nl.devgames.model;
 
 public class Project extends Model {
 
+    public enum Relations {
+        IS_LEAD_BY,
+    }
+
     private String name;
     private String description;
 
+    private User owner;
 
     public Project() {
     }

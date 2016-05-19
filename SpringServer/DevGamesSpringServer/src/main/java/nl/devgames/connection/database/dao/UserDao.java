@@ -242,7 +242,7 @@ public class UserDao implements Dao<User, Long> {
             if (inserted == 0)
                 return null;
             L.d("Created %d rows", inserted);
-            return user;
+            return queryByField("username",user.getUsername()).get(0);
         } else return u;
     }
 
@@ -322,6 +322,16 @@ public class UserDao implements Dao<User, Long> {
         return changed;
     }
 
+    /**
+     * This method is used to create a relationship between a User and a Project. The id's from both parameters are used in the qeury.
+     *
+     * The objects returned from creating an object with {@link #createIfNotExists(User)} and {@link ProjectDao#createIfNotExists(Project)} should have a valid ID
+     *
+     * @param user
+     * @param project
+     * @return
+     * @throws ConnectException
+     */
     public int saveRelationship(User user, Project project) throws ConnectException {
         if (user.getId() == null || project.getId() == null) {
             L.e("Id from user or project was null: user[%b], project[%b]",
@@ -331,20 +341,41 @@ public class UserDao implements Dao<User, Long> {
         L.i("Creating relationship between user: '%d' and project: '%d'",
                 user.getId(), project.getId());
 
-        String response = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:User), (b:Project) " +
-                        "WHERE ID(a) = %d AND ID(b) = %d " +
-                        "CREATE (a)-[:is_developing]->(b)",
-                user.getId(),
-                project.getId()
-        );
+        String response = createRelationship(user.getId(), project.getId(), User.Relations.IS_DEVELOPING);
 
-        System.out.println();
-        return 1;
+        return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
     }
 
-    public int saveRelationship(User user, Push push) {
+    /**
+     * This method is used to create a relationship between a User and a Project. The id's from both parameters are used in the qeury.
+     *
+     * The objects returned from creating an object with {@link #createIfNotExists(User)} and {@link PushDao#createIfNotExists(Push)} should have a valid ID
+     *
+     * @param user
+     * @param push
+     * @return
+     * @throws ConnectException
+     */
+    public int saveRelationship(User user, Push push) throws ConnectException {
+        if (user.getId() == null || push.getId() == null) {
+            L.e("Id from user or push was null: user[%b], push[%b]",
+                    user.getId()==null, push.getId()==null);
+            return 0;
+        }
+        L.i("Creating relationship between user: '%d' and push: '%d'",
+                user.getId(), push.getId());
 
-        return 0;
+        String response = createRelationship(user.getId(), push.getId(), User.Relations.HAS_PUSHED);
+
+        return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
+    }
+
+    private String createRelationship(long a, long b, User.Relations r) throws ConnectException {
+        return Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:User), (b:Project) " +
+                        "WHERE ID(a) = %d AND ID(b) = %d " +
+                        "CREATE (a)-[:%s]->(b)",
+                a, b, r.name()
+        );
     }
 }

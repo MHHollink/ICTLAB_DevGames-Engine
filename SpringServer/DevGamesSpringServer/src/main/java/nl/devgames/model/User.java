@@ -7,6 +7,11 @@ import java.util.Set;
 @JsonIgnoreProperties({"sessionId"})
 public class User extends Model {
 
+    public enum Relations {
+        IS_DEVELOPING,
+        HAS_PUSHED
+    }
+
     private String username;
     private String gitUsername;
 

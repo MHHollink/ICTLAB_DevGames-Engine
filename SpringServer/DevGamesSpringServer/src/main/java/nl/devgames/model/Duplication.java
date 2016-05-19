@@ -5,6 +5,11 @@ import java.util.Set;
 
 public class Duplication extends Model {
 
+    public enum Relations {
+        HAS_FILE
+    }
+
+
     Set<DuplicationFile> files;
     long duplicationId;
 

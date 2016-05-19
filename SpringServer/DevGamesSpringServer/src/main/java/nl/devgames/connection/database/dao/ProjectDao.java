@@ -138,12 +138,13 @@ public class ProjectDao implements Dao<Project, Long> {
         return response;
     }
 
+    @Deprecated
     public int addUserToProject(long userId, long projectId) throws ConnectException {
         String response = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:User), (m:Project) " +
                         "WHERE ID(n) = %d AND ID(m) = %d " +
                         "CREATE (n)-[:works_on]->(m)" +
-                        "RETURN n",
+                        "RETURN {id:id(n), labels: labels(n), data: n}",
                 userId,
                 projectId
         );

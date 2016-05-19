@@ -4,6 +4,14 @@ import java.util.Set;
 
 public class Push extends Model {
 
+    public enum Relations {
+        CONTAINS_COMMIT,
+        HAS_ISSUE,
+        HAS_DUPLICATION,
+        PUSHED_TO
+    }
+
+
     private String issueId;
     private Project project;
     private Set<Commit> commits;
