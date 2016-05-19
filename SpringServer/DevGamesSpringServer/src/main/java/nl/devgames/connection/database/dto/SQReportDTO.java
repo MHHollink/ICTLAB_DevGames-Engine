@@ -200,6 +200,12 @@ public class SQReportDTO {
 						commit.getId()
 				);
 			}
+			//push - user
+			Neo4JRestService.getInstance().postQuery(
+				"MATCH (a:User), (b:Push) " +
+						"WHERE a.gitUsername = '%s' " +
+						"CREATE (a)-[:pushed_by]->(b)"
+			);
 			//push issue relations to database
 			for (Issue issue : this.getIssues()) {
 				Neo4JRestService.getInstance().postQuery(
@@ -272,19 +278,21 @@ public class SQReportDTO {
 		String pushAuthor = reportAsJson.get("author").getAsString();
 		User author = new User();
 		if(pushAuthor!=null) {
-			String[] names = pushAuthor.split("\\s+");
-			if(names.length == 1) {
-				author.setFirstName(names[0]);
-			}
-			else if(names.length == 2) {
-				author.setFirstName(names[0]);
-				author.setLastName(names[1]);
-			}
-			else if(names.length == 3) {
-				author.setFirstName(names[0]);
-				author.setTween(names[1]);
-				author.setFirstName(names[2]);
-			}
+			author.setGitUsername(pushAuthor);
+			//old author was surname, tween, name
+//			String[] names = pushAuthor.split("\\s+");
+//			if(names.length == 1) {
+//				author.setFirstName(names[0]);
+//			}
+//			else if(names.length == 2) {
+//				author.setFirstName(names[0]);
+//				author.setLastName(names[1]);
+//			}
+//			else if(names.length == 3) {
+//				author.setFirstName(names[0]);
+//				author.setTween(names[1]);
+//				author.setFirstName(names[2]);
+//			}
 		}
 		else {
 			L.e("error parsing author");

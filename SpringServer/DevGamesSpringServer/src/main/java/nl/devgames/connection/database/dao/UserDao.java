@@ -321,4 +321,30 @@ public class UserDao implements Dao<User, Long> {
             changed += deleteById(id);
         return changed;
     }
+
+    public int saveRelationship(User user, Project project) throws ConnectException {
+        if (user.getId() == null || project.getId() == null) {
+            L.e("Id from user or project was null: user[%b], project[%b]",
+                    user.getId()==null, project.getId()==null);
+            return 0;
+        }
+        L.i("Creating relationship between user: '%d' and project: '%d'",
+                user.getId(), project.getId());
+
+        String response = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:User), (b:Project) " +
+                        "WHERE ID(a) = %d AND ID(b) = %d " +
+                        "CREATE (a)-[:is_developing]->(b)",
+                user.getId(),
+                project.getId()
+        );
+
+        System.out.println();
+        return 1;
+    }
+
+    public int saveRelationship(User user, Push push) {
+
+        return 0;
+    }
 }
