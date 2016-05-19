@@ -4,6 +4,7 @@ import java.util.Set;
 
 public class Push extends Model {
 
+    private String issueId;
     private Project project;
     private Set<Commit> commits;
     private Set<Issue> issues;
@@ -13,14 +14,34 @@ public class Push extends Model {
     private double score;
 
     public Push() {
+
     }
 
+    public Push(String issueId, long timestamp) {
+        this.issueId = issueId;
+        this.timestamp = timestamp;
+    }
+
+    public Push(String issueId, long timestamp, double score) {
+        this(issueId, timestamp);
+        this.score = score;
+    }
+
+    @Deprecated
     public Push(Project project, Set<Commit> commits, Set<Issue> issues, Set<Duplication> duplications, long timestamp) {
         this.project = project;
         this.commits = commits;
         this.issues = issues;
         this.duplications = duplications;
         this.timestamp = timestamp;
+    }
+
+    public Push(String issueId, Project project, Set<Commit> commits, Set<Issue> issues, Set<Duplication> duplications, long timestamp, double score) {
+        this(issueId, timestamp, score);
+        this.project = project;
+        this.commits = commits;
+        this.issues = issues;
+        this.duplications = duplications;
     }
 
     public Project getProject() {
@@ -63,6 +84,23 @@ public class Push extends Model {
         this.timestamp = timestamp;
     }
 
+    public String getIssueId() {
+        return issueId;
+
+    }
+
+    public void setIssueId(String issueId) {
+        this.issueId = issueId;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
     @Override
     public String toString() {
         return "Push{" +
@@ -73,5 +111,6 @@ public class Push extends Model {
                 ", timestamp=" + timestamp +
                 "} " + super.toString();
     }
+
 
 }

@@ -1,6 +1,7 @@
 package nl.devgames.connection.database.dao;
 
 import nl.devgames.BaseTest;
+import nl.devgames.model.Project;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,15 +13,23 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 
+/**
+ * Created by Marcel on 19-5-2016.
+ */
+public class ProjectDaoTest extends BaseTest {
 
-public class UserDaoTest extends BaseTest {
-
-    UserDao dao;
+    Project testProject = new Project(
+            "TestProject", "TestDescription"
+    );
+    ProjectDao dao;
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        dao = new UserDao();
+        dao = new ProjectDao();
+
+        dao.create(testProject);
+        testProject = dao.queryByField("name", testProject.getName()).get(0);
     }
 
     @After
@@ -32,10 +41,10 @@ public class UserDaoTest extends BaseTest {
     public void testQueryForId() throws Exception {
         assertThat(
                 dao.queryForId(
-                        loggedInUser.getId()
+                        testProject.getId()
                 ),
                 equalTo(
-                        loggedInUser
+                        testProject
                 )
         );
     }
@@ -52,11 +61,11 @@ public class UserDaoTest extends BaseTest {
     public void testQueryByField() throws Exception {
         assertThat(
                 dao.queryByField(
-                        "gitUsername",
-                        loggedInUser.getGitUsername()
+                        "name",
+                        testProject.getName()
                 ).get(0),
                 equalTo(
-                        loggedInUser
+                        testProject
                 )
         );
     }
@@ -65,28 +74,37 @@ public class UserDaoTest extends BaseTest {
     public void testQueryByFields() throws Exception {
         Map<String,Object> fields = new HashMap<>();
 
-        fields.put("username", loggedInUser.getUsername());
-        fields.put("password", loggedInUser.getPassword());
-        fields.put("age", loggedInUser.getAge());
+        fields.put("name", testProject.getName());
+        fields.put("description", testProject.getDescription());
 
         assertThat(
                 dao.queryByFields(
                         fields
                 ).get(0),
                 equalTo(
-                        loggedInUser
+                        testProject
                 )
         );
+    }
+
+    @Test
+    public void testAddUserToProject() throws Exception {
+        throw new Exception();
+    }
+
+    @Test
+    public void testGetProjectForPush() throws Exception {
+        throw new Exception();
     }
 
     @Test
     public void testQueryForSameId() throws Exception {
         assertThat(
                 dao.queryForSameId(
-                        loggedInUser
+                        testProject
                 ),
                 equalTo(
-                        loggedInUser
+                        testProject
                 )
         );
     }
@@ -94,7 +112,7 @@ public class UserDaoTest extends BaseTest {
     @Test
     public void testCreate() throws Exception {
         assertThat(
-                dao.create(loggedInUser)
+                dao.create(testProject)
                 ,equalTo(1)
         );
     }
@@ -103,22 +121,21 @@ public class UserDaoTest extends BaseTest {
     public void testCreateIfNotExists() throws Exception {
         assertThat(
                 dao.createIfNotExists(
-                        loggedInUser
+                        testProject
                 ),
                 equalTo(
-                        loggedInUser
+                        testProject
                 )
         );
     }
 
     @Test
     public void testUpdate() throws Exception {
-
-        loggedInUser.setSessionId("someSession");
+        testProject.setName("someName");
 
         assertThat(
                 dao.update(
-                        loggedInUser
+                        testProject
                 ),
                 equalTo(
                         1
@@ -127,16 +144,16 @@ public class UserDaoTest extends BaseTest {
 
         assertThat(
                 dao.queryForSameId(
-                        loggedInUser
-                ).getSessionId(),
+                        testProject
+                ).getName(),
                 equalTo(
-                        "someSession"
+                        "someName"
                 )
         );
     }
 
     @Test
-    public void testDeleteByUser() throws Exception {
+    public void testDelete() throws Exception {
         throw new Exception();
     }
 
@@ -146,7 +163,7 @@ public class UserDaoTest extends BaseTest {
     }
 
     @Test
-    public void testDeleteByUsers() throws Exception {
+    public void testDelete1() throws Exception {
         throw new Exception();
     }
 

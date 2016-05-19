@@ -1,8 +1,5 @@
 package nl.devgames.rest.controller;
 
-import nl.devgames.Application;
-import nl.devgames.model.Issue;
-import nl.devgames.model.Push;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

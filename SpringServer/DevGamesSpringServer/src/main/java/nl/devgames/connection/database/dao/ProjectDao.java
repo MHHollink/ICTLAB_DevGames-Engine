@@ -6,15 +6,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.ProjectDTO;
-import nl.devgames.connection.database.dto.PushDTO;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Project;
-import nl.devgames.model.Push;
 import nl.devgames.model.User;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class ProjectDao implements Dao<Project, Long> {
 
@@ -66,7 +68,7 @@ public class ProjectDao implements Dao<Project, Long> {
     @Override
     public List<Project> queryForAll() throws ConnectException {
         String r = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:Project) RETURN n"
+                "MATCH (n:Project) RETURN {id:id(n), labels: labels(n), data: n}"
         );
 
         List<Project> response = new ArrayList<>();
