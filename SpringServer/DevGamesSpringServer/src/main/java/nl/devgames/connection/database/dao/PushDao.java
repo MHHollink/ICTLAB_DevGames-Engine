@@ -9,6 +9,7 @@ import nl.devgames.connection.database.dto.*;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
 import nl.devgames.model.Issue;
+import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.utils.L;
 
@@ -18,7 +19,7 @@ import java.util.*;
 /**
  * Created by Jorikito on 18-May-16.
  */
-public class PushDao implements Dao<Push, Long>  {
+public class PushDao extends AbsDao<Push, Long>  {
 
     @Override
     public Push queryById(Long id) throws ConnectException, IndexOutOfBoundsException {
@@ -140,6 +141,22 @@ public class PushDao implements Dao<Push, Long>  {
 
     @Override
     public int deleteIds(Collection<Long> longs) throws ConnectException, IndexOutOfBoundsException {
+        return 0;
+    }
+
+    public int saveRelationship(Push push, Commit commit) {
+        return 0;
+    }
+
+    public int saveRelationship(Push push, Duplication duplication) {
+        return 0;
+    }
+
+    public int saveRelationship(Push push, Issue issue) {
+        return 0;
+    }
+
+    public int saveRelationship(Push push, Project project) {
         return 0;
     }
 }

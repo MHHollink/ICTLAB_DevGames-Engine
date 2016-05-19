@@ -5,7 +5,6 @@ import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.IssueDTO;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Issue;
-import nl.devgames.model.User;
 
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -16,7 +15,7 @@ import java.util.Map;
 /**
  * Created by Jorikito on 18-May-16.
  */
-public class IssueDao implements Dao<Issue, Long> { {
+public class IssueDao extends AbsDao<Issue, Long> { {
 
 }
 

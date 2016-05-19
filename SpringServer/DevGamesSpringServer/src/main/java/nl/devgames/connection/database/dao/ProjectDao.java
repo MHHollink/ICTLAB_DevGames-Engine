@@ -19,7 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class ProjectDao implements Dao<Project, Long> {
+public class ProjectDao extends AbsDao<Project, Long> {
 
     @Override
     public Project queryById(Long id) throws ConnectException, IndexOutOfBoundsException {

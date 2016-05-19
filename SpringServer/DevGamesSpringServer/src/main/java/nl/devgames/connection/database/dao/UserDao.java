@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class UserDao implements Dao<User, Long> {
+public class UserDao extends AbsDao<User, Long> {
 
     @Override
     public User queryById(Long id) throws ConnectException {
@@ -371,12 +371,5 @@ public class UserDao implements Dao<User, Long> {
         return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
     }
 
-    private String createRelationship(long a, long b, User.Relations r) throws ConnectException {
-        return Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:User), (b:Project) " +
-                        "WHERE ID(a) = %d AND ID(b) = %d " +
-                        "CREATE (a)-[:%s]->(b)",
-                a, b, r.name()
-        );
-    }
+
 }

@@ -4,9 +4,9 @@ import com.google.gson.JsonObject;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dao.Dao;
 import nl.devgames.connection.database.dto.BusinessDTO;
-import nl.devgames.connection.database.dto.CommitDTO;
 import nl.devgames.model.Business;
-import nl.devgames.model.Commit;
+import nl.devgames.model.Project;
+import nl.devgames.model.User;
 
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -90,6 +90,15 @@ public class BusinessDao implements Dao<Business, Long> {
 
     @Override
     public int deleteIds(Collection<Long> longs) throws ConnectException, IndexOutOfBoundsException {
+        return 0;
+    }
+
+    public int saveRelationship(Business business, User user) {
+        return 0;
+    }
+
+
+    public int saveRelationship(Business business, Project project) {
         return 0;
     }
 }

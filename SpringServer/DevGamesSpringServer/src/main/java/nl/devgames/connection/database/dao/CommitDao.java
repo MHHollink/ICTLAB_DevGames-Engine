@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Created by Jorikito on 18-May-16.
  */
-public class CommitDao implements Dao<Commit, Long>  {
+public class CommitDao extends AbsDao<Commit, Long>  {
 
     @Override
     public Commit queryById(Long aLong) throws ConnectException, IndexOutOfBoundsException {

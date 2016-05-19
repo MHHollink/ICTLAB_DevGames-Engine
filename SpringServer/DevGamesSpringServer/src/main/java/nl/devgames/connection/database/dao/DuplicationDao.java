@@ -7,20 +7,23 @@ import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.DuplicationDTO;
 import nl.devgames.connection.database.dto.DuplicationFileDTO;
-import nl.devgames.connection.database.dto.IssueDTO;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Duplication;
 import nl.devgames.model.DuplicationFile;
-import nl.devgames.model.Issue;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Jorikito on 18-May-16.
  */
-public class DuplicationDao  implements Dao<Duplication, Long>  {
+public class DuplicationDao extends AbsDao<Duplication, Long>  {
     @Override
     public Duplication queryById(Long aLong) throws ConnectException, IndexOutOfBoundsException {
         return null;

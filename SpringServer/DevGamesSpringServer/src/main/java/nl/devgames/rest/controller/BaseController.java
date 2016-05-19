@@ -101,20 +101,24 @@ public abstract class BaseController {
         BusinessDao businessDao = new BusinessDao();
         PushDao pushDao = new PushDao();
 
-        commitDao.createIfNotExists(a);
-        commitDao.createIfNotExists(b);
-        pushDao.createIfNotExists(c);
-        issueDao.createIfNotExists(issue);
-        duplicationDao.createIfNotExists(duplication);
-        businessDao.createIfNotExists(dg);
+        a = commitDao.createIfNotExists(a);
+        b = commitDao.createIfNotExists(b);
+
+        c = pushDao.createIfNotExists(c);
+
+        issue = issueDao.createIfNotExists(issue); // create issues
+
+        duplication = duplicationDao.createIfNotExists(duplication); // create
+
+        dg = businessDao.createIfNotExists(dg); // create business
 
         adventure = projectDao.createIfNotExists(adventure);
         devGames = projectDao.createIfNotExists(devGames);
-        clarity = projectDao.createIfNotExists(clarity);
+        clarity = projectDao.createIfNotExists(clarity); // Create projects
 
         marcel = userDao.createIfNotExists(marcel);
         evert = userDao.createIfNotExists(evert);
-        jorik = userDao.createIfNotExists(jorik);
+        jorik = userDao.createIfNotExists(jorik); // Create users
 
         userDao.saveRelationship(marcel, devGames);
         userDao.saveRelationship(marcel, clarity);
@@ -123,31 +127,21 @@ public abstract class BaseController {
         userDao.saveRelationship(evert, clarity);
         userDao.saveRelationship(evert, adventure);
         userDao.saveRelationship(jorik, devGames);
-        userDao.saveRelationship(jorik, clarity);
+        userDao.saveRelationship(jorik, clarity); // Relate users to projects
 
-        userDao.saveRelationship(marcel, c);
+        userDao.saveRelationship(marcel, c); // relate user to push
 
+        businessDao.saveRelationship(dg, marcel);
+        businessDao.saveRelationship(dg, evert);
+        businessDao.saveRelationship(dg, jorik);// relate business to user
+        businessDao.saveRelationship(dg, devGames); // relate business to project
 
+        pushDao.saveRelationship(c, a);
+        pushDao.saveRelationship(c, b);
+        pushDao.saveRelationship(c, duplication);
+        pushDao.saveRelationship(c, issue);
+        pushDao.saveRelationship(c, devGames); // relate issues to commit, duplication, issue, project
 
-
-//        dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'DevGames' }) CREATE (a)-[:is_developing]->(b)");
-//        dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Clarity' }) CREATE (a)-[:is_developing]->(b)");
-//        dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Adventure Track' }) CREATE (a)-[:is_developing]->(b)");
-//        dbService.postQuery("MATCH (a:User { username: 'Marcel' }), (b:Project { name: 'DevGames' }) CREATE (a)-[:is_developing]->(b)");
-//        dbService.postQuery("MATCH (a:User { username: 'Marcel' }), (b:Project { name: 'Clarity' }) CREATE (a)-[:is_developing]->(b)");
-//        dbService.postQuery("MATCH (a:User { username: 'Marcel' }), (b:Project { name: 'Adventure Track' }) CREATE (a)-[:is_developing]->(b)");
-//        dbService.postQuery("MATCH (a:User { username: 'Joris' }), (b:Project { name: 'DevGames' }) CREATE (a)-[:is_developing]->(b)");
-//        dbService.postQuery("MATCH (a:User { username: 'Joris' }), (b:Project { name: 'Clarity' }) CREATE (a)-[:is_developing]->(b)");
-//        dbService.postQuery("MATCH (a:Business { name: 'DevGames' }), (b:User { username: 'Marcel' }) CREATE (a)-[:has_employee]->(b)");
-//        dbService.postQuery("MATCH (a:Business { name: 'DevGames' }), (b:User { username: 'Evestar' }) CREATE (a)-[:has_employee]->(b)");
-//        dbService.postQuery("MATCH (a:Business { name: 'DevGames' }), (b:User { username: 'Joris' }) CREATE (a)-[:has_employee]->(b)");
-//        dbService.postQuery("MATCH (a:User { username: 'Marcel' }), (b:Push { timestamp: '1455994686' }) CREATE (a)-[:pushed]->(b)");
-//        dbService.postQuery("MATCH (a:Push { timestamp: '1455994686' }), (b:Commit { commitId: 'b699883e3ccf7afbed8573d5c8add56e12f8393e' }) CREATE (a)-[:contains_commit]->(b)");
-//        dbService.postQuery("MATCH (a:Push { timestamp: '1455994686' }), (b:Commit { commitId: '58c38eb08dce96f734644a0aa17c8ff8939b531e' }) CREATE (a)-[:contains_commit]->(b)");
-//        dbService.postQuery("MATCH (a:Push { timestamp: '1455994686' }), (b:Issue { creationDate: 1455217086 }) CREATE (a)-[:has_issue]->(b)");
-//        dbService.postQuery("MATCH (a:Push { timestamp: '1455994686' }), (b:Duplication) CREATE (a)-[:has_duplication]->(b)");
-//        dbService.postQuery("MATCH (a:Business { name: 'DevGames' }), (b:Project { name: 'DevGames' }) CREATE (a)-[:has_project]->(b)");
-//        dbService.postQuery("MATCH (a:Push { timestamp: '1455994686' }), (b:Project { name: 'DevGames' }) CREATE (a)-[:pushed_to]->(b)");
 //        dbService.postQuery("MATCH (a:User { username: 'Marcel' }), (b:Project { name: 'DevGames' }) CREATE (b)-[:is_lead_by]->(a)");
 //        dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Clarity' }) CREATE (b)-[:is_lead_by]->(a)");
 //        dbService.postQuery("MATCH (a:User { username: 'Evestar' }), (b:Project { name: 'Adventure Track' }) CREATE (b)-[:is_lead_by]->(a)");
