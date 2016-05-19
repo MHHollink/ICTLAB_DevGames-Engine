@@ -199,10 +199,10 @@ public class UserDao implements Dao<User, Long> {
 
     public List<User> queryFromProject(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:User)-[:works_on]->(b:Project) " +
+                "MATCH (a:User)-[:%s]->(b:Project) " +
                         "WHERE ID(b) = %d " +
                         "RETURN a",
-                id
+                id, User.Relations.IS_DEVELOPING.name()
         );
 
         List<User> response = new ArrayList<>();
