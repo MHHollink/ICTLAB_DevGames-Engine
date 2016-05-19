@@ -40,7 +40,7 @@ public class ProjectDaoTest extends BaseTest {
     @Test
     public void testQueryForId() throws Exception {
         assertThat(
-                dao.queryForId(
+                dao.queryById(
                         testProject.getId()
                 ),
                 equalTo(
@@ -100,7 +100,7 @@ public class ProjectDaoTest extends BaseTest {
     @Test
     public void testQueryForSameId() throws Exception {
         assertThat(
-                dao.queryForSameId(
+                dao.queryBySameId(
                         testProject
                 ),
                 equalTo(
@@ -143,7 +143,7 @@ public class ProjectDaoTest extends BaseTest {
         );
 
         assertThat(
-                dao.queryForSameId(
+                dao.queryBySameId(
                         testProject
                 ).getName(),
                 equalTo(

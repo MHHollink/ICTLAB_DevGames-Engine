@@ -21,7 +21,7 @@ import java.util.Map;
 public class ProjectDao implements Dao<Project, Long> {
 
     @Override
-    public Project queryForId(Long id) throws ConnectException, IndexOutOfBoundsException {
+    public Project queryById(Long id) throws ConnectException, IndexOutOfBoundsException {
         ProjectDTO dto = null; User creator = new User();
         String response = Neo4JRestService.getInstance().postQuery(
                             "MATCH (a:User)-[r]->(b) " +
@@ -95,7 +95,7 @@ public class ProjectDao implements Dao<Project, Long> {
         List<Project> response = new ArrayList<>();
         for (JsonObject object : ProjectDTO.findAll(r)) {
             response.add(
-                    queryForId(
+                    queryById(
                             new ProjectDTO().createFromNeo4jData(object).toModel().getId()
                     )
             );
@@ -130,7 +130,7 @@ public class ProjectDao implements Dao<Project, Long> {
         List<Project> response = new ArrayList<>();
         for (JsonObject object : ProjectDTO.findAll(r)) {
             response.add(
-                    queryForId(
+                    queryById(
                             new ProjectDTO().createFromNeo4jData(object).toModel().getId()
                     )
             );
@@ -159,7 +159,7 @@ public class ProjectDao implements Dao<Project, Long> {
         }
     }
 
-    public Project getProjectForPush(long id) throws ConnectException {
+    public Project getProjectByPush(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
                 "MATCH (a:Project)<-[:pushed_to]-(b:Push) " +
                         "WHERE ID(b) = %d " +
@@ -172,8 +172,8 @@ public class ProjectDao implements Dao<Project, Long> {
 
 
     @Override
-    public Project queryForSameId(Project project) throws ConnectException {
-        return queryForId(project.getId());
+    public Project queryBySameId(Project project) throws ConnectException {
+        return queryById(project.getId());
     }
 
     @Override
@@ -192,7 +192,7 @@ public class ProjectDao implements Dao<Project, Long> {
 
     @Override
     public Project createIfNotExists(Project data) throws ConnectException {
-        Project project = queryForId(data.getId());
+        Project project = queryById(data.getId());
         if (project == null || !project.equals(data)) {
             int inserted = create(data);
             if (inserted == 0)
@@ -204,7 +204,7 @@ public class ProjectDao implements Dao<Project, Long> {
 
     @Override
     public int update(Project project) throws ConnectException {
-        if(project != null && queryForId(project.getId()) != null) {
+        if(project != null && queryById(project.getId()) != null) {
 
             String response = Neo4JRestService.getInstance().postQuery(
                     "MATCH (n:Project) " +
@@ -232,7 +232,7 @@ public class ProjectDao implements Dao<Project, Long> {
 
     @Override
     public int deleteById(Long id) throws ConnectException {
-        if(queryForId(id) == null) return 0;
+        if(queryById(id) == null) return 0;
         String response = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:Project) " +
                         "WHERE ID(n) = %d " +

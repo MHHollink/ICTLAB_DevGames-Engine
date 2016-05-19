@@ -31,7 +31,7 @@ public class UserDaoTest extends BaseTest {
     @Test
     public void testQueryForId() throws Exception {
         assertThat(
-                dao.queryForId(
+                dao.queryById(
                         loggedInUser.getId()
                 ),
                 equalTo(
@@ -82,7 +82,7 @@ public class UserDaoTest extends BaseTest {
     @Test
     public void testQueryForSameId() throws Exception {
         assertThat(
-                dao.queryForSameId(
+                dao.queryBySameId(
                         loggedInUser
                 ),
                 equalTo(
@@ -126,7 +126,7 @@ public class UserDaoTest extends BaseTest {
         );
 
         assertThat(
-                dao.queryForSameId(
+                dao.queryBySameId(
                         loggedInUser
                 ).getSessionId(),
                 equalTo(

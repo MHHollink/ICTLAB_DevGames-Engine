@@ -192,7 +192,7 @@ public class ProjectController extends BaseController{
         //check if session is valid
         User caller = getUserFromSession( session );
         try {
-            return new ProjectDao().queryForId(id);
+            return new ProjectDao().queryById(id);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException("Database service offline!");
@@ -221,7 +221,7 @@ public class ProjectController extends BaseController{
 
         try {
             ProjectDao projectDao = new ProjectDao();
-            Project project = projectDao.queryForId(id);
+            Project project = projectDao.queryById(id);
             int deleted = projectDao.delete(project);
             if (deleted != 1) throw new KnownInternalServerError("delete project failed. deleted rows = %d", deleted);
             result.put("message", "succesfully deleted project");
@@ -261,7 +261,7 @@ public class ProjectController extends BaseController{
 
         Project project = null;
         try {
-            project = new ProjectDao().queryForId(id);
+            project = new ProjectDao().queryById(id);
 
             //update project fields
             if(projectWithUpdateFields.getName() != null)
@@ -306,7 +306,7 @@ public class ProjectController extends BaseController{
         if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
-            return new HashSet<User>(new UserDao().queryFromProject(id));
+            return new HashSet<User>(new UserDao().queryByProject(id));
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException("Database service offline!");

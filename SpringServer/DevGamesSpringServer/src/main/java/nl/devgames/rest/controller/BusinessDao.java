@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class BusinessDao implements Dao<Business, Long> {
     @Override
-    public Business queryForId(Long aLong) throws ConnectException, IndexOutOfBoundsException {
+    public Business queryById(Long aLong) throws ConnectException, IndexOutOfBoundsException {
         return null;
     }
 
@@ -39,7 +39,7 @@ public class BusinessDao implements Dao<Business, Long> {
     }
 
     @Override
-    public Business queryForSameId(Business data) throws ConnectException, IndexOutOfBoundsException {
+    public Business queryBySameId(Business data) throws ConnectException, IndexOutOfBoundsException {
         return null;
     }
 

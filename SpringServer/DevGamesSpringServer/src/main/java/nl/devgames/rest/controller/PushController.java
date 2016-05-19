@@ -37,7 +37,7 @@ public class PushController extends BaseController {
         if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
-            return new PushDao().queryForId(id);
+            return new PushDao().queryById(id);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException("Database service offline!");
@@ -79,7 +79,7 @@ public class PushController extends BaseController {
         if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
-            return new ProjectDao().getProjectForPush(id);
+            return new ProjectDao().getProjectByPush(id);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException("Database service offline!");

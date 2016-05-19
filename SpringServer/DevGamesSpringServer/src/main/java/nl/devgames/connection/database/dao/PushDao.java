@@ -21,7 +21,7 @@ import java.util.*;
 public class PushDao implements Dao<Push, Long>  {
 
     @Override
-    public Push queryForId(Long id) throws ConnectException, IndexOutOfBoundsException {
+    public Push queryById(Long id) throws ConnectException, IndexOutOfBoundsException {
         PushDTO dto = null; Set<Commit> commits = new HashSet<>(); Set<Issue> issues = new HashSet<>(); Set<Duplication> duplications = new HashSet<>();
         String response = Neo4JRestService.getInstance().postQuery(
                 "MATCH (a:Push)-[r]->(b) " +
@@ -89,7 +89,7 @@ public class PushDao implements Dao<Push, Long>  {
     }
 
     @Override
-    public Push queryForSameId(Push data) throws ConnectException, IndexOutOfBoundsException {
+    public Push queryBySameId(Push data) throws ConnectException, IndexOutOfBoundsException {
         return null;
     }
 

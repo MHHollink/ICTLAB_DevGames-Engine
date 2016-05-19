@@ -21,7 +21,7 @@ public class IssueDao implements Dao<Issue, Long> { {
 }
 
     @Override
-    public Issue queryForId(Long aLong) throws ConnectException, IndexOutOfBoundsException {
+    public Issue queryById(Long aLong) throws ConnectException, IndexOutOfBoundsException {
         return null;
     }
 
@@ -41,7 +41,7 @@ public class IssueDao implements Dao<Issue, Long> { {
     }
 
     @Override
-    public Issue queryForSameId(Issue data) throws ConnectException, IndexOutOfBoundsException {
+    public Issue queryBySameId(Issue data) throws ConnectException, IndexOutOfBoundsException {
         return null;
     }
 

@@ -22,7 +22,7 @@ import java.util.*;
  */
 public class DuplicationDao  implements Dao<Duplication, Long>  {
     @Override
-    public Duplication queryForId(Long aLong) throws ConnectException, IndexOutOfBoundsException {
+    public Duplication queryById(Long aLong) throws ConnectException, IndexOutOfBoundsException {
         return null;
     }
 
@@ -42,7 +42,7 @@ public class DuplicationDao  implements Dao<Duplication, Long>  {
     }
 
     @Override
-    public Duplication queryForSameId(Duplication data) throws ConnectException, IndexOutOfBoundsException {
+    public Duplication queryBySameId(Duplication data) throws ConnectException, IndexOutOfBoundsException {
         return null;
     }
 

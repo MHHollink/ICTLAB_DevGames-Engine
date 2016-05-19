@@ -77,7 +77,7 @@ public class UserController extends BaseController {
         getUserFromSession( session );
         L.i("Called");
         try {
-            return new UserDao().queryForId(id);
+            return new UserDao().queryById(id);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException("Database service offline!");
