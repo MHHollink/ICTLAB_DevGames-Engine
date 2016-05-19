@@ -2,6 +2,7 @@ package nl.devgames.connection.database.dao;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
@@ -22,13 +23,19 @@ public class ProjectDao implements Dao<Project, Long> {
 
     @Override
     public Project queryById(Long id) throws ConnectException, IndexOutOfBoundsException {
-        ProjectDTO dto = null; User creator = new User();
+        ProjectDTO dto = null;
+        User creator = null;
         String response = Neo4JRestService.getInstance().postQuery(
-                            "MATCH (a:User)-[r]->(b) " +
-                                    "WHERE ID(a) = %d " +
-                                    "RETURN {id:id(a), labels: labels(a), data: a}," +
-                                    "       {id:id(b), labels: labels(b), data: b}",
-                id);
+                "MATCH (a:Project) " +
+                        "WHERE ID(a) = %d " +
+                            "OPTIONAL " +
+                                "MATCH a-[]->(b) " +
+                                "WHERE ID(a) = %d " +
+                        "RETURN " +
+                            "{id:id(a), labels: labels(a), data: a}," +
+                            "{id:id(b), labels: labels(b), data: b}",
+                id, id
+        );
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
 
@@ -40,6 +47,9 @@ public class ProjectDao implements Dao<Project, Long> {
             JsonArray rows = element.getAsJsonObject().get("row").getAsJsonArray();
 
             for ( JsonElement row : rows) {
+                JsonElement labels = row.getAsJsonObject().get("labels");
+                if (labels instanceof JsonNull)
+                    continue;
                 String label = row.getAsJsonObject().get("labels").getAsJsonArray().get(0).getAsString();
 
                 switch (label) {
@@ -60,7 +70,8 @@ public class ProjectDao implements Dao<Project, Long> {
             }
         }
         if(dto == null) return null;
-        //todo: set creator of dto
+
+        dto.creator = creator;
 
         return dto.toModel();
     }
@@ -192,13 +203,13 @@ public class ProjectDao implements Dao<Project, Long> {
 
     @Override
     public Project createIfNotExists(Project data) throws ConnectException {
-        Project project = queryById(data.getId());
+        Project project = data.getId() != null ? queryById(data.getId()) : null;
         if (project == null || !project.equals(data)) {
             int inserted = create(data);
             if (inserted == 0)
                 return null;
             L.d("Created %d rows", inserted);
-            return data;
+            return queryByField("name", data.getName()).get(0);
         } else return project;
     }
 

@@ -13,6 +13,10 @@ public class Business extends Model {
     public Business() {
     }
 
+    public Business(String name) {
+        this.name = name;
+    }
+
     public Business(String name, Set<User> employees, Set<Project> projects) {
         this.name = name;
         this.employees = employees;

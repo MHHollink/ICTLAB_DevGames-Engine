@@ -2,6 +2,7 @@ package nl.devgames.model;
 
 public class Project extends Model {
 
+
     public enum Relations {
         IS_LEAD_BY,
     }
@@ -33,6 +34,14 @@ public class Project extends Model {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     @Override

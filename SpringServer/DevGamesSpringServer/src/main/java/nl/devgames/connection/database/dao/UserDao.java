@@ -39,7 +39,8 @@ public class UserDao implements Dao<User, Long> {
                                         "WHERE ID(a) = %d " +
                                     "RETURN {id:id(a), labels: labels(a), data: a}," +
                                            "{id:id(b), labels: labels(b), data: b}",
-                id, id);
+                id, id
+        );
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
 
@@ -134,7 +135,7 @@ public class UserDao implements Dao<User, Long> {
         L.i("Query users with %s: %s", fieldName, value);
         String queryFormat;
         if(value instanceof Number)
-            queryFormat = "MATCH (n:User) WHERE n.%s =  %s  RETURN {id:id(n), labels: labels(n), data: n}";
+            queryFormat = "MATCH (n:User) WHERE n.%s = %s RETURN {id:id(n), labels: labels(n), data: n}";
         else
             queryFormat = "MATCH (n:User) WHERE n.%s = '%s' RETURN {id:id(n), labels: labels(n), data: n}";
 
