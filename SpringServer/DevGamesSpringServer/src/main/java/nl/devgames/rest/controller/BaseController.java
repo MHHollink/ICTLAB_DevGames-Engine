@@ -1,6 +1,7 @@
 package nl.devgames.rest.controller;
 
 import nl.devgames.connection.database.Neo4JRestService;
+import nl.devgames.connection.database.dao.BusinessDao;
 import nl.devgames.connection.database.dao.CommitDao;
 import nl.devgames.connection.database.dao.DuplicationDao;
 import nl.devgames.connection.database.dao.IssueDao;
@@ -18,9 +19,8 @@ import nl.devgames.model.Issue;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
-import nl.devgames.rest.errors.BadRequestException;
+import nl.devgames.rest.errors.DatabaseOfflineException;
 import nl.devgames.rest.errors.InvalidSessionException;
-import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,12 +39,12 @@ public abstract class BaseController {
 
     protected User getUserFromSession(String session) {
         if (session == null || session.isEmpty())
-            throw new BadRequestException("Request without session"); // throws exception when session is null or blank
+            throw new InvalidSessionException("Request without session"); // throws exception when session is null or blank
         try {
             return new UserDao().queryByField("session", session).get(0);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new KnownInternalServerError("Database service offline!");
+            throw new DatabaseOfflineException("Database service offline!");
         } catch (IndexOutOfBoundsException e) {
             L.w("User was not found");
             throw new InvalidSessionException("Session invalid!");

@@ -27,7 +27,7 @@ import java.util.Set;
 public class PushController extends BaseController {
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public Push getPushById(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public Push getPushById(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                             @PathVariable long id)
     {
         L.d("Called");
@@ -48,7 +48,7 @@ public class PushController extends BaseController {
     }
 
     @RequestMapping(value = "/{id}/users", method = RequestMethod.GET)
-    public User getPushPusher(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public User getPushPusher(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                               @PathVariable long id)
     {
         L.d("Called");
@@ -69,7 +69,7 @@ public class PushController extends BaseController {
     }
 
     @RequestMapping(value = "/{id}/projects", method = RequestMethod.GET)
-    public Project getProjectFromPush(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public Project getProjectFromPush(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                            @PathVariable long id)
     {
         L.d("Called");
@@ -90,7 +90,7 @@ public class PushController extends BaseController {
     }
 
     @RequestMapping(value = "/{id}/commits", method = RequestMethod.GET)
-    public Set<Commit> getUnderLayingCommits(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public Set<Commit> getUnderLayingCommits(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                              @PathVariable long id) {
         L.d("Called");
 
@@ -110,7 +110,7 @@ public class PushController extends BaseController {
     }
 
     @RequestMapping(value = "/{id}/issues", method = RequestMethod.GET)
-    public Set<Issue> getUnderLayingIssues(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public Set<Issue> getUnderLayingIssues(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                         @PathVariable long id) {
         L.d("Called");
 
@@ -130,7 +130,7 @@ public class PushController extends BaseController {
     }
 
     @RequestMapping(value = "/{id}/duplications", method = RequestMethod.GET)
-    public Set<Duplication> getDuplicationsFromPush(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public Set<Duplication> getDuplicationsFromPush(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                                     @PathVariable long id) {
         L.d("Called");
 

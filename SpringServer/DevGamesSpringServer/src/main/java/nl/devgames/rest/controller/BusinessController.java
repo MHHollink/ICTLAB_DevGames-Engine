@@ -28,7 +28,7 @@ import java.util.Set;
 public class BusinessController extends BaseController{
 
     @RequestMapping(method = RequestMethod.POST)
-    public Business createBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Business createBusiness(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                    @RequestBody Business business) throws ConnectException {
         Business returnBusiness = new Business();
 
@@ -68,7 +68,7 @@ public class BusinessController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public Business getBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Business getBusiness(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                 @PathVariable(value = "id") long id) throws ConnectException {
         Business returnBusiness = new Business();
 
@@ -89,7 +89,7 @@ public class BusinessController extends BaseController{
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
-    public Map deleteBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Map deleteBusiness(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                               @PathVariable(value = "id") long id)
     {
         throw new UnsupportedOperationException();
@@ -102,7 +102,7 @@ public class BusinessController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}/users", method = RequestMethod.GET)
-    public Set<User> getEmployees(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<User> getEmployees(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                                     @PathVariable(value = "id") long id)
     {
         // TODO : 1 -> check if session is valid, 2 -> return list of all users in relation with this business
@@ -117,7 +117,7 @@ public class BusinessController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}/users/{uid}", method = RequestMethod.PUT)
-    public Map addEmployeeToBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Map addEmployeeToBusiness(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                           @PathVariable(value = "id") long id,
                                           @PathVariable(value = "uid") long uid)
     {
@@ -132,7 +132,7 @@ public class BusinessController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}/projects", method = RequestMethod.GET)
-    public Set<Project> getProjects(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Project> getProjects(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                     @PathVariable(value = "id") long id)
     {
         // TODO : 1 -> check if session is valid, 2 -> return all projects that have a relation
@@ -147,7 +147,7 @@ public class BusinessController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}/projects/{pid}", method = RequestMethod.PUT)
-    public Map addProjectToBusiness(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Map addProjectToBusiness(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                          @PathVariable(value = "id") long id,
                                          @PathVariable(value = "pid") long pid)
     {

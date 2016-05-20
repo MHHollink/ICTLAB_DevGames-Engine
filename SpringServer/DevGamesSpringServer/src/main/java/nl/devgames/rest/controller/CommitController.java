@@ -24,7 +24,7 @@ import java.net.ConnectException;
 public class CommitController extends BaseController{
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public Commit getCommitById(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public Commit getCommitById(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                 @PathVariable long id) throws ConnectException {
         Commit returnCommit = new Commit();
 
@@ -51,7 +51,7 @@ public class CommitController extends BaseController{
     }
 
     @RequestMapping(value = "{id}/pushes", method = RequestMethod.GET)
-    public Push getPush(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public Push getPush(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                         @PathVariable long id) throws ConnectException {
         Push returnPush = new Push();
 
@@ -77,7 +77,7 @@ public class CommitController extends BaseController{
     }
 
     @RequestMapping(value = "{id}/user", method = RequestMethod.GET)
-    public User getUser(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public User getUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                         @PathVariable long id) throws ConnectException {
         User returnUser = new User();
 
@@ -103,7 +103,7 @@ public class CommitController extends BaseController{
     }
 
     @RequestMapping(value = "{id}/projects", method = RequestMethod.GET)
-    public Project getProject(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public Project getProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                               @PathVariable long id) throws ConnectException {
         Project returnProject = new Project();
 

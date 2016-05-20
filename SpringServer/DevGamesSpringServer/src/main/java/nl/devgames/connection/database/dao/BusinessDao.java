@@ -1,8 +1,7 @@
-package nl.devgames.rest.controller;
+package nl.devgames.connection.database.dao;
 
 import com.google.gson.JsonObject;
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dao.Dao;
 import nl.devgames.connection.database.dto.BusinessDTO;
 import nl.devgames.model.Business;
 import nl.devgames.model.Project;

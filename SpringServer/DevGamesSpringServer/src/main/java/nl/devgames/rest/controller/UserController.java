@@ -64,14 +64,14 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public User getOwnUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session) {
+    public User getOwnUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session) {
         User caller = getUserFromSession( session );
         L.i("Called");
         return caller;
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public User getUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public User getUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                         @PathVariable Long id)
     {
         getUserFromSession( session );
@@ -88,7 +88,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
-    public User updateOwnUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public User updateOwnUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                               @PathVariable long id,
                               @RequestBody User userWithUpdateFields)
     {
@@ -139,7 +139,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
-    public Map deleteUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Map deleteUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                           @PathVariable long id)
     {
         L.i("Called");
@@ -159,7 +159,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}/projects", method = RequestMethod.GET)
-    public Set<Project> getProjects(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Project> getProjects(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                      @PathVariable Long id)
     {
         getUserFromSession( session );
@@ -176,7 +176,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}/pushes", method = RequestMethod.GET)
-    public Set<Push> getPushes(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Push> getPushes(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                 @PathVariable Long id)
     {
         getUserFromSession( session );
@@ -193,7 +193,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}/commits", method = RequestMethod.GET)
-    public Set<Commit> getCommits(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Commit> getCommits(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                    @PathVariable Long id)
     {
         L.i("Called");
@@ -202,7 +202,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}/issues", method = RequestMethod.GET)
-    public Set<Issue> getIssues(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Issue> getIssues(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                  @PathVariable Long id)
     {
         L.i("Called");
@@ -211,7 +211,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}/duplications", method = RequestMethod.GET)
-    public Set<Duplication> getDuplications(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Duplication> getDuplications(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                 @PathVariable Long id)
     {
         L.i("Called");
@@ -220,7 +220,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}/businesses", method = RequestMethod.GET)
-    public Set<Business> getBusinesses(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Business> getBusinesses(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                        @PathVariable Long id)
     {
         L.i("Called");
