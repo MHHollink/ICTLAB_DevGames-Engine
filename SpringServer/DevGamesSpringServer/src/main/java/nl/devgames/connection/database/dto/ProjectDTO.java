@@ -6,6 +6,8 @@ import nl.devgames.model.Project;
 import nl.devgames.model.User;
 import nl.devgames.utils.L;
 
+import java.util.Set;
+
 /**
  * Created by Marcel on 14-4-2016.
  */
@@ -15,6 +17,8 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
     public String description;
     public User creator;
 
+    public Set<User> developers;
+
     @Override
     public Project toModel() {
         Project project = new Project();
@@ -23,6 +27,7 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
         project.setName(this.name);
         project.setDescription(this.description);
         project.setOwner(creator);
+        project.setDevelopers(developers);
 
         return project;
     }

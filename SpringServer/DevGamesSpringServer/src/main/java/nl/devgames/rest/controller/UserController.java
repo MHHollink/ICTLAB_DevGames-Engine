@@ -168,7 +168,7 @@ public class UserController extends BaseController {
         getUserFromSession( session );
         L.i("Called");
         try {
-            return new UserDao().queryById(id).getProjects().parallelStream()
+            return new UserDao().queryById(id).getProjects().stream()
                     .map( p -> {
                         try {
                             return new ProjectDao().queryById(p.getId());
@@ -194,7 +194,7 @@ public class UserController extends BaseController {
         getUserFromSession( session );
         L.i("Called");
         try {
-            return new UserDao().queryById(id).getPushes().parallelStream()
+            return new UserDao().queryById(id).getPushes().stream()
                     .map( p -> {
                         try {
                             return new PushDao().queryById(p.getId());
