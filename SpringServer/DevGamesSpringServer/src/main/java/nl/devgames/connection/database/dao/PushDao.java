@@ -23,7 +23,10 @@ public class PushDao extends AbsDao<Push, Long>  {
 
     @Override
     public Push queryById(Long id) throws ConnectException, IndexOutOfBoundsException {
-        PushDTO dto = null; Set<Commit> commits = new HashSet<>(); Set<Issue> issues = new HashSet<>(); Set<Duplication> duplications = new HashSet<>();
+        PushDTO dto = null;
+        Set<Commit> commits = new HashSet<>();
+        Set<Issue> issues = new HashSet<>();
+        Set<Duplication> duplications = new HashSet<>();
         String response = Neo4JRestService.getInstance().postQuery(
                 "MATCH (a:Push)-[r]->(b) " +
                         "WHERE ID(a) = %d " +
@@ -53,13 +56,25 @@ public class PushDao extends AbsDao<Push, Long>  {
                         }
                         break;
                     case "Commit" :
-                        commits.add(new CommitDTO().createFromNeo4jData(row.getAsJsonObject()).toModel());
+                        Commit c= new Commit();
+                        c.setId(
+                                row.getAsJsonObject().get("id").getAsLong()
+                        );
+                        commits.add(c);
                         break;
                     case "Issue" :
-                        issues.add(new IssueDTO().createFromNeo4jData(row.getAsJsonObject()).toModel());
+                        Issue i = new Issue();
+                        i.setId(
+                                row.getAsJsonObject().get("id").getAsLong()
+                        );
+                        issues.add(i);
                         break;
                     case "Duplication" :
-                        duplications.add(new DuplicationDTO().createFromNeo4jData(row.getAsJsonObject()).toModel());
+                        Duplication d = new Duplication();
+                        d.setId(
+                                row.getAsJsonObject().get("id").getAsLong()
+                        );
+                        duplications.add(d);
                         break;
                     default:
                         L.w("Unimplemented case detected : '%s'", label);
@@ -67,6 +82,7 @@ public class PushDao extends AbsDao<Push, Long>  {
             }
         }
         if(dto == null) return null;
+
         dto.commits = commits;
         dto.issues = issues;
         dto.duplications = duplications;
