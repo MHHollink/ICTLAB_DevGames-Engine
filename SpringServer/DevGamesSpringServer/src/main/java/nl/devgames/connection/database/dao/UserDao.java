@@ -6,7 +6,6 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dto.ProjectDTO;
 import nl.devgames.connection.database.dto.PushDTO;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Project;
@@ -68,9 +67,18 @@ public class UserDao extends AbsDao<User, Long> {
                         }
                         break;
                     case "Project" :
-                        projects.add(new ProjectDTO().createFromNeo4jData(row.getAsJsonObject()).toModel());
+                        Project project = new Project();
+                        project.setId(
+                                row.getAsJsonObject().get("id").getAsLong()
+                        );
+                        projects.add(project);
                         break;
                     case "Push" :
+                        Push push = new Push();
+                        push.setId(
+                                row.getAsJsonObject().get("id").getAsLong()
+                        );
+
                         pushes.add(new PushDTO().createFromNeo4jData(row.getAsJsonObject()).toModel());
                         break;
                     default:
