@@ -1,6 +1,7 @@
 package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
+import nl.devgames.connection.database.dao.ProjectDao;
 import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Business;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.ConnectException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -165,7 +167,21 @@ public class UserController extends BaseController {
         getUserFromSession( session );
         L.i("Called");
         try {
-            return new UserDao().queryById(id).getProjects();
+
+            Set<Project> response = new HashSet<>();
+
+            new UserDao().queryById(id).getProjects().parallelStream().forEach(project -> {
+                try {
+                    response.add(
+                            new ProjectDao().queryById(project.getId())
+                    );
+                } catch (ConnectException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            return response;
+
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException("Database service offline!");
