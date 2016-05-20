@@ -162,18 +162,34 @@ public class UserController extends BaseController {
     public Set<Project> getProjects(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                      @PathVariable Long id)
     {
+        getUserFromSession( session );
         L.i("Called");
-        // TODO : 1 -> check if session is valid, 2 -> get a list of projects from the user id
-        throw new UnsupportedOperationException("This will return an list containing all projects the user is involved in");
+        try {
+            return new UserDao().queryById(id).getProjects();
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("User was not found");
+            throw new InvalidSessionException("Session invalid!");
+        }
     }
 
     @RequestMapping(value = "{id}/pushes", method = RequestMethod.GET)
     public Set<Push> getPushes(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
                                 @PathVariable Long id)
     {
+        getUserFromSession( session );
         L.i("Called");
-        // TODO : 1 -> check if session is valid, 2 -> get a list of pushes from the user id
-        throw new UnsupportedOperationException("This will return an list containing all pushes under the user");
+        try {
+            return new UserDao().queryById(id).getPushes();
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("User was not found");
+            throw new InvalidSessionException("Session invalid!");
+        }
     }
 
     @RequestMapping(value = "{id}/commits", method = RequestMethod.GET)
