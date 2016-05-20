@@ -3,11 +3,7 @@ package nl.devgames.connection.database.dao;
 import com.google.gson.JsonObject;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.CommitDTO;
-import nl.devgames.connection.database.dto.DuplicationDTO;
-import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Commit;
-import nl.devgames.model.Duplication;
-import nl.devgames.model.Push;
 
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -18,10 +14,10 @@ import java.util.Map;
 /**
  * Created by Jorikito on 18-May-16.
  */
-public class CommitDao implements Dao<Commit, Long>  {
+public class CommitDao extends AbsDao<Commit, Long>  {
 
     @Override
-    public Commit queryForId(Long aLong) throws ConnectException, IndexOutOfBoundsException {
+    public Commit queryById(Long aLong) throws ConnectException, IndexOutOfBoundsException {
         return null;
     }
 
@@ -41,7 +37,7 @@ public class CommitDao implements Dao<Commit, Long>  {
     }
 
     @Override
-    public Commit queryForSameId(Commit data) throws ConnectException, IndexOutOfBoundsException {
+    public Commit queryBySameId(Commit data) throws ConnectException, IndexOutOfBoundsException {
         return null;
     }
 

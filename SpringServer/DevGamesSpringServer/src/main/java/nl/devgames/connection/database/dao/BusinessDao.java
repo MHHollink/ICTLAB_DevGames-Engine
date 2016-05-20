@@ -1,12 +1,11 @@
-package nl.devgames.rest.controller;
+package nl.devgames.connection.database.dao;
 
 import com.google.gson.JsonObject;
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dao.Dao;
 import nl.devgames.connection.database.dto.BusinessDTO;
-import nl.devgames.connection.database.dto.CommitDTO;
 import nl.devgames.model.Business;
-import nl.devgames.model.Commit;
+import nl.devgames.model.Project;
+import nl.devgames.model.User;
 
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import java.util.Map;
  */
 public class BusinessDao implements Dao<Business, Long> {
     @Override
-    public Business queryForId(Long aLong) throws ConnectException, IndexOutOfBoundsException {
+    public Business queryById(Long aLong) throws ConnectException, IndexOutOfBoundsException {
         return null;
     }
 
@@ -39,7 +38,7 @@ public class BusinessDao implements Dao<Business, Long> {
     }
 
     @Override
-    public Business queryForSameId(Business data) throws ConnectException, IndexOutOfBoundsException {
+    public Business queryBySameId(Business data) throws ConnectException, IndexOutOfBoundsException {
         return null;
     }
 
@@ -90,6 +89,15 @@ public class BusinessDao implements Dao<Business, Long> {
 
     @Override
     public int deleteIds(Collection<Long> longs) throws ConnectException, IndexOutOfBoundsException {
+        return 0;
+    }
+
+    public int saveRelationship(Business business, User user) {
+        return 0;
+    }
+
+
+    public int saveRelationship(Business business, Project project) {
         return 0;
     }
 }

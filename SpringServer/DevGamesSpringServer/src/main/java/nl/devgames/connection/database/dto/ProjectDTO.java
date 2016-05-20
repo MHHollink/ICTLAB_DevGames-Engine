@@ -3,6 +3,7 @@ package nl.devgames.connection.database.dto;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Project;
+import nl.devgames.model.User;
 import nl.devgames.utils.L;
 
 /**
@@ -12,13 +13,16 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
 
     public String name;
     public String description;
+    public User creator;
 
     @Override
     public Project toModel() {
         Project project = new Project();
 
+        project.setId(id);
         project.setName(this.name);
         project.setDescription(this.description);
+        project.setOwner(creator);
 
         return project;
     }

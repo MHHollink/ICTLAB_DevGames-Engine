@@ -7,6 +7,11 @@ import java.util.Set;
 @JsonIgnoreProperties({"sessionId"})
 public class User extends Model {
 
+    public enum Relations {
+        IS_DEVELOPING,
+        HAS_PUSHED
+    }
+
     private String username;
     private String gitUsername;
 
@@ -28,33 +33,26 @@ public class User extends Model {
     public User() {
     }
 
-    public User(String username, String gitUsername, String firstName, String tween, String lastName, int age, String mainJob, Set<Project> projects, Set<Push> pushes, String sessionId, String gcmId) {
+    public User(String username, String firstName, String gitUsername, String tween, String lastName, String password) {
         this.username = username;
-        this.gitUsername = gitUsername;
         this.firstName = firstName;
+        this.gitUsername = gitUsername;
         this.tween = tween;
         this.lastName = lastName;
-        this.age = age;
-        this.mainJob = mainJob;
-        this.projects = projects;
-        this.pushes = pushes;
-        this.sessionId = sessionId;
-        this.gcmId = gcmId;
+        this.password = password;
     }
 
     public User(String username, String gitUsername, String firstName, String tween, String lastName, int age, String mainJob, Set<Project> projects, Set<Push> pushes, String sessionId, String gcmId, String password) {
-        this.username = username;
-        this.gitUsername = gitUsername;
-        this.firstName = firstName;
-        this.tween = tween;
-        this.lastName = lastName;
+        this(username,firstName,gitUsername,tween,lastName,password);
+
         this.age = age;
         this.mainJob = mainJob;
+
         this.projects = projects;
         this.pushes = pushes;
+
         this.sessionId = sessionId;
         this.gcmId = gcmId;
-        this.password = password;
     }
 
     public String getUsername() {

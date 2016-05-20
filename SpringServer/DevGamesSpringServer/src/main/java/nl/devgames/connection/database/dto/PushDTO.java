@@ -26,6 +26,7 @@ public class PushDTO extends ModelDTO<PushDTO, Push> {
     public Push toModel() {
         Push push = new Push();
 
+        push.setId(id);
         push.setProject(this.project);
         push.setCommits(this.commits);
         push.setIssues(this.issues);

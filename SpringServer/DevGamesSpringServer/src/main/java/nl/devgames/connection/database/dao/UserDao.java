@@ -6,7 +6,6 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dto.ProjectDTO;
 import nl.devgames.connection.database.dto.PushDTO;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Project;
@@ -23,10 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class UserDao implements Dao<User, Long> {
+public class UserDao extends AbsDao<User, Long> {
 
     @Override
-    public User queryForId(Long id) throws ConnectException {
+    public User queryById(Long id) throws ConnectException {
         L.i("Query user with id: %d", id);
         UserDTO dto = null;
         Set<Project> projects = new HashSet<>();
@@ -39,7 +38,8 @@ public class UserDao implements Dao<User, Long> {
                                         "WHERE ID(a) = %d " +
                                     "RETURN {id:id(a), labels: labels(a), data: a}," +
                                            "{id:id(b), labels: labels(b), data: b}",
-                id, id);
+                id, id
+        );
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
 
@@ -67,9 +67,18 @@ public class UserDao implements Dao<User, Long> {
                         }
                         break;
                     case "Project" :
-                        projects.add(new ProjectDTO().createFromNeo4jData(row.getAsJsonObject()).toModel());
+                        Project project = new Project();
+                        project.setId(
+                                row.getAsJsonObject().get("id").getAsLong()
+                        );
+                        projects.add(project);
                         break;
                     case "Push" :
+                        Push push = new Push();
+                        push.setId(
+                                row.getAsJsonObject().get("id").getAsLong()
+                        );
+
                         pushes.add(new PushDTO().createFromNeo4jData(row.getAsJsonObject()).toModel());
                         break;
                     default:
@@ -134,7 +143,7 @@ public class UserDao implements Dao<User, Long> {
         L.i("Query users with %s: %s", fieldName, value);
         String queryFormat;
         if(value instanceof Number)
-            queryFormat = "MATCH (n:User) WHERE n.%s =  %s  RETURN {id:id(n), labels: labels(n), data: n}";
+            queryFormat = "MATCH (n:User) WHERE n.%s = %s RETURN {id:id(n), labels: labels(n), data: n}";
         else
             queryFormat = "MATCH (n:User) WHERE n.%s = '%s' RETURN {id:id(n), labels: labels(n), data: n}";
 
@@ -147,7 +156,7 @@ public class UserDao implements Dao<User, Long> {
         List<User> response = new ArrayList<>();
         for (JsonObject object : UserDTO.findAll(r)) {
             response.add(
-                    queryForId(
+                    queryById(
                             new UserDTO().createFromNeo4jData(object).toModel().getId()
                     )
             );
@@ -183,7 +192,7 @@ public class UserDao implements Dao<User, Long> {
         List<User> response = new ArrayList<>();
         for (JsonObject object : UserDTO.findAll(r)) {
             response.add(
-                    queryForId(
+                    queryById(
                             new UserDTO().createFromNeo4jData(object).toModel().getId()
                     )
             );
@@ -192,17 +201,17 @@ public class UserDao implements Dao<User, Long> {
     }
 
     @Override
-    public User queryForSameId(User user) throws ConnectException {
+    public User queryBySameId(User user) throws ConnectException {
         L.i("Query user with same id as user: %s", user);
-        return queryForId(user.getId());
+        return queryById(user.getId());
     }
 
-    public List<User> queryFromProject(long id) throws ConnectException {
+    public List<User> queryByProject(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:User)-[:works_on]->(b:Project) " +
+                "MATCH (a:User)-[:%s]->(b:Project) " +
                         "WHERE ID(b) = %d " +
                         "RETURN a",
-                id
+                id, User.Relations.IS_DEVELOPING.name()
         );
 
         List<User> response = new ArrayList<>();
@@ -236,20 +245,20 @@ public class UserDao implements Dao<User, Long> {
     @Override
     public User createIfNotExists(User user) throws ConnectException {
         L.i("Creating user if it does not exist: %s", user);
-        User u = queryForId(user.getId());
+        User u = queryById(user.getId());
         if (u == null || !u.equals(user)) {
             int inserted = create(user);
             if (inserted == 0)
                 return null;
             L.d("Created %d rows", inserted);
-            return user;
+            return queryByField("username",user.getUsername()).get(0);
         } else return u;
     }
 
     @Override
     public int update(User user) throws ConnectException {
         L.i("Updating user: %s", user);
-        if(user != null && queryForId(user.getId()) != null) {
+        if(user != null && queryById(user.getId()) != null) {
 
             String response = Neo4JRestService.getInstance().postQuery(
                     "MATCH (n:User) " +
@@ -287,7 +296,7 @@ public class UserDao implements Dao<User, Long> {
     @Override
     public int deleteById(Long id) throws ConnectException {
         L.i("Deleting user with id: %d", id);
-        if(queryForId(id) == null)
+        if(queryById(id) == null)
             return 0;
         String response = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:User) " +
@@ -321,4 +330,54 @@ public class UserDao implements Dao<User, Long> {
             changed += deleteById(id);
         return changed;
     }
+
+    /**
+     * This method is used to create a relationship between a User and a Project. The id's from both parameters are used in the qeury.
+     *
+     * The objects returned from creating an object with {@link #createIfNotExists(User)} and {@link ProjectDao#createIfNotExists(Project)} should have a valid ID
+     *
+     * @param user
+     * @param project
+     * @return
+     * @throws ConnectException
+     */
+    public int saveRelationship(User user, Project project) throws ConnectException {
+        if (user.getId() == null || project.getId() == null) {
+            L.e("Id from user or project was null: user[%b], project[%b]",
+                    user.getId()==null, project.getId()==null);
+            return 0;
+        }
+        L.i("Creating relationship between user: '%d' and project: '%d'",
+                user.getId(), project.getId());
+
+        String response = createRelationship(user.getId(), project.getId(), User.Relations.IS_DEVELOPING);
+
+        return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
+    }
+
+    /**
+     * This method is used to create a relationship between a User and a Project. The id's from both parameters are used in the qeury.
+     *
+     * The objects returned from creating an object with {@link #createIfNotExists(User)} and {@link PushDao#createIfNotExists(Push)} should have a valid ID
+     *
+     * @param user
+     * @param push
+     * @return
+     * @throws ConnectException
+     */
+    public int saveRelationship(User user, Push push) throws ConnectException {
+        if (user.getId() == null || push.getId() == null) {
+            L.e("Id from user or push was null: user[%b], push[%b]",
+                    user.getId()==null, push.getId()==null);
+            return 0;
+        }
+        L.i("Creating relationship between user: '%d' and push: '%d'",
+                user.getId(), push.getId());
+
+        String response = createRelationship(user.getId(), push.getId(), User.Relations.HAS_PUSHED);
+
+        return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
+    }
+
+
 }

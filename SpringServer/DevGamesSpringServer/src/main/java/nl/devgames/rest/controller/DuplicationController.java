@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DuplicationController extends BaseController {
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public Duplication getDuplicationById(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public Duplication getDuplicationById(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                           @PathVariable long id)
     {
         // TODO : 1 -> check if session is valid, 2 -> return Duplication with the given id
@@ -25,7 +25,7 @@ public class DuplicationController extends BaseController {
     }
 
     @RequestMapping(value = "{id}/pushes", method = RequestMethod.GET)
-    public Push getPush(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public Push getPush(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                         @PathVariable long id)
     {
         // TODO : 1 -> check if session is valid, 2 -> return push connected to Duplication with the given id
@@ -33,7 +33,7 @@ public class DuplicationController extends BaseController {
     }
 
     @RequestMapping(value = "{id}/user", method = RequestMethod.GET)
-    public User getUser(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public User getUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                         @PathVariable long id)
     {
         // TODO : 1 -> check if session is valid, 2 -> return user connected to Duplication  with the given id
@@ -41,7 +41,7 @@ public class DuplicationController extends BaseController {
     }
 
     @RequestMapping(value = "{id}/projects", method = RequestMethod.GET)
-    public Project getProject(@RequestHeader(value = Application.SESSION_HEADER_KEY) String session,
+    public Project getProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                               @PathVariable long id)
     {
         // TODO : 1 -> check if session is valid, 2 -> return project connected to Duplication  with the given id

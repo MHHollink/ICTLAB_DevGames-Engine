@@ -1,6 +1,7 @@
 package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
+import nl.devgames.connection.database.dao.ProjectDao;
 import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Business;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.ConnectException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -64,20 +66,20 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public User getOwnUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session) {
+    public User getOwnUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session) {
         User caller = getUserFromSession( session );
         L.i("Called");
         return caller;
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public User getUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public User getUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                         @PathVariable Long id)
     {
         getUserFromSession( session );
         L.i("Called");
         try {
-            return new UserDao().queryForId(id);
+            return new UserDao().queryById(id);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException();
@@ -88,7 +90,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
-    public User updateOwnUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public User updateOwnUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                               @PathVariable long id,
                               @RequestBody User userWithUpdateFields)
     {
@@ -139,7 +141,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
-    public Map deleteUser(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Map deleteUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                           @PathVariable long id)
     {
         L.i("Called");
@@ -159,25 +161,55 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}/projects", method = RequestMethod.GET)
-    public Set<Project> getProjects(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Project> getProjects(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                      @PathVariable Long id)
     {
+        getUserFromSession( session );
         L.i("Called");
-        // TODO : 1 -> check if session is valid, 2 -> get a list of projects from the user id
-        throw new UnsupportedOperationException("This will return an list containing all projects the user is involved in");
+        try {
+
+            Set<Project> response = new HashSet<>();
+
+            new UserDao().queryById(id).getProjects().parallelStream().forEach(project -> {
+                try {
+                    response.add(
+                            new ProjectDao().queryById(project.getId())
+                    );
+                } catch (ConnectException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            return response;
+
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("User was not found");
+            throw new InvalidSessionException("Session invalid!");
+        }
     }
 
     @RequestMapping(value = "{id}/pushes", method = RequestMethod.GET)
-    public Set<Push> getPushes(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Push> getPushes(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                 @PathVariable Long id)
     {
+        getUserFromSession( session );
         L.i("Called");
-        // TODO : 1 -> check if session is valid, 2 -> get a list of pushes from the user id
-        throw new UnsupportedOperationException("This will return an list containing all pushes under the user");
+        try {
+            return new UserDao().queryById(id).getPushes();
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException("Database service offline!");
+        } catch (IndexOutOfBoundsException e) {
+            L.w("User was not found");
+            throw new InvalidSessionException("Session invalid!");
+        }
     }
 
     @RequestMapping(value = "{id}/commits", method = RequestMethod.GET)
-    public Set<Commit> getCommits(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Commit> getCommits(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                    @PathVariable Long id)
     {
         L.i("Called");
@@ -186,7 +218,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}/issues", method = RequestMethod.GET)
-    public Set<Issue> getIssues(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Issue> getIssues(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                  @PathVariable Long id)
     {
         L.i("Called");
@@ -195,7 +227,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}/duplications", method = RequestMethod.GET)
-    public Set<Duplication> getDuplications(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Duplication> getDuplications(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                 @PathVariable Long id)
     {
         L.i("Called");
@@ -204,7 +236,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "{id}/businesses", method = RequestMethod.GET)
-    public Set<Business> getBusinesses(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Business> getBusinesses(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                        @PathVariable Long id)
     {
         L.i("Called");

@@ -1,8 +1,5 @@
 package nl.devgames.rest.controller;
 
-import nl.devgames.Application;
-import nl.devgames.model.Issue;
-import nl.devgames.model.Push;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,8 +15,8 @@ public class IssueControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        sessionId = new AuthController().login("Joris", "admin").get(Application.SESSION_HEADER_KEY);
-        controller = new IssueController();
+//        sessionId = new AuthController().login("Joris", "admin").get(Application.SESSION_HEADER_KEY);
+//        controller = new IssueController();
     }
 
     @After
@@ -29,13 +26,13 @@ public class IssueControllerTest {
 
     @Test
     public void testGetIssueById() throws Exception {
-        Issue issue = controller.getIssueById(sessionId, issueId);
+        //Issue issue = controller.getIssueById(sessionId, issueId);
 //        Assert
     }
 
     @Test
     public void testGetPush() throws Exception {
-        Push push = controller.getPush(sessionId, issueId);
+        //Push push = controller.getPush(sessionId, issueId);
     }
 
     @Test

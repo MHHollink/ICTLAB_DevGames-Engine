@@ -14,7 +14,7 @@ public interface Dao<T, ID>{
      *            Identifier that matches a specific row in the database to find and return.
      * @return The object that has the ID field which equals id or null if no matches.
      */
-    T queryForId(ID id) throws ConnectException;
+    T queryById(ID id) throws ConnectException;
 
     /**
      * Query for all of the items in the object table.
@@ -39,7 +39,7 @@ public interface Dao<T, ID>{
     /**
      * Query for a data item in the table that has the same id as the data parameter.
      */
-    T queryForSameId(T data) throws ConnectException;
+    T queryBySameId(T data) throws ConnectException;
 
     /**
      * Create a new row in the database from an object.
@@ -52,7 +52,7 @@ public interface Dao<T, ID>{
 
     /**
      * This is a convenience method to creating a data item but only if the ID does not already exist in the table. This
-     * extracts the id from the data parameter, does a {@link #queryForId(Object)} on it, returning the data if it
+     * extracts the id from the data parameter, does a {@link #queryById(Object)} on it, returning the data if it
      * exists. If it does not exist {@link #create(Object)} will be called with the parameter.
      *
      * @return Either the data parameter if it was inserted (now with the ID field set via the create method) or the

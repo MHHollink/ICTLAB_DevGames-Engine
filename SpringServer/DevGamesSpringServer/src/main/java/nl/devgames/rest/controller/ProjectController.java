@@ -3,6 +3,7 @@ package nl.devgames.rest.controller;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.Application;
+import nl.devgames.connection.database.dao.BusinessDao;
 import nl.devgames.connection.database.dao.CommitDao;
 import nl.devgames.connection.database.dao.DuplicationDao;
 import nl.devgames.connection.database.dao.IssueDao;
@@ -163,7 +164,7 @@ public class ProjectController extends BaseController{
      * @return
      */
     @RequestMapping(method = RequestMethod.POST)
-    public Project createProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Project createProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                  @RequestBody Project project) {
         L.d("Called");
 
@@ -184,7 +185,7 @@ public class ProjectController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public Project getProjectById(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Project getProjectById(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                   @PathVariable(value = "id") long id)
     {
         L.d("Called");
@@ -192,7 +193,7 @@ public class ProjectController extends BaseController{
         //check if session is valid
         User caller = getUserFromSession( session );
         try {
-            return new ProjectDao().queryForId(id);
+            return new ProjectDao().queryById(id);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException();
@@ -209,7 +210,7 @@ public class ProjectController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
-    public Map deleteProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Map deleteProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                  @PathVariable(value = "id") long id) {
         L.d("Called");
 
@@ -221,7 +222,7 @@ public class ProjectController extends BaseController{
 
         try {
             ProjectDao projectDao = new ProjectDao();
-            Project project = projectDao.queryForId(id);
+            Project project = projectDao.queryById(id);
             int deleted = projectDao.delete(project);
             if (deleted != 1) throw new KnownInternalServerError("delete project failed. deleted rows = %d", deleted);
             result.put("message", "succesfully deleted project");
@@ -239,7 +240,7 @@ public class ProjectController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
-    public Project updateProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Project updateProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                  @PathVariable(value = "id") long id,
                                  @RequestBody Project projectWithUpdateFields) {
         L.d("Called");
@@ -261,7 +262,7 @@ public class ProjectController extends BaseController{
 
         Project project = null;
         try {
-            project = new ProjectDao().queryForId(id);
+            project = new ProjectDao().queryById(id);
 
             //update project fields
             if(projectWithUpdateFields.getName() != null)
@@ -296,7 +297,7 @@ public class ProjectController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}/users", method = RequestMethod.GET)
-    public Set<User> getDevelopersFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<User> getDevelopersFromProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                               @PathVariable(value = "id") long id)
     {
         L.d("Called");
@@ -306,7 +307,7 @@ public class ProjectController extends BaseController{
         if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
-            return new HashSet<User>(new UserDao().queryFromProject(id));
+            return new HashSet<User>(new UserDao().queryByProject(id));
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException();
@@ -325,7 +326,7 @@ public class ProjectController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}/users/{uid}", method = RequestMethod.PUT)
-    public Map addDeveloperToProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Map addDeveloperToProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                          @PathVariable(value = "id") long id,
                                          @PathVariable(value = "uid") long uid) {
         L.d("Called");
@@ -359,7 +360,7 @@ public class ProjectController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}/issues", method = RequestMethod.GET)
-    public Set<Issue> getIssuesFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Issue> getIssuesFromProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                            @PathVariable(value = "id") long id)
     {
         L.d("Called");
@@ -387,7 +388,7 @@ public class ProjectController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}/duplications", method = RequestMethod.GET)
-    public Set<Duplication> getDuplicationsFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Duplication> getDuplicationsFromProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                                        @PathVariable(value = "id") long id)
     {
         L.d("Called");
@@ -414,7 +415,7 @@ public class ProjectController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}/pushes", method = RequestMethod.GET)
-    public Set<Push> getPushesFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Push> getPushesFromProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                           @PathVariable(value = "id") long id)
     {
         L.d("Called");
@@ -441,7 +442,7 @@ public class ProjectController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}/commits", method = RequestMethod.GET)
-    public Set<Commit> getCommitsFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Commit> getCommitsFromProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                              @PathVariable(value = "id") long id)
     {
         L.d("Called");
@@ -468,7 +469,7 @@ public class ProjectController extends BaseController{
      * @return
      */
     @RequestMapping(value = "{id}/businesses", method = RequestMethod.GET)
-    public Set<Business> getBusinessesFromProject(@RequestHeader(Application.SESSION_HEADER_KEY) String session,
+    public Set<Business> getBusinessesFromProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                             @PathVariable(value = "id") long id)
     {
         L.d("Called");
