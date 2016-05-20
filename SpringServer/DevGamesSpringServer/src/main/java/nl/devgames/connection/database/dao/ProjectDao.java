@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.ProjectDTO;
-import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Project;
 import nl.devgames.model.User;
 import nl.devgames.utils.L;
@@ -62,7 +61,10 @@ public class ProjectDao extends AbsDao<Project, Long> {
                         }
                         break;
                     case "User" :
-                        creator = new UserDTO().createFromNeo4jData(row.getAsJsonObject()).toModel();
+                        creator = new User();
+                        creator.setId(
+                                row.getAsJsonObject().get("id").getAsLong()
+                        );
                         break;
                     default:
                         L.w("Unimplemented case detected : '%s'", label);
