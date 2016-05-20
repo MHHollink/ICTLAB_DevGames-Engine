@@ -1,7 +1,7 @@
 package nl.devgames.model;
 
 public class Issue extends Model {
-    String issueId;
+    String key;
 
     String severity;
     String component;
@@ -22,8 +22,8 @@ public class Issue extends Model {
     public Issue() {
     }
 
-    public Issue(String issueId, String severity, String component, Integer startLine, Integer endLine, String status, String resolution, String message, Integer debt, Long creationDate, Long updateDate, Long closeDate) {
-        this.issueId = issueId;
+    public Issue(String key, String severity, String component, Integer startLine, Integer endLine, String status, String resolution, String message, Integer debt, Long creationDate, Long updateDate, Long closeDate) {
+        this.key = key;
         this.severity = severity;
         this.component = component;
         this.startLine = startLine;
@@ -37,8 +37,8 @@ public class Issue extends Model {
         this.closeDate = closeDate;
     }
 
-    public String getIssueId() {
-        return issueId;
+    public String getKey() {
+        return key;
     }
 
     public String getSeverity() {
@@ -85,8 +85,8 @@ public class Issue extends Model {
         return closeDate;
     }
 
-    public void setIssueId(String issueId) {
-        this.issueId = issueId;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public void setSeverity(String severity) {

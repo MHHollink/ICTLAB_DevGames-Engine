@@ -10,11 +10,13 @@ import nl.devgames.utils.L;
  */
 public class IssueDTO extends ModelDTO<IssueDTO, Issue> {
 
+    public String key;
+
     public String severity;
     public String component;
 
-    public int startLine;
-    public int endLine;
+    public Integer startLine;
+    public Integer endLine;
 
     public String status;
     public String resolution;
@@ -30,6 +32,7 @@ public class IssueDTO extends ModelDTO<IssueDTO, Issue> {
     public Issue toModel() {
         Issue issue = new Issue();
 
+        issue.setKey(key);
         issue.setSeverity(this.severity);
         issue.setComponent(this.component);
         issue.setStartLine(this.startLine);
