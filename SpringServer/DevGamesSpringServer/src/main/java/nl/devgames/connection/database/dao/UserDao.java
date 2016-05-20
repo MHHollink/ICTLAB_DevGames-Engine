@@ -37,7 +37,7 @@ public class UserDao extends AbsDao<User, Long> {
                                         "MATCH a-[]->(b) " +
                                         "WHERE ID(a) = %d " +
                                     "RETURN {id:id(a), labels: labels(a), data: a}," +
-                                           "{id:id(b), labels: labels(b), data: b}",
+                                           "{id:id(b), labels: labels(b)}",
                 id, id
         );
 
