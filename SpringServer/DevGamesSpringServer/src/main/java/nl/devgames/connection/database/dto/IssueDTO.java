@@ -20,11 +20,11 @@ public class IssueDTO extends ModelDTO<IssueDTO, Issue> {
     public String resolution;
 
     public String message;
-    public int debt;
+    public Integer debt;
 
-    public long creationDate;
-    public long updateDate;
-    public long closeDate;
+    public Long creationDate;
+    public Long updateDate;
+    public Long closeDate;
 
     @Override
     public Issue toModel() {

@@ -1,28 +1,28 @@
 package nl.devgames.model;
 
 public class Issue extends Model {
-    long issueId;
+    String issueId;
 
     String severity;
     String component;
 
-    int startLine;
-    int endLine;
+    Integer startLine;
+    Integer endLine;
 
     String status;
     String resolution;
 
     String message;
-    int debt;
+    Integer debt;
 
-    long creationDate;
-    long updateDate;
-    long closeDate;
+    Long creationDate;
+    Long updateDate;
+    Long closeDate;
 
     public Issue() {
     }
 
-    public Issue(long issueId, String severity, String component, int startLine, int endLine, String status, String resolution, String message, int debt, long creationDate, long updateDate, long closeDate) {
+    public Issue(String issueId, String severity, String component, Integer startLine, Integer endLine, String status, String resolution, String message, Integer debt, Long creationDate, Long updateDate, Long closeDate) {
         this.issueId = issueId;
         this.severity = severity;
         this.component = component;
@@ -37,96 +37,96 @@ public class Issue extends Model {
         this.closeDate = closeDate;
     }
 
-    public long getIssueId() {
+    public String getIssueId() {
         return issueId;
-    }
-
-    public void setIssueId(long issueId) {
-        this.issueId = issueId;
     }
 
     public String getSeverity() {
         return severity;
     }
 
-    public void setSeverity(String severity) {
-        this.severity = severity;
-    }
-
     public String getComponent() {
         return component;
     }
 
-    public void setComponent(String component) {
-        this.component = component;
-    }
-
-    public int getStartLine() {
+    public Integer getStartLine() {
         return startLine;
     }
 
-    public void setStartLine(int startLine) {
-        this.startLine = startLine;
-    }
-
-    public int getEndLine() {
+    public Integer getEndLine() {
         return endLine;
-    }
-
-    public void setEndLine(int endLine) {
-        this.endLine = endLine;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public String getResolution() {
         return resolution;
-    }
-
-    public void setResolution(String resolution) {
-        this.resolution = resolution;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public Integer getDebt() {
+        return debt;
     }
 
-    public int getDebt() {
-        return debt;
+    public Long getCreationDate() {
+        return creationDate;
+    }
+
+    public Long getUpdateDate() {
+        return updateDate;
+    }
+
+    public Long getCloseDate() {
+        return closeDate;
+    }
+
+    public void setIssueId(String issueId) {
+        this.issueId = issueId;
+    }
+
+    public void setSeverity(String severity) {
+        this.severity = severity;
+    }
+
+    public void setComponent(String component) {
+        this.component = component;
+    }
+
+    public void setStartLine(int startLine) {
+        this.startLine = startLine;
+    }
+
+    public void setEndLine(int endLine) {
+        this.endLine = endLine;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setResolution(String resolution) {
+        this.resolution = resolution;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public void setDebt(int debt) {
         this.debt = debt;
     }
 
-    public long getCreationDate() {
-        return creationDate;
-    }
-
     public void setCreationDate(long creationDate) {
         this.creationDate = creationDate;
     }
 
-    public long getUpdateDate() {
-        return updateDate;
-    }
-
     public void setUpdateDate(long updateDate) {
         this.updateDate = updateDate;
-    }
-
-    public long getCloseDate() {
-        return closeDate;
     }
 
     public void setCloseDate(long closeDate) {

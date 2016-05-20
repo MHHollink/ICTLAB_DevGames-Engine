@@ -85,8 +85,8 @@ public abstract class BaseController {
 
         Issue issue =
                 new Issue(
-                        213456, "MAJOR", "nl.devgames.Application", 11, 13, "OPEN", null,
-                        "This application is still shit", 840, 1455217086, 1459624317, 0
+                        UUID.randomUUID().toString(), "MAJOR", "nl.devgames.Application", 11, 13, "OPEN", null,
+                        "This application is still shit", 840, 1455217086L, 1459624317L, 0L
                 );
 
 

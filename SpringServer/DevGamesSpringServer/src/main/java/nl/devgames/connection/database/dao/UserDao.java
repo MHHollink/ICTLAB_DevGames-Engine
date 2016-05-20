@@ -6,7 +6,6 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dto.PushDTO;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
@@ -78,8 +77,7 @@ public class UserDao extends AbsDao<User, Long> {
                         push.setId(
                                 row.getAsJsonObject().get("id").getAsLong()
                         );
-
-                        pushes.add(new PushDTO().createFromNeo4jData(row.getAsJsonObject()).toModel());
+                        pushes.add(push);
                         break;
                     default:
                         L.w("Unimplemented case detected : '%s'", label);

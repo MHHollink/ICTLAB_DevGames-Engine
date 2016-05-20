@@ -6,8 +6,8 @@ public class Business extends Model {
 
     private String name;
 
-    Set<User> employees;
-    Set<Project> projects;
+    private Set<User> employees;
+    private Set<Project> projects;
 
 
     public Business() {

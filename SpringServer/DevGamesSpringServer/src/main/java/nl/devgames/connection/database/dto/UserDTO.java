@@ -18,7 +18,7 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
     public String tween;
     public String lastName;
 
-    public int age;
+    public Integer age;
     public String mainJob;
 
     public Set<Project> projects;
@@ -32,21 +32,6 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
     public boolean deleted;
 
     public UserDTO() {
-    }
-
-    public UserDTO(String username, String gitUsername, String firstName, String tween, String lastName, int age, String mainJob, Set<Project> projects, Set<Push> pushes, String session, String gcmId, String password) {
-        this.username = username;
-        this.gitUsername = gitUsername;
-        this.firstName = firstName;
-        this.tween = tween;
-        this.lastName = lastName;
-        this.age = age;
-        this.mainJob = mainJob;
-        this.projects = projects;
-        this.pushes = pushes;
-        this.session = session;
-        this.gcmId = gcmId;
-        this.password = password;
     }
 
     public UserDTO(User user) {

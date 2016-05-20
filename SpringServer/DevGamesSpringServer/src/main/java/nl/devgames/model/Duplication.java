@@ -1,6 +1,5 @@
 package nl.devgames.model;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class Duplication extends Model {
@@ -12,7 +11,7 @@ public class Duplication extends Model {
     Set<DuplicationFile> files;
 
     public Duplication() {
-        files = new HashSet<>();
+
     }
 
     public Duplication(Set<DuplicationFile> files) {
