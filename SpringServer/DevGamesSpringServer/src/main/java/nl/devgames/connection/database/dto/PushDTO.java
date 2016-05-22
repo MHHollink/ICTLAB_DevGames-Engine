@@ -11,9 +11,6 @@ import nl.devgames.utils.L;
 
 import java.util.Set;
 
-/**
- * Created by Marcel on 14-4-2016.
- */
 public class PushDTO extends ModelDTO<PushDTO, Push> {
 
     public Project project;
@@ -21,12 +18,14 @@ public class PushDTO extends ModelDTO<PushDTO, Push> {
     public Set<Issue> issues;
     public Set<Duplication> duplications;
     public Long timestamp;
+    public String key;
 
     @Override
     public Push toModel() {
         Push push = new Push();
 
         push.setId(id);
+        push.setKey(key);
         push.setProject(this.project);
         push.setCommits(this.commits);
         push.setIssues(this.issues);
@@ -74,9 +73,16 @@ public class PushDTO extends ModelDTO<PushDTO, Push> {
     }
 
     @Override
-    public boolean equalsInContent(PushDTO other) {
-        return false;
+    public boolean equalsInContent(PushDTO o) {
+        return
+                this == o || o != null
+                        && (project != null ? project.equals(o.project) : o.project == null
+                        && (commits != null ? commits.equals(o.commits) : o.commits == null
+                        && (issues != null ? issues.equals(o.issues) : o.issues == null
+                        && (duplications != null ? duplications.equals(o.duplications) : o.duplications == null
+                        && (timestamp != null ? timestamp.equals(o.timestamp) : o.timestamp == null)))));
     }
+
 
     @Override
     public String toString() {
@@ -86,6 +92,7 @@ public class PushDTO extends ModelDTO<PushDTO, Push> {
                 ", issues=" + issues +
                 ", duplications=" + duplications +
                 ", timestamp=" + timestamp +
+                ", key='" + key + '\'' +
                 "} " + super.toString();
     }
 }

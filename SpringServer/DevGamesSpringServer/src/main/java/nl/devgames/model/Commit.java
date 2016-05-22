@@ -10,7 +10,7 @@ public class Commit extends Model {
 
     }
 
-    public Commit(String commitId, String commitMsg, long timeStamp) {
+    public Commit(String commitId, String commitMsg, long timestamp) {
         this.commitId = commitId;
         this.commitMsg = commitMsg;
         this.timestamp = timestamp;
@@ -36,7 +36,7 @@ public class Commit extends Model {
         return timestamp;
     }
 
-    public void setTimeStamp(long timeStamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 

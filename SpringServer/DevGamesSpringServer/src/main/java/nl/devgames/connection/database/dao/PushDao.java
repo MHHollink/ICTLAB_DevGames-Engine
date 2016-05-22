@@ -2,6 +2,7 @@ package nl.devgames.connection.database.dao;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
@@ -35,11 +36,14 @@ public class PushDao extends AbsDao<Push, Long>  {
         Set<Issue> issues = new HashSet<>();
         Set<Duplication> duplications = new HashSet<>();
         String response = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Push)-[r]->(b) " +
+                "MATCH (a:Push) " +
                         "WHERE ID(a) = %d " +
+                        "OPTIONAL " +
+                            "MATCH (a:Push)-[r]->(b) " +
+                            "WHERE ID(a) = %d "+
                         "RETURN {id:id(a), labels: labels(a), data: a}," +
-                        "       {id:id(b), labels: labels(b)}",
-                id);
+                               "{id:id(b), labels: labels(b)}",
+                id, id);
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
 
@@ -51,7 +55,9 @@ public class PushDao extends AbsDao<Push, Long>  {
             JsonArray rows = element.getAsJsonObject().get("row").getAsJsonArray();
 
             for ( JsonElement row : rows) {
-                String label = row.getAsJsonObject().get("labels").getAsJsonArray().get(0).getAsString();
+                JsonElement labels =row.getAsJsonObject().get("labels");
+                if(labels instanceof JsonNull) continue;
+                String label = labels.getAsJsonArray().get(0).getAsString();
 
                 switch (label) {
                     case "Push" :
@@ -193,8 +199,8 @@ public class PushDao extends AbsDao<Push, Long>  {
     @Override
     public int create(Push push) throws ConnectException, IndexOutOfBoundsException {
         String response = Neo4JRestService.getInstance().postQuery(
-                "CREATE (n:Push { issueId: '%s' }) RETURN {id:id(n), labels: labels(n), data: n} ",
-                push.getIssueId()
+                "CREATE (n:Push { key: '%s' }) RETURN {id:id(n), labels: labels(n), data: n} ",
+                push.getKey()
         );
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
@@ -211,7 +217,7 @@ public class PushDao extends AbsDao<Push, Long>  {
             if (inserted == 0)
                 return null;
             L.d("Created %d rows", inserted);
-            return queryByField("issueId", data.getIssueId()).get(0);
+            return queryByField("key", data.getKey()).get(0);
         } else return push;
     }
 
@@ -222,10 +228,10 @@ public class PushDao extends AbsDao<Push, Long>  {
             String response = Neo4JRestService.getInstance().postQuery(
                     "MATCH (n:Push) " +
                             "WHERE ID(n) = %d " +
-                            "SET n.issueId = '%s', n.score = %d, n.timeStamp = %d " +
+                            "SET n.key = '%s', n.score = %d, n.timeStamp = %d " +
                             "RETURN {id:id(n), labels: labels(n), data: n} ",
                     push.getId(),
-                    push.getIssueId(),
+                    push.getKey(),
                     push.getScore(),
                     push.getTimestamp()
             );

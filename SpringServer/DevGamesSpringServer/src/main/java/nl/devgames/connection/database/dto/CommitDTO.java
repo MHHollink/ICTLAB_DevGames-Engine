@@ -15,9 +15,10 @@ public class CommitDTO extends ModelDTO<CommitDTO, Commit> {
     public Commit toModel() {
         Commit commit = new Commit();
 
+        commit.setId(id);
         commit.setCommitId(this.commitId);
         commit.setCommitMsg(this.commitMsg);
-        commit.setTimeStamp(this.timestamp);
+        commit.setTimestamp(this.timestamp);
 
         return commit;
     }
@@ -47,7 +48,11 @@ public class CommitDTO extends ModelDTO<CommitDTO, Commit> {
 
     @Override
     public CommitDTO createFromNeo4jData(JsonObject data) {
-        return null;
+        CommitDTO dto = new CommitDTO().createFromJsonObject(
+                data.get("data").getAsJsonObject()
+        );
+        dto.id = data.get("id").getAsLong();
+        return dto;
     }
 
     @Override
