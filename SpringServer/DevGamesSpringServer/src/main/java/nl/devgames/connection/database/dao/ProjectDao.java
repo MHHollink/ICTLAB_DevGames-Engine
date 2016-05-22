@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.ProjectDTO;
-import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
@@ -16,9 +15,11 @@ import nl.devgames.utils.L;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ProjectDao extends AbsDao<Project, Long> {
 
@@ -26,6 +27,7 @@ public class ProjectDao extends AbsDao<Project, Long> {
     public Project queryById(Long id) throws ConnectException, IndexOutOfBoundsException {
         ProjectDTO dto = null;
         User creator = null;
+        Set<User> developers = new HashSet<>();
         String response = Neo4JRestService.getInstance().postQuery(
                 "MATCH (a:Project) " +
                         "WHERE ID(a) = %d " +
@@ -34,14 +36,17 @@ public class ProjectDao extends AbsDao<Project, Long> {
                                 "WHERE ID(a) = %d " +
                         "RETURN " +
                             "{id:id(a), labels: labels(a), data: a}," +
-                            "{id:id(b), labels: labels(b), data: b}",
+                            "{id:id(b), labels: labels(b)}",
                 id, id
         );
 
-        JsonObject json = new JsonParser().parse(response).getAsJsonObject();
+        JsonParser parser = new JsonParser();
+        JsonObject json = parser.parse(response).getAsJsonObject();
 
-        if(json.get("errors").getAsJsonArray().size() != 0)
+        if(json.get("errors").getAsJsonArray().size() != 0) {
             L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
+            return null;
+        }
 
         JsonArray data = json.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
         for (JsonElement element : data) {
@@ -63,16 +68,51 @@ public class ProjectDao extends AbsDao<Project, Long> {
                         }
                         break;
                     case "User" :
-                        creator = new UserDTO().createFromNeo4jData(row.getAsJsonObject()).toModel();
+                        creator = new User();
+                        creator.setId(
+                                row.getAsJsonObject().get("id").getAsLong()
+                        );
                         break;
                     default:
                         L.w("Unimplemented case detected : '%s'", label);
                 }
             }
         }
+
+        response = Neo4JRestService.getInstance().postQuery(
+                "match (a:Project),(b:User) WHERE ID(a) = %d MATCH a<-[]-b RETURN id(b)", id
+        );
+
+        json = parser.parse(response).getAsJsonObject();
+
+        if(json.get("errors").getAsJsonArray().size() != 0) {
+            L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
+            return null;
+        }
+
+        json.get("results")
+                .getAsJsonArray()
+                .get(0)
+                .getAsJsonObject()
+                .get("data")
+                .getAsJsonArray()
+                .forEach(row -> {
+                    User u = new User();
+                    u.setId(
+                            row.getAsJsonObject()
+                                    .get("row")
+                                    .getAsJsonArray()
+                                    .get(0)
+                                    .getAsLong()
+                    );
+                    developers.add(u);
+                });
+
+
         if(dto == null) return null;
 
         dto.creator = creator;
+        dto.developers = developers;
 
         return dto.toModel();
     }

@@ -2,6 +2,7 @@ package nl.devgames.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.Objects;
 import java.util.Set;
 
 @JsonIgnoreProperties({"sessionId"})
@@ -19,7 +20,7 @@ public class User extends Model {
     private String tween;
     private String lastName;
 
-    private int age;
+    private Integer age;
     private String mainJob;
 
     private Set<Project> projects;
@@ -59,20 +60,56 @@ public class User extends Model {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getGitUsername() {
         return gitUsername;
     }
 
-    public void setGitUsername(String gitUsername) {
-        this.gitUsername = gitUsername;
-    }
-
     public Set<Project> getProjects() {
         return projects;
+    }
+
+    public Set<Push> getPushes() {
+        return pushes;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getTween() {
+        return tween;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public String getMainJob() {
+        return mainJob;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public String getGcmId() {
+        return gcmId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setGitUsername(String gitUsername) {
+        this.gitUsername = gitUsername;
     }
 
     public void setProjects(Set<Project> projects) {
@@ -99,52 +136,16 @@ public class User extends Model {
         this.mainJob = mainJob;
     }
 
-    public Set<Push> getPushes() {
-        return pushes;
-    }
-
     public void setPushes(Set<Push> pushes) {
         this.pushes = pushes;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getTween() {
-        return tween;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public String getMainJob() {
-        return mainJob;
-    }
-
-    public String getSessionId() {
-        return sessionId;
     }
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
     }
 
-    public String getGcmId() {
-        return gcmId;
-    }
-
     public void setGcmId(String gcmId) {
         this.gcmId = gcmId;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setPassword(String password) {
@@ -177,7 +178,7 @@ public class User extends Model {
 
         User user = (User) o;
 
-        if (age != user.age) return false;
+        if (!Objects.equals(age, user.age)) return false;
         if (username != null ? !username.equals(user.username) : user.username != null) return false;
         if (gitUsername != null ? !gitUsername.equals(user.gitUsername) : user.gitUsername != null) return false;
         if (firstName != null ? !firstName.equals(user.firstName) : user.firstName != null) return false;

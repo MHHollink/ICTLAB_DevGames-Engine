@@ -75,7 +75,7 @@ public class AuthController extends BaseController{
 
         } catch (ConnectException e) {
             L.e(e, "Neo4J Post threw exeption, Database might be offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         }
     }
 }

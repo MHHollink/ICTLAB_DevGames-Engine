@@ -18,8 +18,8 @@ public class Push extends Model {
     private Set<Issue> issues;
     private Set<Duplication> duplications;
 
-    private long timestamp;
-    private double score;
+    private Long timestamp;
+    private Double score;
 
     public Push() {
 
@@ -35,13 +35,33 @@ public class Push extends Model {
         this.score = score;
     }
 
-    @Deprecated
-    public Push(Project project, Set<Commit> commits, Set<Issue> issues, Set<Duplication> duplications, long timestamp) {
-        this.project = project;
-        this.commits = commits;
-        this.issues = issues;
-        this.duplications = duplications;
-        this.timestamp = timestamp;
+    public Project getProject() {
+        return project;
+    }
+
+    public Set<Commit> getCommits() {
+        return commits;
+    }
+
+    public Set<Issue> getIssues() {
+        return issues;
+    }
+
+    public Set<Duplication> getDuplications() {
+        return duplications;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public Double getScore() {
+        return score;
+    }
+
+    public String getIssueId() {
+        return issueId;
+
     }
 
     public Push(String issueId, Project project, Set<Commit> commits, Set<Issue> issues, Set<Duplication> duplications, long timestamp, double score) {
@@ -52,57 +72,28 @@ public class Push extends Model {
         this.duplications = duplications;
     }
 
-    public Project getProject() {
-        return project;
-    }
-
     public void setProject(Project project) {
         this.project = project;
-    }
-
-    public Set<Commit> getCommits() {
-        return commits;
     }
 
     public void setCommits(Set<Commit> commits) {
         this.commits = commits;
     }
 
-    public Set<Issue> getIssues() {
-        return issues;
-    }
-
     public void setIssues(Set<Issue> issues) {
         this.issues = issues;
-    }
-
-    public Set<Duplication> getDuplications() {
-        return duplications;
     }
 
     public void setDuplications(Set<Duplication> duplications) {
         this.duplications = duplications;
     }
 
-    public long getTimestamp() {
-        return timestamp;
-    }
-
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
-    public String getIssueId() {
-        return issueId;
-
-    }
-
     public void setIssueId(String issueId) {
         this.issueId = issueId;
-    }
-
-    public double getScore() {
-        return score;
     }
 
     public void setScore(double score) {

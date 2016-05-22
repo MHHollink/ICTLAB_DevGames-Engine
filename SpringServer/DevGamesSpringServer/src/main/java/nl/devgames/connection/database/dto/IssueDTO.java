@@ -10,26 +10,29 @@ import nl.devgames.utils.L;
  */
 public class IssueDTO extends ModelDTO<IssueDTO, Issue> {
 
+    public String key;
+
     public String severity;
     public String component;
 
-    public int startLine;
-    public int endLine;
+    public Integer startLine;
+    public Integer endLine;
 
     public String status;
     public String resolution;
 
     public String message;
-    public int debt;
+    public Integer debt;
 
-    public long creationDate;
-    public long updateDate;
-    public long closeDate;
+    public Long creationDate;
+    public Long updateDate;
+    public Long closeDate;
 
     @Override
     public Issue toModel() {
         Issue issue = new Issue();
 
+        issue.setKey(key);
         issue.setSeverity(this.severity);
         issue.setComponent(this.component);
         issue.setStartLine(this.startLine);

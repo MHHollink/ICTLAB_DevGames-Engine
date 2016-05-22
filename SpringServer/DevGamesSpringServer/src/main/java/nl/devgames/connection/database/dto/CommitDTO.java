@@ -9,7 +9,7 @@ public class CommitDTO extends ModelDTO<CommitDTO, Commit> {
 
     public String commitId;
     public String commitMsg;
-    public long timestamp;
+    public Long timestamp;
 
     @Override
     public Commit toModel() {

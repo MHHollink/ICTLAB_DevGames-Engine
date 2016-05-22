@@ -2,6 +2,7 @@ package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
 import nl.devgames.connection.database.dao.ProjectDao;
+import nl.devgames.connection.database.dao.PushDao;
 import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Business;
@@ -26,9 +27,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.ConnectException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/users")
@@ -61,7 +62,7 @@ public class UserController extends BaseController {
 
         } catch (ConnectException e) {
             L.e("Database service is ofline");
-            throw new DatabaseOfflineException("Database service is ofline!");
+            throw new DatabaseOfflineException();
         }
     }
 
@@ -82,7 +83,7 @@ public class UserController extends BaseController {
             return new UserDao().queryById(id);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("User was not found");
             throw new InvalidSessionException("Session invalid!");
@@ -136,7 +137,7 @@ public class UserController extends BaseController {
             return caller;
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         }
     }
 
@@ -155,7 +156,7 @@ public class UserController extends BaseController {
             return new HashMap<>();
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         }
 
     }
@@ -167,24 +168,19 @@ public class UserController extends BaseController {
         getUserFromSession( session );
         L.i("Called");
         try {
-
-            Set<Project> response = new HashSet<>();
-
-            new UserDao().queryById(id).getProjects().parallelStream().forEach(project -> {
-                try {
-                    response.add(
-                            new ProjectDao().queryById(project.getId())
-                    );
-                } catch (ConnectException e) {
-                    e.printStackTrace();
-                }
-            });
-
-            return response;
+            return new UserDao().queryById(id).getProjects().stream()
+                    .map( p -> {
+                        try {
+                            return new ProjectDao().queryById(p.getId());
+                        } catch (ConnectException e) {
+                            L.e(e, "Database is offline");
+                            throw new DatabaseOfflineException();
+                        }
+                    }).collect(Collectors.toSet());
 
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("User was not found");
             throw new InvalidSessionException("Session invalid!");
@@ -198,10 +194,18 @@ public class UserController extends BaseController {
         getUserFromSession( session );
         L.i("Called");
         try {
-            return new UserDao().queryById(id).getPushes();
+            return new UserDao().queryById(id).getPushes().stream()
+                    .map( p -> {
+                        try {
+                            return new PushDao().queryById(p.getId());
+                        } catch (ConnectException e) {
+                            L.e(e, "Database is offline");
+                            throw new DatabaseOfflineException();
+                        }
+                    }).collect(Collectors.toSet());
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("User was not found");
             throw new InvalidSessionException("Session invalid!");

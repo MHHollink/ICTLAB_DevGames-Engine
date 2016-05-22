@@ -20,7 +20,7 @@ public class PushDTO extends ModelDTO<PushDTO, Push> {
     public Set<Commit> commits;
     public Set<Issue> issues;
     public Set<Duplication> duplications;
-    public long timestamp;
+    public Long timestamp;
 
     @Override
     public Push toModel() {

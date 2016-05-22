@@ -21,15 +21,15 @@ import java.util.Set;
 
 public class SQReportDTO {
 	private Project project;
-	private long id;
+	private Long id;
 	private User author;
-	private long timestamp;
+	private Long timestamp;
 	private ReportResultType buildResult;
 	private List<Commit> commits;
 	private List<Issue> issues;
 	private List<Duplication> duplications;
-	private double score;
-    private boolean valid = true;
+	private Double score;
+    private Boolean valid = true;
 
 	public SQReportDTO() {
 		
