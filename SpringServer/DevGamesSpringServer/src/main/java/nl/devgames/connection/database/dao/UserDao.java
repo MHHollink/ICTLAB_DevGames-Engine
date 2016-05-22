@@ -371,7 +371,7 @@ public class UserDao extends AbsDao<User, Long> {
                     user.getId()==null, push.getId()==null);
             return 0;
         }
-        L.i("Creating relationship between user: '%d' and push: '%d'",
+        L.i("Creating relationship between user: %d and push: %d",
                 user.getId(), push.getId());
 
         String response = createRelationship(user.getId(), push.getId(), User.Relations.HAS_PUSHED);

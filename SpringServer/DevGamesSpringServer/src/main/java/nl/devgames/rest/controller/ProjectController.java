@@ -213,6 +213,7 @@ public class ProjectController extends BaseController{
     public Map deleteProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                  @PathVariable(value = "id") long id) {
         L.d("Called");
+        //todo delete everything
 
         java.util.Map<String, String> result = new java.util.HashMap<>();
 
