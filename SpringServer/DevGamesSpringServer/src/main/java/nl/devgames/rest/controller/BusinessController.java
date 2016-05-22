@@ -92,6 +92,7 @@ public class BusinessController extends BaseController{
     public Map deleteBusiness(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                               @PathVariable(value = "id") long id)
     {
+        //detach in dao
         throw new UnsupportedOperationException();
     }
 

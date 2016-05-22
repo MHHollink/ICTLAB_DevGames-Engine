@@ -92,22 +92,80 @@ public class PushDao extends AbsDao<Push, Long>  {
 
     @Override
     public List<Push> queryForAll() throws ConnectException, IndexOutOfBoundsException {
-        return null;
+        String r = Neo4JRestService.getInstance().postQuery(
+                "MATCH (n:Push) RETURN {id:id(n), labels: labels(n), data: n}"
+        );
+
+        List<Push> response = new ArrayList<>();
+        for (JsonObject object : PushDTO.findAll(r)) {
+            response.add(new PushDTO().createFromNeo4jData(object).toModel());
+        }
+        return response;
     }
 
     @Override
     public List<Push> queryByField(String fieldName, Object value) throws ConnectException, IndexOutOfBoundsException {
-        return null;
+        String queryFormat;
+        if(value instanceof Number)
+            queryFormat = "MATCH (n:Push) WHERE n.%s =  %s  RETURN {id:id(n), labels: labels(n), data: n}";
+        else
+            queryFormat = "MATCH (n:Push) WHERE n.%s = '%s' RETURN {id:id(n), labels: labels(n), data: n}";
+
+        String r = Neo4JRestService.getInstance().postQuery(
+                queryFormat,
+                fieldName,
+                value
+        );
+
+        List<Push> response = new ArrayList<>();
+        for (JsonObject object : PushDTO.findAll(r)) {
+            response.add(
+                    queryById(
+                            new PushDTO().createFromNeo4jData(object).toModel().getId()
+                    )
+            );
+        }
+        return response;
     }
 
     @Override
     public List<Push> queryByFields(Map<String, Object> fieldValues) throws ConnectException, IndexOutOfBoundsException {
-        return null;
+        String queryFormat = "MATCH (n:Push) WHERE ";
+
+        Iterator<String> iterator = fieldValues.keySet().iterator();
+        while (iterator.hasNext()) {
+            String field = iterator.next();
+            Object value = fieldValues.get(field);
+
+            if(value instanceof Number)
+                queryFormat += String.format("n.%s = %s ", field, value);
+            else
+                queryFormat += String.format("n.%s = '%s' ", field, value);
+
+            if (iterator.hasNext())
+                queryFormat += "AND ";
+        }
+
+        queryFormat += " RETURN {id:id(n), labels: labels(n), data: n}";
+
+        String r = Neo4JRestService.getInstance().postQuery(
+                queryFormat
+        );
+
+        List<Push> response = new ArrayList<>();
+        for (JsonObject object : PushDTO.findAll(r)) {
+            response.add(
+                    queryById(
+                            new PushDTO().createFromNeo4jData(object).toModel().getId()
+                    )
+            );
+        }
+        return response;
     }
 
     @Override
-    public Push queryBySameId(Push data) throws ConnectException, IndexOutOfBoundsException {
-        return null;
+    public Push queryBySameId(Push push) throws ConnectException, IndexOutOfBoundsException {
+        return queryById(push.getId());
     }
 
     public List<Push> queryFromProject(long id) throws ConnectException {
@@ -126,23 +184,57 @@ public class PushDao extends AbsDao<Push, Long>  {
     }
 
     @Override
-    public int create(Push data) throws ConnectException, IndexOutOfBoundsException {
-        return 0;
+    public int create(Push push) throws ConnectException, IndexOutOfBoundsException {
+        String response = Neo4JRestService.getInstance().postQuery(
+                "CREATE (n:Push { issueId: '%s' }) RETURN {id:id(n), labels: labels(n), data: n} ",
+                push.getIssueId()
+        );
+
+        JsonObject json = new JsonParser().parse(response).getAsJsonObject();
+        if(json.get("errors").getAsJsonArray().size() != 0)
+            L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
+        return json.get("results").getAsJsonArray().size();
     }
 
     @Override
     public Push createIfNotExists(Push data) throws ConnectException, IndexOutOfBoundsException {
-        return null;
+        Push push = data.getId() != null ? queryById(data.getId()) : null;
+        if (push == null || !push.equals(data)) {
+            int inserted = create(data);
+            if (inserted == 0)
+                return null;
+            L.d("Created %d rows", inserted);
+            return queryByField("issueId", data.getIssueId()).get(0);
+        } else return push;
     }
 
     @Override
-    public int update(Push data) throws ConnectException, IndexOutOfBoundsException {
+    public int update(Push push) throws ConnectException, IndexOutOfBoundsException {
+        if(push != null && queryById(push.getId()) != null) {
+
+            String response = Neo4JRestService.getInstance().postQuery(
+                    "MATCH (n:Push) " +
+                            "WHERE ID(n) = %d " +
+                            "SET n.issueId = '%s', n.score = %d, n.timeStamp = %d " +
+                            "RETURN {id:id(n), labels: labels(n), data: n} ",
+                    push.getId(),
+                    push.getIssueId(),
+                    push.getScore(),
+                    push.getTimestamp()
+            );
+
+            JsonObject json = new JsonParser().parse(response).getAsJsonObject();
+            if(json.get("errors").getAsJsonArray().size() != 0)
+                L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
+            return json.get("results").getAsJsonArray().size();
+        }
+        L.w("Push is null or has no id that is present in the database");
         return 0;
     }
 
     @Override
-    public int delete(Push data) throws ConnectException, IndexOutOfBoundsException {
-        return 0;
+    public int delete(Push push) throws ConnectException, IndexOutOfBoundsException {
+        return deleteById(push.getId());
     }
 
     @Override
@@ -151,13 +243,19 @@ public class PushDao extends AbsDao<Push, Long>  {
     }
 
     @Override
-    public int delete(Collection<Push> datas) throws ConnectException, IndexOutOfBoundsException {
-        return 0;
+    public int delete(Collection<Push> pushes) throws ConnectException, IndexOutOfBoundsException {
+        int changed = 0;
+        for(Push push : pushes)
+            changed += delete(push);
+        return changed;
     }
 
     @Override
-    public int deleteIds(Collection<Long> longs) throws ConnectException, IndexOutOfBoundsException {
-        return 0;
+    public int deleteIds(Collection<Long> ids) throws ConnectException, IndexOutOfBoundsException {
+        int changed = 0;
+        for(Long id : ids)
+            changed += deleteById(id);
+        return changed;
     }
 
     public int saveRelationship(Push push, Commit commit) {

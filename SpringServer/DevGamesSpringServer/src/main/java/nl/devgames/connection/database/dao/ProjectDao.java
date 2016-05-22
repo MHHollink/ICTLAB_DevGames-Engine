@@ -8,6 +8,7 @@ import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.ProjectDTO;
 import nl.devgames.model.Project;
+import nl.devgames.model.Push;
 import nl.devgames.model.User;
 import nl.devgames.utils.L;
 
@@ -214,7 +215,7 @@ public class ProjectDao extends AbsDao<Project, Long> {
         String responseString = Neo4JRestService.getInstance().postQuery(
                 "MATCH (a:Project)<-[:pushed_to]-(b:Push) " +
                         "WHERE ID(b) = %d " +
-                        "RETURN a",
+                        "RETURN {id:id(a), labels: labels(a), data: a}",
                 id
         );
 
@@ -228,11 +229,11 @@ public class ProjectDao extends AbsDao<Project, Long> {
     }
 
     @Override
-    public int create(Project data) throws ConnectException {
+    public int create(Project project) throws ConnectException {
         String response = Neo4JRestService.getInstance().postQuery(
-                "CREATE (n:Project { name: '%s', description: '%s' }) RETURN n ",
-                data.getName(),
-                data.getDescription()
+                "CREATE (n:Project { name: '%s', description: '%s' }) RETURN {id:id(n), labels: labels(n), data: n} ",
+                project.getName(),
+                project.getDescription()
         );
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
@@ -261,7 +262,7 @@ public class ProjectDao extends AbsDao<Project, Long> {
                     "MATCH (n:Project) " +
                             "WHERE ID(n) = %d " +
                             "SET n.name = '%s', n.description = '%s' " +
-                            "RETURN n",
+                            "RETURN {id:id(n), labels: labels(n), data: n} ",
                     project.getId(),
                     project.getName(),
                     project.getDescription()
@@ -288,7 +289,7 @@ public class ProjectDao extends AbsDao<Project, Long> {
                 "MATCH (n:Project) " +
                         "WHERE ID(n) = %d " +
                         "SET n.name = NULL, n.description = NULL " +
-                        "RETURN n",
+                        "RETURN {id:id(n), labels: labels(n), data: n} ",
                 id
         );
 
