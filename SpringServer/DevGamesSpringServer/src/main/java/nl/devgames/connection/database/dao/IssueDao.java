@@ -9,14 +9,17 @@ import nl.devgames.model.Issue;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Jorikito on 18-May-16.
  */
-public class IssueDao extends AbsDao<Issue, Long> { {
+public class IssueDao extends AbsDao<Issue, Long> {
 
-}
 
     @Override
     public Issue queryById(Long id) throws ConnectException, IndexOutOfBoundsException {

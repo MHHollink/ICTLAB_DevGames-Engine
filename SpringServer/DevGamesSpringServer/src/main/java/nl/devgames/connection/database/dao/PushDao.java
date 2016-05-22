@@ -5,7 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dto.*;
+import nl.devgames.connection.database.dto.PushDTO;
+import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
 import nl.devgames.model.Issue;
@@ -14,7 +15,13 @@ import nl.devgames.model.Push;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Jorikito on 18-May-16.
