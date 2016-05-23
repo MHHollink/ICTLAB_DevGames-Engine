@@ -289,14 +289,23 @@ public class BusinessDao extends AbsDao<Business, Long> {
         L.i("Creating relationship between user: '%d' and business: '%d'",
                 user.getId(), business.getId());
 
-        //todo new create relationship???
-        String response = createRelationship(user.getId(), business.getId(), User.Relations.IS_DEVELOPING);
+        String response = createRelationship(business.getId(), user.getId(), Business.Relations.HAS_EMPLOYEE);
 
         return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
     }
 
 
-    public int saveRelationship(Business business, Project project) {
-        return 0;
+    public int saveRelationship(Business business, Project project) throws ConnectException {
+        if (business.getId() == null || project.getId() == null) {
+            L.e("Id from business or project was null: business[%b], project[%b]",
+                    business.getId()==null, project.getId()==null);
+            return 0;
+        }
+        L.i("Creating relationship between business: '%d' and project: '%d'",
+                business.getId(), project.getId());
+
+        String response = createRelationship(business.getId(), project.getId(), Business.Relations.HAS_PROJECT);
+
+        return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
     }
 }

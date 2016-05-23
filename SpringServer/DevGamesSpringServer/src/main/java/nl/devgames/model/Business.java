@@ -9,6 +9,10 @@ public class Business extends Model {
     private Set<User> employees;
     private Set<Project> projects;
 
+    public enum Relations {
+        HAS_EMPLOYEE,
+        HAS_PROJECT
+    }
 
     public Business() {
     }
