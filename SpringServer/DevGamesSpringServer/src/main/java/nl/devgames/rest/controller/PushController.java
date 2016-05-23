@@ -1,7 +1,12 @@
 package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
-import nl.devgames.connection.database.dao.*;
+import nl.devgames.connection.database.dao.CommitDao;
+import nl.devgames.connection.database.dao.DuplicationDao;
+import nl.devgames.connection.database.dao.IssueDao;
+import nl.devgames.connection.database.dao.ProjectDao;
+import nl.devgames.connection.database.dao.PushDao;
+import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
 import nl.devgames.model.Issue;

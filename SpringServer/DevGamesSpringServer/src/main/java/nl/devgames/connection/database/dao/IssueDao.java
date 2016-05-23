@@ -4,21 +4,22 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.IssueDTO;
-import nl.devgames.connection.database.dto.PushDTO;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Issue;
-import nl.devgames.model.Push;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Jorikito on 18-May-16.
  */
-public class IssueDao extends AbsDao<Issue, Long> { {
+public class IssueDao extends AbsDao<Issue, Long> {
 
-}
 
     @Override
     public Issue queryById(Long id) throws ConnectException, IndexOutOfBoundsException {
@@ -143,11 +144,11 @@ public class IssueDao extends AbsDao<Issue, Long> { {
     @Override
     public int create(Issue issue) throws ConnectException, IndexOutOfBoundsException {
         String response = Neo4JRestService.getInstance().postQuery(
-                "CREATE (n:Issue { issueId: %d, severity: '%s', " +
+                "CREATE (n:Issue { key: %s, severity: '%s', " +
                         "component: '%s', startLine: %d, endLine: %d, " +
                         "status: '%s', resolution: '%s', message: '%s', " +
                         "debt: %d, creationDate: %d, updateDate %d, closeDate %d }) RETURN {id:id(n), labels: labels(n), data: n} ",
-                issue.getIssueId(),
+                issue.getKey(),
                 issue.getSeverity(),
                 issue.getComponent(),
                 issue.getStartLine(),
@@ -176,7 +177,7 @@ public class IssueDao extends AbsDao<Issue, Long> { {
             if (inserted == 0)
                 return null;
             L.d("Created %d rows", inserted);
-            return queryByField("issueId", data.getIssueId()).get(0);
+            return queryByField("key", data.getKey()).get(0);
         } else return issue;
     }
 
@@ -187,13 +188,13 @@ public class IssueDao extends AbsDao<Issue, Long> { {
             String response = Neo4JRestService.getInstance().postQuery(
                     "MATCH (n:Issue) " +
                             "WHERE ID(n) = %d " +
-                            "SET issueId: %d, severity: '%s', " +
+                            "SET key: %s, severity: '%s', " +
                             "component: '%s', startLine: %d, endLine: %d, " +
                             "status: '%s', resolution: '%s', message: '%s', " +
                             "debt: %d, creationDate: %d, updateDate %d, closeDate %d " +
                     "RETURN {id:id(n), labels: labels(n), data: n} ",
                     issue.getId(),
-                    issue.getIssueId(),
+                    issue.getKey(),
                     issue.getSeverity(),
                     issue.getComponent(),
                     issue.getStartLine(),

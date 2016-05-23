@@ -1,6 +1,5 @@
 package nl.devgames.connection.database.dao;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
@@ -9,7 +8,11 @@ import nl.devgames.model.Commit;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Jorikito on 18-May-16.

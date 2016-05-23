@@ -51,9 +51,6 @@ public abstract class BaseController {
         }
     }
 
-
-
-
     @RequestMapping(value = "/test/insert", method = RequestMethod.POST)
     public boolean setUpDb() throws ConnectException {
 

@@ -21,7 +21,7 @@ public class PushDaoTest {
         dao = new PushDao();
 
         dao.create(testPush);
-        testPush = dao.queryByField("issueId", testPush.getIssueId()).get(0);
+        testPush = dao.queryByField("issueId", testPush.getKey()).get(0);
     }
 
     @After

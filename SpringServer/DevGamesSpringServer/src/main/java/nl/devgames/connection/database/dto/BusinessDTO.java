@@ -55,7 +55,11 @@ public class BusinessDTO extends ModelDTO<BusinessDTO, Business>{
 
     @Override
     public BusinessDTO createFromNeo4jData(JsonObject data) {
-        return null;
+        BusinessDTO dto = new BusinessDTO().createFromJsonObject(
+                data.get("data").getAsJsonObject()
+        );
+        dto.id = data.get("id").getAsLong();
+        return dto;
     }
 
     @Override

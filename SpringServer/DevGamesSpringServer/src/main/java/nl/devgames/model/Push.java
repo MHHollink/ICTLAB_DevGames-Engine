@@ -12,7 +12,7 @@ public class Push extends Model {
     }
 
 
-    private String issueId;
+    private String key;
     private Project project;
     private Set<Commit> commits;
     private Set<Issue> issues;
@@ -25,13 +25,13 @@ public class Push extends Model {
 
     }
 
-    public Push(String issueId, long timestamp) {
-        this.issueId = issueId;
+    public Push(String key, long timestamp) {
+        this.key = key;
         this.timestamp = timestamp;
     }
 
-    public Push(String issueId, long timestamp, double score) {
-        this(issueId, timestamp);
+    public Push(String key, long timestamp, double score) {
+        this(key, timestamp);
         this.score = score;
     }
 
@@ -59,13 +59,13 @@ public class Push extends Model {
         return score;
     }
 
-    public String getIssueId() {
-        return issueId;
+    public String getKey() {
+        return key;
 
     }
 
-    public Push(String issueId, Project project, Set<Commit> commits, Set<Issue> issues, Set<Duplication> duplications, long timestamp, double score) {
-        this(issueId, timestamp, score);
+    public Push(String key, Project project, Set<Commit> commits, Set<Issue> issues, Set<Duplication> duplications, long timestamp, double score) {
+        this(key, timestamp, score);
         this.project = project;
         this.commits = commits;
         this.issues = issues;
@@ -88,12 +88,12 @@ public class Push extends Model {
         this.duplications = duplications;
     }
 
-    public void setTimestamp(long timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 
-    public void setIssueId(String issueId) {
-        this.issueId = issueId;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public void setScore(double score) {
