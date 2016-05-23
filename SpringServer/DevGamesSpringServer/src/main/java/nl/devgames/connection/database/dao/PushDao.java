@@ -310,19 +310,59 @@ public class PushDao extends AbsDao<Push, Long>  {
         return changed;
     }
 
-    public int saveRelationship(Push push, Commit commit) {
-        return 0;
+    public int saveRelationship(Push push, Commit commit) throws ConnectException {
+        if (push.getId() == null || commit.getId() == null) {
+            L.e("Id from push or commit was null: push[%b], commit[%b]",
+                    push.getId()==null, commit.getId()==null);
+            return 0;
+        }
+        L.i("Creating relationship between push: '%d' and commit: '%d'",
+                push.getId(), commit.getId());
+
+        String response = createRelationship(push.getId(), commit.getId(), Push.Relations.CONTAINS_COMMIT);
+
+        return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
     }
 
-    public int saveRelationship(Push push, Duplication duplication) {
-        return 0;
+    public int saveRelationship(Push push, Duplication duplication) throws ConnectException {
+        if (push.getId() == null || duplication.getId() == null) {
+            L.e("Id from push or duplication was null: push[%b], duplication[%b]",
+                    push.getId()==null, duplication.getId()==null);
+            return 0;
+        }
+        L.i("Creating relationship between push: '%d' and duplication: '%d'",
+                push.getId(), duplication.getId());
+
+        String response = createRelationship(push.getId(), duplication.getId(), Push.Relations.HAS_DUPLICATION);
+
+        return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
     }
 
-    public int saveRelationship(Push push, Issue issue) {
-        return 0;
+    public int saveRelationship(Push push, Issue issue) throws ConnectException {
+        if (push.getId() == null || issue.getId() == null) {
+            L.e("Id from push or issue was null: push[%b], issue[%b]",
+                    push.getId()==null, issue.getId()==null);
+            return 0;
+        }
+        L.i("Creating relationship between push: '%d' and issue: '%d'",
+                push.getId(), issue.getId());
+
+        String response = createRelationship(push.getId(), issue.getId(), Push.Relations.HAS_ISSUE);
+
+        return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
     }
 
-    public int saveRelationship(Push push, Project project) {
-        return 0;
+    public int saveRelationship(Push push, Project project) throws ConnectException {
+        if (push.getId() == null || project.getId() == null) {
+            L.e("Id from push or project was null: push[%b], project[%b]",
+                    push.getId()==null, project.getId()==null);
+            return 0;
+        }
+        L.i("Creating relationship between push: '%d' and project: '%d'",
+                push.getId(), project.getId());
+
+        String response = createRelationship(push.getId(), project.getId(), Push.Relations.PUSHED_TO);
+
+        return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
     }
 }
