@@ -11,6 +11,7 @@ import nl.devgames.connection.database.dto.DuplicationFileDTO;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Duplication;
 import nl.devgames.model.DuplicationFile;
+import nl.devgames.model.Push;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
@@ -319,5 +320,19 @@ public class DuplicationDao extends AbsDao<Duplication, Long>  {
         for(Long id : ids)
             changed += deleteById(id);
         return changed;
+    }
+
+    public int saveRelationship(Duplication duplication, DuplicationFile duplicationFile) throws ConnectException {
+        if (duplication.getId() == null || duplicationFile.getId() == null) {
+            L.e("Id from duplication or duplicationFile was null: duplication[%b], duplicationFile[%b]",
+                    duplication.getId()==null, duplicationFile.getId()==null);
+            return 0;
+        }
+        L.i("Creating relationship between duplication: '%d' and duplicationFile: '%d'",
+                duplication.getId(), duplicationFile.getId());
+
+        String response = createRelationship(duplication.getId(), duplicationFile.getId(), Duplication.Relations.HAS_FILE);
+
+        return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
     }
 }
