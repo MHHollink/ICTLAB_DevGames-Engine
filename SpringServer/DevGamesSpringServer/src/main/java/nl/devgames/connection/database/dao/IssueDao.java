@@ -24,7 +24,6 @@ public class IssueDao extends AbsDao<Issue, Long> {
 
     @Override
     public Issue queryById(Long id) throws ConnectException, IndexOutOfBoundsException {
-        IssueDTO dto;
         String responseString = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:Issue) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}",
                 id
@@ -46,12 +45,7 @@ public class IssueDao extends AbsDao<Issue, Long> {
                 .get("row")
                 .getAsJsonArray();
 
-
-
-
-        // dto = new IssueDTO().createFromNeo4jData(IssueDTO.findFirst(responseString));
-
-        return null;
+        return new IssueDTO().createFromNeo4jData(data.get(0).getAsJsonObject()).toModel();
     }
 
     @Override
