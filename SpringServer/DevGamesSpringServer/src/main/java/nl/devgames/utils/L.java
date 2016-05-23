@@ -62,14 +62,14 @@ public class L {
 
     public static void w(String message, Object... args) {
         if(level.ordinal() <= WARN.ordinal()) {
-            System.out.print("\u003B[31m");
+            System.out.print("\u001B[33m");
             printLog(message, args);
         }
     }
 
     public static void w(Throwable throwable, String message, Object... args) {
         if(level.ordinal() <= WARN.ordinal()) {
-            System.out.print("\u003B[31m");
+            System.out.print("\u001B[33m");
             printLog(throwable, message, args);
         }
     }
