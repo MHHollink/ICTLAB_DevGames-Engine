@@ -19,6 +19,7 @@ public class DuplicationFileDTO extends ModelDTO<DuplicationFileDTO, Duplication
     public DuplicationFile toModel() {
         DuplicationFile df = new DuplicationFile();
 
+        df.setId(id);
         df.setFile(file);
         df.setBeginLine(beginLine);
         df.setEndLine(endLine);

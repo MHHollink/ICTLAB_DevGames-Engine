@@ -23,7 +23,7 @@ public class CommitDao extends AbsDao<Commit, Long>  {
     public Commit queryById(Long id) throws ConnectException, IndexOutOfBoundsException {
         CommitDTO dto = null;
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:Commit) RETURN {id:id(n), labels: labels(n), data: n}"
+                "MATCH (n:Commit) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}", id
         );
 
         dto = new CommitDTO().createFromNeo4jData(CommitDTO.findFirst(responseString));

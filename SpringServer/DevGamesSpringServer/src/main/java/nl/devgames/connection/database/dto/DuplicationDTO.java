@@ -19,6 +19,7 @@ public class DuplicationDTO extends ModelDTO<DuplicationDTO, Duplication> {
     public Duplication toModel() {
         Duplication duplication = new Duplication();
 
+        duplication.setId(id);
         duplication.setFiles(this.files);
 
         return duplication;
@@ -45,7 +46,11 @@ public class DuplicationDTO extends ModelDTO<DuplicationDTO, Duplication> {
 
     @Override
     public DuplicationDTO createFromNeo4jData(JsonObject data) {
-        return null;
+        DuplicationDTO dto = new DuplicationDTO().createFromJsonObject(
+                data.get("data").getAsJsonObject()
+        );
+        dto.id = data.get("id").getAsLong();
+        return dto;
     }
 
     @Override

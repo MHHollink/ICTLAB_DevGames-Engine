@@ -44,7 +44,7 @@ public abstract class BaseController {
             return new UserDao().queryByField("session", session).get(0);
         } catch (ConnectException e) {
             L.e("Database service is offline!");
-            throw new DatabaseOfflineException("Database service offline!");
+            throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("User was not found");
             throw new InvalidSessionException("Session invalid!");

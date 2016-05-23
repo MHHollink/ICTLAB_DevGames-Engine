@@ -23,6 +23,7 @@ public class BusinessDTO extends ModelDTO<BusinessDTO, Business>{
     public Business toModel() {
         Business business = new Business();
 
+        business.setId(id);
         business.setName(this.name);
         business.setEmployees(this.employees);
         business.setProjects(this.projects);

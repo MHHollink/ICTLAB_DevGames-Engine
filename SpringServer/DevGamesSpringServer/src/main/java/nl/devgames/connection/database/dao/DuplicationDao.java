@@ -33,9 +33,9 @@ public class DuplicationDao extends AbsDao<Duplication, Long>  {
         String response = Neo4JRestService.getInstance().postQuery(
                 "MATCH (a:Duplication) " +
                         "WHERE ID(a) = %d " +
-                        "OPTIONAL " +
-                        "MATCH a-[]->(b) " +
-                        "WHERE ID(a) = %d " +
+                            "OPTIONAL " +
+                                "MATCH a-[]->(b) " +
+                                "WHERE ID(a) = %d " +
                         "RETURN " +
                         "{id:id(a), labels: labels(a), data: a}," +
                         "{id:id(b), labels: labels(b), data: b}",
@@ -240,7 +240,8 @@ public class DuplicationDao extends AbsDao<Duplication, Long>  {
     @Override
     public int create(Duplication duplication) throws ConnectException, IndexOutOfBoundsException {
         String response = Neo4JRestService.getInstance().postQuery(
-                "CREATE (n:Duplication) RETURN {id:id(n), labels: labels(n), data: n} "
+                "CREATE (n:Duplication {generatedUUID: '%s'}) RETURN {id:id(n), labels: labels(n), data: n} ",
+                duplication.getUuid()
         );
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
@@ -257,8 +258,7 @@ public class DuplicationDao extends AbsDao<Duplication, Long>  {
             if (inserted == 0)
                 return null;
             L.d("Created %d rows", inserted);
-            //todo: return what?
-            return queryById(data.getId());
+            return queryByField("generatedUUID", data.getUuid()).get(0);
         } else return duplication;
     }
 

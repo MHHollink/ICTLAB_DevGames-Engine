@@ -1,5 +1,6 @@
 package nl.devgames.connection.database.dao;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
@@ -23,14 +24,34 @@ public class IssueDao extends AbsDao<Issue, Long> {
 
     @Override
     public Issue queryById(Long id) throws ConnectException, IndexOutOfBoundsException {
-        IssueDTO dto = null;
+        IssueDTO dto;
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:Issue) RETURN {id:id(n), labels: labels(n), data: n}"
+                "MATCH (n:Issue) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}",
+                id
         );
 
-        dto = new IssueDTO().createFromNeo4jData(IssueDTO.findFirst(responseString));
+        JsonObject json = new JsonParser().parse(responseString).getAsJsonObject();
 
-        return dto.toModel();
+        if(json.get("errors").getAsJsonArray().size() != 0)
+            L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
+
+        JsonArray data = json.get("results")
+                .getAsJsonArray()
+                .get(0)
+                .getAsJsonObject()
+                .get("data")
+                .getAsJsonArray()
+                .get(0)
+                .getAsJsonObject()
+                .get("row")
+                .getAsJsonArray();
+
+
+
+
+        // dto = new IssueDTO().createFromNeo4jData(IssueDTO.findFirst(responseString));
+
+        return null;
     }
 
     @Override
@@ -64,7 +85,7 @@ public class IssueDao extends AbsDao<Issue, Long> {
         for (JsonObject object : IssueDTO.findAll(r)) {
             response.add(
                     queryById(
-                            new IssueDTO().createFromNeo4jData(object).toModel().getId()
+                            object.get("id").getAsLong()
                     )
             );
         }
@@ -159,10 +180,10 @@ public class IssueDao extends AbsDao<Issue, Long> {
     @Override
     public int create(Issue issue) throws ConnectException, IndexOutOfBoundsException {
         String response = Neo4JRestService.getInstance().postQuery(
-                "CREATE (n:Issue { key: %s, severity: '%s', " +
+                "CREATE (n:Issue { key: '%s', severity: '%s', " +
                         "component: '%s', startLine: %d, endLine: %d, " +
                         "status: '%s', resolution: '%s', message: '%s', " +
-                        "debt: %d, creationDate: %d, updateDate %d, closeDate %d }) RETURN {id:id(n), labels: labels(n), data: n} ",
+                        "debt: %d, creationDate: %d, updateDate: %d, closeDate: %d }) RETURN {id:id(n), labels: labels(n), data: n} ",
                 issue.getKey(),
                 issue.getSeverity(),
                 issue.getComponent(),

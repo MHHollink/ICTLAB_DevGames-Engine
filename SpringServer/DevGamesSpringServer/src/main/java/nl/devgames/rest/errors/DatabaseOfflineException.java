@@ -1,12 +1,11 @@
 package nl.devgames.rest.errors;
 
-public class DatabaseOfflineException extends KnownInternalServerError {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(code = HttpStatus.SERVICE_UNAVAILABLE)
+public class DatabaseOfflineException extends RuntimeException {
     public DatabaseOfflineException() {
         super("Database service might be offline!");
-    }
-
-    @Deprecated
-    public DatabaseOfflineException(String message, Object... args) {
-        super(message, args);
     }
 }

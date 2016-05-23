@@ -1,6 +1,7 @@
 package nl.devgames.model;
 
 import java.util.Set;
+import java.util.UUID;
 
 public class Duplication extends Model {
 
@@ -8,10 +9,23 @@ public class Duplication extends Model {
         HAS_FILE
     }
 
-    Set<DuplicationFile> files;
+    private String uuid; // using uuid for unique field
+    private Set<DuplicationFile> files;
 
     public Duplication() {
+        generateUUID();
+    }
 
+    public void generateUUID() {
+        uuid = UUID.randomUUID().toString();
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public Duplication(Set<DuplicationFile> files) {
