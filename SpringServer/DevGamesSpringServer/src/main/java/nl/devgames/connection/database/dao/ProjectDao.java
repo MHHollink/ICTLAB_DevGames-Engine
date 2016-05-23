@@ -221,6 +221,38 @@ public class ProjectDao extends AbsDao<Project, Long> {
         return new ProjectDTO().createFromNeo4jData(ProjectDTO.findFirst(responseString)).toModel();
     }
 
+    public Project queryByCommit(long id) throws ConnectException {
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:Project)<-[:pushed_to]-(b:Push)-[:contains_commit]->(c:Commit) " +
+                        "WHERE ID(c) = %d " +
+                        "RETURN {id:id(a), labels: labels(a), data: a}",
+                id
+        );
+
+        return new ProjectDTO().createFromNeo4jData(ProjectDTO.findFirst(responseString)).toModel();
+    }
+
+    public Project queryByDuplication(long id) throws ConnectException {
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:Project)<-[:pushed_to]-(b:Push)-[:has_duplication]->(d:Duplication) " +
+                        "WHERE ID(d) = %d " +
+                        "RETURN {id:id(a), labels: labels(a), data: a}",
+                id
+        );
+
+        return new ProjectDTO().createFromNeo4jData(ProjectDTO.findFirst(responseString)).toModel();
+    }
+
+    public Project queryByIssue(long id) throws ConnectException {
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:Project)<-[:pushed_to]-(b:Push)-[:has_issue]->(i:Issue) " +
+                        "WHERE ID(i) = %d " +
+                        "RETURN {id:id(a), labels: labels(a), data: a}",
+                id
+        );
+
+        return new ProjectDTO().createFromNeo4jData(ProjectDTO.findFirst(responseString)).toModel();
+    }
 
     @Override
     public Project queryBySameId(Project project) throws ConnectException {

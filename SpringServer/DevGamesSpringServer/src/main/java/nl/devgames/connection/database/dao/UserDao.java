@@ -97,7 +97,7 @@ public class UserDao extends AbsDao<User, Long> {
         String stringResponse = Neo4JRestService.getInstance().postQuery(
                 "MATCH (u:User)-[:works_on]->(p:Project) " +
                         "WHERE ID(u) = %d AND ID(p) = %d " +
-                        "RETURN u",
+                        "RETURN {id:id(u), labels: labels(u), data: u}",
                 userId,
                 projectId
         );
@@ -109,14 +109,50 @@ public class UserDao extends AbsDao<User, Long> {
         return tokenList;
     }
 
-    public User getPusherOfPush(long pushId) throws ConnectException {
+    public User getPusherOfPush(long id) throws ConnectException {
         List<User> userList = new ArrayList<>();
 
         String stringResponse = Neo4JRestService.getInstance().postQuery(
                 "MATCH (u:User)-[:pushed_by]->(p:Push) " +
                         "WHERE ID(p) = %d " +
-                        "RETURN u",
-                pushId
+                        "RETURN {id:id(u), labels: labels(u), data: u}",
+                id
+        );
+
+        return new UserDTO().createFromNeo4jData(UserDTO.findFirst(stringResponse)).toModel();
+    }
+
+    public User queryByCommit(long id) throws ConnectException {
+
+        String stringResponse = Neo4JRestService.getInstance().postQuery(
+                "MATCH (u:User)-[:pushed_by]->(p:Push)-[:contains_commit]->(c:Commit) " +
+                        "WHERE ID(c) = %d " +
+                        "RETURN {id:id(u), labels: labels(u), data: u}",
+                id
+        );
+
+        return new UserDTO().createFromNeo4jData(UserDTO.findFirst(stringResponse)).toModel();
+    }
+
+    public User queryByIssue(long id) throws ConnectException {
+
+        String stringResponse = Neo4JRestService.getInstance().postQuery(
+                "MATCH (u:User)-[:pushed_by]->(p:Push)-[:has_issue]->(i:Issue) " +
+                        "WHERE ID(i) = %d " +
+                        "RETURN {id:id(u), labels: labels(u), data: u}",
+                id
+        );
+
+        return new UserDTO().createFromNeo4jData(UserDTO.findFirst(stringResponse)).toModel();
+    }
+
+    public User queryByDuplication(long id) throws ConnectException {
+
+        String stringResponse = Neo4JRestService.getInstance().postQuery(
+                "MATCH (u:User)-[:pushed_by]->(p:Push)-[:has_duplication]->(d:Duplication) " +
+                        "WHERE ID(d) = %d " +
+                        "RETURN {id:id(u), labels: labels(u), data: u}",
+                id
         );
 
         return new UserDTO().createFromNeo4jData(UserDTO.findFirst(stringResponse)).toModel();
@@ -126,7 +162,7 @@ public class UserDao extends AbsDao<User, Long> {
     public List<User> queryForAll() throws ConnectException {
         L.i("Query user all users");
         String r = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:User) RETURN n"
+                "MATCH (n:User) RETURN {id:id(u), labels: labels(u), data: u}"
         );
 
         List<User> response = new ArrayList<>();
@@ -208,9 +244,25 @@ public class UserDao extends AbsDao<User, Long> {
         String responseString = Neo4JRestService.getInstance().postQuery(
                 "MATCH (a:User)-[:%s]->(b:Project) " +
                         "WHERE ID(b) = %d " +
-                        "RETURN a",
+                        "RETURN {id:id(a), labels: labels(a), data: a}",
                 id, User.Relations.IS_DEVELOPING.name()
         );
+
+        List<User> response = new ArrayList<>();
+        for (JsonObject object : UserDTO.findAll(responseString)) {
+            response.add(new UserDTO().createFromNeo4jData(object).toModel());
+        }
+        return response;
+    }
+
+    public List<User> queryByBusiness(long id) throws ConnectException {
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:User)-[:%s]->(b:Business) " +
+                        "WHERE ID(b) = %d " +
+                        "RETURN {id:id(a), labels: labels(a), data: a}",
+                id, User.Relations.IS_DEVELOPING.name()
+        );
+        //todo make new relationship
 
         List<User> response = new ArrayList<>();
         for (JsonObject object : UserDTO.findAll(responseString)) {
@@ -263,7 +315,7 @@ public class UserDao extends AbsDao<User, Long> {
                             "WHERE ID(n) = %d " +
                             "SET n.username = '%s', n.password = '%s', n.firstName = '%s', n.lastName = '%s', n.age = %d, " +
                                 "n.gcmId = '%s', n.session = '%s', n.mainJob = '%s', n.gitUsername = '%s' " +
-                            "RETURN n",
+                            "RETURN {id:id(n), labels: labels(n), data: n}",
                     user.getId(),
                     user.getUsername(),
                     user.getPassword(),
@@ -301,7 +353,7 @@ public class UserDao extends AbsDao<User, Long> {
                         "WHERE ID(n) = %d " +
                         "SET n.username = NULL, n.password = NULL, " +
                             "n.firstName = NULL, n.lastName = NULL, n.age = NULL, n.session = NULL, n.gcmId = NULL, n.deleted = true " + // TODO: 16-5-2016 More field to null?
-                        "RETURN n",
+                        "RETURN {id:id(n), labels: labels(n), data: n}",
                 id
         );
 

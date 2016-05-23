@@ -216,6 +216,7 @@ public class UserController extends BaseController {
     public Set<Commit> getCommits(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                    @PathVariable Long id)
     {
+        getUserFromSession( session );
         L.i("Called");
         // TODO : 1 -> check if session is valid, 2 -> get a list of commits from the user id
         throw new UnsupportedOperationException("This will return an list containing all commits under the user");

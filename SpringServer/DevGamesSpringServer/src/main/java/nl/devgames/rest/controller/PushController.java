@@ -39,7 +39,6 @@ public class PushController extends BaseController {
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
             return new PushDao().queryById(id);
@@ -60,7 +59,6 @@ public class PushController extends BaseController {
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
             return new UserDao().getPusherOfPush(id);
@@ -81,7 +79,6 @@ public class PushController extends BaseController {
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
             return new ProjectDao().getProjectByPush(id);
@@ -101,7 +98,6 @@ public class PushController extends BaseController {
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
             return new HashSet<>(new CommitDao().getCommitsFromPush(id));
@@ -121,7 +117,6 @@ public class PushController extends BaseController {
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
             return new HashSet<>(new IssueDao().getIssuesFromPush(id));
@@ -141,7 +136,6 @@ public class PushController extends BaseController {
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
             return new HashSet<>(new DuplicationDao().getDuplicationsFromPush(id));

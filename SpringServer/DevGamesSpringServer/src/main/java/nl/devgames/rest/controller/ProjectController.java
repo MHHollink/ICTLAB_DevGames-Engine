@@ -10,6 +10,7 @@ import nl.devgames.connection.database.dao.IssueDao;
 import nl.devgames.connection.database.dao.ProjectDao;
 import nl.devgames.connection.database.dao.PushDao;
 import nl.devgames.connection.database.dao.UserDao;
+import nl.devgames.connection.database.dto.ProjectDTO;
 import nl.devgames.connection.database.dto.SQReportDTO;
 import nl.devgames.connection.gcm.GCMMessageComposer;
 import nl.devgames.connection.gcm.GCMMessageType;
@@ -170,6 +171,7 @@ public class ProjectController extends BaseController{
 
         //check if session is valid
         User caller = getUserFromSession( session );
+
         try {
             return new ProjectDao().createIfNotExists(project);
         } catch (ConnectException e) {
@@ -192,6 +194,7 @@ public class ProjectController extends BaseController{
 
         //check if session is valid
         User caller = getUserFromSession( session );
+
         try {
             return new ProjectDao().queryById(id);
         } catch (ConnectException e) {
@@ -219,7 +222,6 @@ public class ProjectController extends BaseController{
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for project with id '%d'", id );
 
         try {
             ProjectDao projectDao = new ProjectDao();
@@ -253,7 +255,6 @@ public class ProjectController extends BaseController{
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         //check if user has update rights for project
         if(!caller.getMainJob().contains("admin")) {
@@ -305,7 +306,6 @@ public class ProjectController extends BaseController{
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
             return new HashSet<User>(new UserDao().queryByProject(id));
@@ -313,7 +313,7 @@ public class ProjectController extends BaseController{
             L.e("Database service is offline!");
             throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
-            L.w("Users was not found");
+            L.w("Users were not found");
             throw new InvalidSessionException("Session invalid!");
         }
     }
@@ -336,7 +336,6 @@ public class ProjectController extends BaseController{
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         //check if user has update rights for project
         if(!caller.getMainJob().contains("admin")) {
@@ -368,7 +367,6 @@ public class ProjectController extends BaseController{
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
             return new HashSet<Issue>(new IssueDao().queryFromProject(id));
@@ -396,7 +394,6 @@ public class ProjectController extends BaseController{
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
             return new HashSet<Duplication>(new DuplicationDao().queryFromProject(id));
@@ -423,7 +420,6 @@ public class ProjectController extends BaseController{
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
             return new HashSet<Push>(new PushDao().queryFromProject(id));
@@ -450,7 +446,6 @@ public class ProjectController extends BaseController{
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
             return new HashSet<Commit>(new CommitDao().queryFromProject(id));
@@ -477,7 +472,6 @@ public class ProjectController extends BaseController{
 
         //check if session is valid
         User caller = getUserFromSession( session );
-        if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
 
         try {
             return new HashSet<Business>(new BusinessDao().queryFromProject(id));

@@ -2,6 +2,10 @@ package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
+import nl.devgames.connection.database.dao.IssueDao;
+import nl.devgames.connection.database.dao.ProjectDao;
+import nl.devgames.connection.database.dao.PushDao;
+import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.connection.database.dto.IssueDTO;
 import nl.devgames.connection.database.dto.ProjectDTO;
 import nl.devgames.connection.database.dto.PushDTO;
@@ -10,8 +14,10 @@ import nl.devgames.model.Issue;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
+import nl.devgames.rest.errors.DatabaseOfflineException;
 import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.NotFoundException;
+import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,117 +33,76 @@ public class IssueController extends BaseController{
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public Issue getIssueById(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                    @PathVariable long id) throws ConnectException {
-        Issue returnIssue = new Issue();
+        L.d("Called");
 
-        //check if session valid
-        String sessionResponseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:User) " +
-                        "WHERE n.sessionId = '%s' " +
-                        "RETURN {id:id(n), labels: labels(n), data: n}",
-                session
-        );
-        if (!new UserDTO().createFromNeo4jData(UserDTO.findFirst(sessionResponseString)).isValid())
-            //session invalid
-            throw new InvalidSessionException("Request session is not found");
+        //check if session is valid
+        User caller = getUserFromSession( session );
 
-
-        //get issue by id
-        String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:Issue) " +
-                        "WHERE n.id = '%d' " +
-                        "RETURN {id:id(n), labels: labels(n), data: n}",
-                id
-        );
-
-        IssueDTO issueDTO = new IssueDTO().createFromNeo4jData(
-                IssueDTO.findFirst(responseString)
-        );
-        //return issue if valid
-        if(issueDTO.isValid()) {
-            returnIssue = issueDTO.toModel();
+        try {
+            return new IssueDao().queryById(id);
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException();
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Issue was not found");
+            throw new InvalidSessionException("Session invalid!");
         }
-        else {
-            throw new NotFoundException("Request session is not found");
-        }
-
-        return returnIssue;
     }
 
     @RequestMapping(value = "{id}/pushes", method = RequestMethod.GET)
     public Push getPush(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                         @PathVariable long id) throws ConnectException {
-        Push returnPush = new Push();
+        L.d("Called");
 
-        //get push by issue id
-        String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:Push)-[:has_issues]->(m:Issue { id:'%d' })" +
-                        "RETURN {id:id(n), labels: labels(n), data: n}",
-                id
-        );
+        //check if session is valid
+        User caller = getUserFromSession( session );
 
-        PushDTO pushDTO = new PushDTO().createFromNeo4jData(
-                PushDTO.findFirst(responseString)
-        );
-        //return push if valid
-        if(pushDTO.isValid()) {
-            returnPush = pushDTO.toModel();
+        try {
+            return new PushDao().queryByIssue(id);
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException();
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Push was not found");
+            throw new InvalidSessionException("Session invalid!");
         }
-        else {
-            throw new InvalidSessionException("Request session is not found");
-        }
-
-        return returnPush;
     }
 
     @RequestMapping(value = "{id}/user", method = RequestMethod.GET)
     public User getUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                         @PathVariable long id) throws ConnectException {
-        User returnUser = new User();
+        L.d("Called");
 
-        //get user by issue id
-        String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:User)-[:pushed_by]->(p:Push)-[:has_issues]->(i:Issue { id:'%d' })" +
-                        "RETURN {id:id(n), labels: labels(n), data: n}",
-                id
-        );
+        //check if session is valid
+        User caller = getUserFromSession( session );
 
-        UserDTO userDTO = new UserDTO().createFromNeo4jData(
-                UserDTO.findFirst(responseString)
-        );
-        //return user if valid
-        if(userDTO.isValid()) {
-            returnUser = userDTO.toModel();
+        try {
+            return new UserDao().queryByIssue(id);
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException();
+        } catch (IndexOutOfBoundsException e) {
+            L.w("User was not found");
+            throw new InvalidSessionException("Session invalid!");
         }
-        else {
-            throw new InvalidSessionException("Request session is not found");
-        }
-
-        return returnUser;
     }
 
     @RequestMapping(value = "{id}/projects", method = RequestMethod.GET)
     public Project getProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                               @PathVariable long id) throws ConnectException {
-        Project returnProject = new Project();
+        L.d("Called");
 
-        //get project by issue id
-        String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:Project)<-[:pushed_to]-(p:Push)-[:has_issues]->(i:Issue { id:'%d' })" +
-                        "RETURN {id:id(n), labels: labels(n), data: n}",
-                id
-        );
+        //check if session is valid
+        User caller = getUserFromSession( session );
 
-        ProjectDTO projectDTO = new ProjectDTO().createFromNeo4jData(
-                ProjectDTO.findFirst(responseString)
-        );
-        //return project if valid
-        if(projectDTO.isValid()) {
-            returnProject = projectDTO.toModel();
+        try {
+            return new ProjectDao().queryByIssue(id);
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException();
+        } catch (IndexOutOfBoundsException e) {
+            L.w("User was not found");
+            throw new InvalidSessionException("Session invalid!");
         }
-        else {
-            throw new InvalidSessionException("Request session is not found");
-        }
-
-        return returnProject;
     }
 }

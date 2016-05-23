@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * Created by Jorikito on 18-May-16.
  */
-public class BusinessDao implements Dao<Business, Long> {
+public class BusinessDao extends AbsDao<Business, Long> {
     @Override
     public Business queryById(Long id) throws ConnectException, IndexOutOfBoundsException {
         BusinessDTO dto = null;
@@ -233,8 +233,20 @@ public class BusinessDao implements Dao<Business, Long> {
     }
 
     @Override
-    public int deleteById(Long aLong) throws ConnectException, IndexOutOfBoundsException {
-        return 0;
+    public int deleteById(Long id) throws ConnectException, IndexOutOfBoundsException {
+        if(queryById(id) == null) return 0;
+        String response = Neo4JRestService.getInstance().postQuery(
+                "MATCH (n:Business) " +
+                        "WHERE ID(n) = %d " +
+                        "OPTIONAL MATCH n-[r]-() DELETE n, r " +
+                        "RETURN {id:id(n), labels: labels(n), data: n} ",
+                id
+        );
+
+        JsonObject json = new JsonParser().parse(response).getAsJsonObject();
+        if(json.get("errors").getAsJsonArray().size() != 0)
+            L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
+        return json.get("results").getAsJsonArray().size();
     }
 
     @Override
@@ -253,8 +265,19 @@ public class BusinessDao implements Dao<Business, Long> {
         return changed;
     }
 
-    public int saveRelationship(Business business, User user) {
-        return 0;
+    public int saveRelationship(Business business, User user) throws ConnectException {
+        if (user.getId() == null || business.getId() == null) {
+            L.e("Id from user or business was null: user[%b], business[%b]",
+                    user.getId()==null, business.getId()==null);
+            return 0;
+        }
+        L.i("Creating relationship between user: '%d' and business: '%d'",
+                user.getId(), business.getId());
+
+        //todo new create relationship???
+        String response = createRelationship(user.getId(), business.getId(), User.Relations.IS_DEVELOPING);
+
+        return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
     }
 
 

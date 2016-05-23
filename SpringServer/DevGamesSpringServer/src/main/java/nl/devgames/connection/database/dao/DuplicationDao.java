@@ -274,8 +274,20 @@ public class DuplicationDao extends AbsDao<Duplication, Long>  {
     }
 
     @Override
-    public int deleteById(Long aLong) throws ConnectException, IndexOutOfBoundsException {
-        return 0;
+    public int deleteById(Long id) throws ConnectException, IndexOutOfBoundsException {
+        if(queryById(id) == null) return 0;
+        String response = Neo4JRestService.getInstance().postQuery(
+                "MATCH (n:Duplication) " +
+                        "WHERE ID(n) = %d " +
+                        "OPTIONAL MATCH n-[r]-() DELETE n, r " +
+                        "RETURN {id:id(n), labels: labels(n), data: n} ",
+                id
+        );
+
+        JsonObject json = new JsonParser().parse(response).getAsJsonObject();
+        if(json.get("errors").getAsJsonArray().size() != 0)
+            L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
+        return json.get("results").getAsJsonArray().size();
     }
 
     @Override
