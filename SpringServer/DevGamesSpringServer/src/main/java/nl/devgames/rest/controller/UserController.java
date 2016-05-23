@@ -1,9 +1,7 @@
 package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
-import nl.devgames.connection.database.dao.ProjectDao;
-import nl.devgames.connection.database.dao.PushDao;
-import nl.devgames.connection.database.dao.UserDao;
+import nl.devgames.connection.database.dao.*;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Business;
 import nl.devgames.model.Commit;
@@ -27,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.ConnectException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -218,34 +217,69 @@ public class UserController extends BaseController {
     {
         getUserFromSession( session );
         L.i("Called");
-        // TODO : 1 -> check if session is valid, 2 -> get a list of commits from the user id
-        throw new UnsupportedOperationException("This will return an list containing all commits under the user");
+
+        try {
+            return new HashSet<Commit>(new CommitDao().queryByUser(id));
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException();
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Commits not found");
+            throw new InvalidSessionException("Session invalid!");
+        }
     }
 
     @RequestMapping(value = "{id}/issues", method = RequestMethod.GET)
     public Set<Issue> getIssues(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                  @PathVariable Long id)
     {
+        getUserFromSession( session );
         L.i("Called");
-        // TODO : 1 -> check if session is valid, 2 -> get a list of issues linked to the user id
-        throw new UnsupportedOperationException("This will return an list containing all issues the user created");
+
+        try {
+            return new HashSet<Issue>(new IssueDao().queryByUser(id));
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException();
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Issues not found");
+            throw new InvalidSessionException("Session invalid!");
+        }
     }
 
     @RequestMapping(value = "{id}/duplications", method = RequestMethod.GET)
     public Set<Duplication> getDuplications(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                 @PathVariable Long id)
     {
+        getUserFromSession( session );
         L.i("Called");
-        // TODO : 1 -> check if session is valid, 2 -> get a list of duplications with files linked to the user id
-        throw new UnsupportedOperationException("This will return an list containing all duplications the user created");
+
+        try {
+            return new HashSet<Duplication>(new DuplicationDao().queryByUser(id));
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException();
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Duplications not found");
+            throw new InvalidSessionException("Session invalid!");
+        }
     }
 
     @RequestMapping(value = "{id}/businesses", method = RequestMethod.GET)
     public Set<Business> getBusinesses(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                        @PathVariable Long id)
     {
+        getUserFromSession( session );
         L.i("Called");
-        // TODO : 1 -> check if session is valid, 2 -> get a list of Businesses with files linked to the user id
-        throw new UnsupportedOperationException("This will return an list containing all duplications the user created");
+
+        try {
+            return new HashSet<Business>(new BusinessDao().queryByUser(id));
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException();
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Businesses not found");
+            throw new InvalidSessionException("Session invalid!");
+        }
     }
 }

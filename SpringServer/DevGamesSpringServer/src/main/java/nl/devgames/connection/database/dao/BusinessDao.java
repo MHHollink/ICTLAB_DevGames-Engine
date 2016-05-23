@@ -180,6 +180,21 @@ public class BusinessDao extends AbsDao<Business, Long> {
         return response;
     }
 
+    public List<Business> queryByUser(long id) throws ConnectException {
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:Business)-[:has_employee]->(b:User) " +
+                        "WHERE ID(b) = %d " +
+                        "RETURN {id:id(a), labels: labels(a), data: a}",
+                id
+        );
+
+        List<Business> response = new ArrayList<>();
+        for (JsonObject object : BusinessDTO.findAll(responseString)) {
+            response.add(new BusinessDTO().createFromNeo4jData(object).toModel());
+        }
+        return response;
+    }
+
     @Override
     public int create(Business business) throws ConnectException, IndexOutOfBoundsException {
         String response = Neo4JRestService.getInstance().postQuery(

@@ -174,6 +174,21 @@ public class DuplicationDao extends AbsDao<Duplication, Long>  {
         return response;
     }
 
+    public List<Duplication> queryByUser(long id) throws ConnectException {
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:Duplication)<-[:has_duplications]-(b:Push)<-[:pushed_by]-(c:User) " +
+                        "WHERE ID(c) = %d " +
+                        "RETURN {id:id(a), labels: labels(a), data: a}",
+                id
+        );
+
+        List<Duplication> response = new ArrayList<>();
+        for (JsonObject object : UserDTO.findAll(responseString)) {
+            response.add(new DuplicationDTO().createFromNeo4jData(object).toModel());
+        }
+        return response;
+    }
+
     public List<Duplication> getDuplicationsFromPush(long id) throws ConnectException {
 
         List<Duplication> duplicationList = new ArrayList<>();

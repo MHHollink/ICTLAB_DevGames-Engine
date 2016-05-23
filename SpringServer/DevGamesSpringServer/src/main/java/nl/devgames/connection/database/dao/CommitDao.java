@@ -113,7 +113,7 @@ public class CommitDao extends AbsDao<Commit, Long>  {
         String responseString = Neo4JRestService.getInstance().postQuery(
                 "MATCH (a:Commit)<-[:contains_commits]-(b:Push)-[:pushed_to]->(c:Project) " +
                         "WHERE ID(c) = %d " +
-                        "RETURN a",
+                        "RETURN {id:id(a), labels: labels(a), data: a} ",
                 id
         );
 
@@ -128,7 +128,22 @@ public class CommitDao extends AbsDao<Commit, Long>  {
         String responseString = Neo4JRestService.getInstance().postQuery(
                 "MATCH (a:Commit)<-[:contains_commits]-(b:Push) " +
                         "WHERE ID(b) = %d " +
-                        "RETURN a",
+                        "RETURN {id:id(a), labels: labels(a), data: a} ",
+                id
+        );
+
+        List<Commit> response = new ArrayList<>();
+        for (JsonObject object : CommitDTO.findAll(responseString)) {
+            response.add(new CommitDTO().createFromNeo4jData(object).toModel());
+        }
+        return response;
+    }
+
+    public List<Commit> queryByUser(long id) throws ConnectException {
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:Commit)<-[:contains_commits]-(b:Push)<-[:pushed_by]-(c:User) " +
+                        "WHERE ID(c) = %d " +
+                        "RETURN {id:id(a), labels: labels(a), data: a} ",
                 id
         );
 

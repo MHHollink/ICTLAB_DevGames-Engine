@@ -115,7 +115,7 @@ public class IssueDao extends AbsDao<Issue, Long> {
         String responseString = Neo4JRestService.getInstance().postQuery(
                 "MATCH (a:Issue)<-[:has_issues]-(b:Push)-[:pushed_to]->(c:Project) " +
                         "WHERE ID(c) = %d " +
-                        "RETURN a",
+                        "RETURN {id:id(a), labels: labels(a), data: a}",
                 id
         );
 
@@ -130,7 +130,22 @@ public class IssueDao extends AbsDao<Issue, Long> {
         String responseString = Neo4JRestService.getInstance().postQuery(
                 "MATCH (a:Issue)<-[:has_issues]-(b:Push) " +
                         "WHERE ID(b) = %d " +
-                        "RETURN a",
+                        "RETURN {id:id(a), labels: labels(a), data: a}",
+                id
+        );
+
+        List<Issue> response = new ArrayList<>();
+        for (JsonObject object : UserDTO.findAll(responseString)) {
+            response.add(new IssueDTO().createFromNeo4jData(object).toModel());
+        }
+        return response;
+    }
+
+    public List<Issue> queryByUser(long id) throws ConnectException {
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:Issue)<-[:has_issues]-(b:Push)<-[:pushed_by]-(c:User) " +
+                        "WHERE ID(c) = %d " +
+                        "RETURN {id:id(a), labels: labels(a), data: a}",
                 id
         );
 
