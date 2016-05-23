@@ -8,4 +8,8 @@ public class KnownInternalServerError  extends RuntimeException{
     public KnownInternalServerError(String message, Object... args) {
         super(String.format(message, args));
     }
+
+    public KnownInternalServerError(String message) {
+        super(message);
+    }
 }

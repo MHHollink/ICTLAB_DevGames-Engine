@@ -12,6 +12,7 @@ public class Project extends Model {
     private String name;
     private String description;
     private User owner;
+    private String token;
 
     public Set<User> developers;
 
@@ -21,6 +22,12 @@ public class Project extends Model {
     public Project(String name, String description) {
         this.name = name;
         this.description = description;
+    }
+
+    public Project(String name, String description, String token) {
+        this.name = name;
+        this.description = description;
+        this.token = token;
     }
 
     public String getName() {
@@ -55,11 +62,22 @@ public class Project extends Model {
         this.owner = owner;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     @Override
     public String toString() {
         return "Project{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                '}';
+                ", owner=" + owner +
+                ", token='" + token + '\'' +
+                ", developers=" + developers +
+                "} " + super.toString();
     }
 }

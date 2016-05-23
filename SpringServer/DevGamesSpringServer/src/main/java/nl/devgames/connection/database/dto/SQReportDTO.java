@@ -256,6 +256,7 @@ public class SQReportDTO {
 	 * @return project			the project with the project name
 	 */
 	private Project parseProject(JsonObject reportAsJson) {
+
 		String projectName = reportAsJson.get("projectName").getAsString();
 		Project project = new Project();
 		if(projectName!=null) {

@@ -25,7 +25,8 @@ public class UserDao extends AbsDao<User, Long> {
 
     @Override
     public User queryById(Long id) throws ConnectException {
-        L.i("Query user with id: %d", id);
+        if(id == null ) return  null;
+        L.d("Query user with id: %d", id);
         UserDTO dto = null;
         Set<Project> projects = new HashSet<>();
         Set<Push> pushes = new HashSet<>();

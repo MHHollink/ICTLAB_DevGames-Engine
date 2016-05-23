@@ -16,6 +16,11 @@ public class Duplication extends Model {
         generateUUID();
     }
 
+    public Duplication(Set<DuplicationFile> files) {
+        this.files = files;
+        generateUUID();
+    }
+
     public void generateUUID() {
         uuid = UUID.randomUUID().toString();
     }
@@ -26,10 +31,6 @@ public class Duplication extends Model {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    public Duplication(Set<DuplicationFile> files) {
-        this.files = files;
     }
 
     public Set<DuplicationFile> getFiles() {

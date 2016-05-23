@@ -262,9 +262,10 @@ public class ProjectDao extends AbsDao<Project, Long> {
     @Override
     public int create(Project project) throws ConnectException {
         String response = Neo4JRestService.getInstance().postQuery(
-                "CREATE (n:Project { name: '%s', description: '%s' }) RETURN {id:id(n), labels: labels(n), data: n} ",
+                "CREATE (n:Project { name: '%s', description: '%s', token: '%s' }) RETURN {id:id(n), labels: labels(n), data: n} ",
                 project.getName(),
-                project.getDescription()
+                project.getDescription(),
+                project.getToken()
         );
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();

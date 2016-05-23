@@ -16,6 +16,7 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
     public String name;
     public String description;
     public User creator;
+    public String token;
 
     public Set<User> developers;
 
@@ -28,6 +29,7 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
         project.setDescription(this.description);
         project.setOwner(creator);
         project.setDevelopers(developers);
+        project.setToken(token);
 
         return project;
     }
@@ -72,6 +74,9 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
         return "ProjectDTO{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", creator=" + creator +
+                ", token='" + token + '\'' +
+                ", developers=" + developers +
                 "} " + super.toString();
     }
 }
