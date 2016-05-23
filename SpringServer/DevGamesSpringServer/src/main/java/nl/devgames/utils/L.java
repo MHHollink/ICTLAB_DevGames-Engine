@@ -1,6 +1,5 @@
 package nl.devgames.utils;
 
-import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,48 +61,31 @@ public class L {
     }
 
     public static void w(String message, Object... args) {
-        if(level.ordinal() <= WARN.ordinal())
+        if(level.ordinal() <= WARN.ordinal()) {
+            System.out.print("\u003B[31m");
             printLog(message, args);
+        }
     }
 
     public static void w(Throwable throwable, String message, Object... args) {
-        if(level.ordinal() <= WARN.ordinal())
+        if(level.ordinal() <= WARN.ordinal()) {
+            System.out.print("\u003B[31m");
             printLog(throwable, message, args);
+        }
     }
 
     public static void e(String message, Object... args) {
-        if(level.ordinal() <= ERROR.ordinal())
+        if(level.ordinal() <= ERROR.ordinal()) {
+            System.out.print("\u001B[31m");
             printLog(message, args);
+        }
     }
 
     public static void e(Throwable throwable, String message, Object... args) {
-        if(level.ordinal() <= ERROR.ordinal())
+        if(level.ordinal() <= ERROR.ordinal()) {
+            System.out.print("\u001B[31m");
             printLog(throwable, message, args);
-    }
-
-    /**
-     * NEVER USE THIS, USE THE APPROPRIATE LOG LEVEL!
-     */
-    @Deprecated
-    public static void og(String message, Object... args) {
-        String formattedMessage = String.format(message, args);
-        System.out.println(
-                        createTag() +
-                        formattedMessage
-        );
-    }
-
-    /**
-     * NEVER USE THIS, USE THE APPROPRIATE LOG LEVEL!
-     */
-    @Deprecated
-    public static void og(Throwable throwable, String message, Object... args) {
-        MessageFormat form = new MessageFormat(message);
-        System.out.println(
-                createTag()+
-                        form.format(args == null ? NO_ARGS : args)
-        );
-        throwable.printStackTrace();
+        }
     }
 
     /**
@@ -155,7 +137,8 @@ public class L {
     private static void printLog(String message, Object... args) {
         System.out.println(
                 createTag()+
-                        String.format(message, args == null ? NO_ARGS : args)
+                        String.format(message, args == null ? NO_ARGS : args)+
+                        "\u001B[0m" // RESET COLOR IF CHANGED
         );
     }
 }

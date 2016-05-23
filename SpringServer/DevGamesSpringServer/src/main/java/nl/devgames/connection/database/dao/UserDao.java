@@ -273,7 +273,7 @@ public class UserDao extends AbsDao<User, Long> {
 
     @Override
     public int create(User user) throws ConnectException {
-        L.i("Creating user: %s", user);
+        L.d("Creating user: %s", user);
         String response = Neo4JRestService.getInstance().postQuery(
                 "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmId: '%s' }) RETURN n ",
                 user.getUsername(),
@@ -294,7 +294,7 @@ public class UserDao extends AbsDao<User, Long> {
 
     @Override
     public User createIfNotExists(User user) throws ConnectException {
-        L.i("Creating user if it does not exist: %s", user);
+        L.d("Creating user if it does not exist: %s", user);
         User u = queryById(user.getId());
         if (u == null || !u.equals(user)) {
             int inserted = create(user);
@@ -307,7 +307,7 @@ public class UserDao extends AbsDao<User, Long> {
 
     @Override
     public int update(User user) throws ConnectException {
-        L.i("Updating user: %s", user);
+        L.d("Updating user: %s", user);
         if(user != null && queryById(user.getId()) != null) {
 
             String response = Neo4JRestService.getInstance().postQuery(
