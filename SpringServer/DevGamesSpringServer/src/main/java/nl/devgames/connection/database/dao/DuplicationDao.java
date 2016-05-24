@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.sun.org.apache.bcel.internal.generic.DUP;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.DuplicationDTO;
 import nl.devgames.connection.database.dto.DuplicationFileDTO;
@@ -12,6 +13,7 @@ import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Duplication;
 import nl.devgames.model.DuplicationFile;
 import nl.devgames.model.Push;
+import nl.devgames.model.User;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
@@ -162,10 +164,10 @@ public class DuplicationDao extends AbsDao<Duplication, Long>  {
 
     public List<Duplication> queryFromProject(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Duplication)<-[:has_duplications]-(b:Push)-[:pushed_to]->(c:Project) " +
+                "MATCH (a:Duplication)<-[:%s]-(b:Push)-[:%s]->(c:Project) " +
                         "WHERE ID(c) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Push.Relations.HAS_DUPLICATION.name(), Push.Relations.PUSHED_TO.name(),id
         );
 
         List<Duplication> response = new ArrayList<>();
@@ -177,10 +179,10 @@ public class DuplicationDao extends AbsDao<Duplication, Long>  {
 
     public List<Duplication> queryByUser(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Duplication)<-[:has_duplications]-(b:Push)<-[:pushed_by]-(c:User) " +
+                "MATCH (a:Duplication)<-[:%s]-(b:Push)<-[:%s]-(c:User) " +
                         "WHERE ID(c) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Push.Relations.HAS_DUPLICATION.name(), User.Relations.HAS_PUSHED.name(), id
         );
 
         List<Duplication> response = new ArrayList<>();
@@ -194,11 +196,11 @@ public class DuplicationDao extends AbsDao<Duplication, Long>  {
 
         List<Duplication> duplicationList = new ArrayList<>();
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:DuplicationFile)<-[:has_files]-(b:Duplication)<-[:has_duplications]-(c:Push " +
+                "MATCH (a:DuplicationFile)<-[:%s]-(b:Duplication)<-[:%s]-(c:Push " +
                         "WHERE ID(c) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}," +
                         "       {id:id(b), labels: labels(b), data: b}",
-                id);
+                Duplication.Relations.HAS_FILE.name(), Push.Relations.HAS_DUPLICATION.name(),id);
 
         JsonObject json = new JsonParser().parse(responseString).getAsJsonObject();
 

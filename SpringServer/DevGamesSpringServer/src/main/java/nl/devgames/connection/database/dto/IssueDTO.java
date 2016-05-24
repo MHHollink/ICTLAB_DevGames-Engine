@@ -32,7 +32,7 @@ public class IssueDTO extends ModelDTO<IssueDTO, Issue> {
     public Issue toModel() {
         Issue issue = new Issue();
 
-        issue.setId(id);
+        //issue.setId(id);
         issue.setKey(key);
         issue.setSeverity(this.severity);
         issue.setComponent(this.component);
@@ -56,16 +56,17 @@ public class IssueDTO extends ModelDTO<IssueDTO, Issue> {
                 startLine != Integer.MIN_VALUE &&
                 endLine != Integer.MIN_VALUE &&
                 status != null &&
-                resolution != null &&
+//                resolution != null &&
                 message != null &&
                 debt != Integer.MIN_VALUE &&
-                creationDate != 0d &&
-                updateDate != 0d &&
-                closeDate != 0d;
+                creationDate != null;
+//                updateDate != null &&
+//                closeDate != null;
 
         if(!valid) {
             L.w("Issue is not valid! False indicates a problem: " +
-                            "severity:'%b', beginLine:'%b', endLine:'%b', size:'%b'",
+                            "severity:'%b', component:'%b', startLine:'%b', endLine:'%b', status:'%b', resolution:'%b', message:'%b', " +
+                            "debt:'%b', creationDate:'%b', updateDate:'%b', closeDate:'%b'",
                             severity != null,
                             component != null,
                             startLine != Integer.MIN_VALUE,
@@ -74,9 +75,9 @@ public class IssueDTO extends ModelDTO<IssueDTO, Issue> {
                             resolution != null,
                             message != null,
                             debt != Integer.MIN_VALUE,
-                            creationDate != 0d,
-                            updateDate != 0d,
-                            closeDate != 0d
+                            creationDate != null,
+                            updateDate != null,
+                            closeDate != null
             );
         }
 

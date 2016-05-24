@@ -114,10 +114,10 @@ public class UserDao extends AbsDao<User, Long> {
         List<User> userList = new ArrayList<>();
 
         String stringResponse = Neo4JRestService.getInstance().postQuery(
-                "MATCH (u:User)-[:pushed_by]->(p:Push) " +
+                "MATCH (u:User)-[:%s]->(p:Push) " +
                         "WHERE ID(p) = %d " +
                         "RETURN {id:id(u), labels: labels(u), data: u}",
-                id
+                User.Relations.HAS_PUSHED.name(), id
         );
 
         return new UserDTO().createFromNeo4jData(UserDTO.findFirst(stringResponse)).toModel();
@@ -126,10 +126,10 @@ public class UserDao extends AbsDao<User, Long> {
     public User queryByCommit(long id) throws ConnectException {
 
         String stringResponse = Neo4JRestService.getInstance().postQuery(
-                "MATCH (u:User)-[:pushed_by]->(p:Push)-[:contains_commit]->(c:Commit) " +
+                "MATCH (u:User)-[:%s]->(p:Push)-[:%s]->(c:Commit) " +
                         "WHERE ID(c) = %d " +
                         "RETURN {id:id(u), labels: labels(u), data: u}",
-                id
+                User.Relations.HAS_PUSHED.name(), Push.Relations.CONTAINS_COMMIT.name(), id
         );
 
         return new UserDTO().createFromNeo4jData(UserDTO.findFirst(stringResponse)).toModel();
@@ -138,10 +138,10 @@ public class UserDao extends AbsDao<User, Long> {
     public User queryByIssue(long id) throws ConnectException {
 
         String stringResponse = Neo4JRestService.getInstance().postQuery(
-                "MATCH (u:User)-[:pushed_by]->(p:Push)-[:has_issue]->(i:Issue) " +
+                "MATCH (u:User)-[:%s]->(p:Push)-[:%s]->(i:Issue) " +
                         "WHERE ID(i) = %d " +
                         "RETURN {id:id(u), labels: labels(u), data: u}",
-                id
+                User.Relations.HAS_PUSHED.name(), Push.Relations.HAS_ISSUE.name(), id
         );
 
         return new UserDTO().createFromNeo4jData(UserDTO.findFirst(stringResponse)).toModel();
@@ -150,10 +150,10 @@ public class UserDao extends AbsDao<User, Long> {
     public User queryByDuplication(long id) throws ConnectException {
 
         String stringResponse = Neo4JRestService.getInstance().postQuery(
-                "MATCH (u:User)-[:pushed_by]->(p:Push)-[:has_duplication]->(d:Duplication) " +
+                "MATCH (u:User)-[:%s]->(p:Push)-[:%s]->(d:Duplication) " +
                         "WHERE ID(d) = %d " +
                         "RETURN {id:id(u), labels: labels(u), data: u}",
-                id
+                User.Relations.HAS_PUSHED.name(), Push.Relations.HAS_DUPLICATION.name(), id
         );
 
         return new UserDTO().createFromNeo4jData(UserDTO.findFirst(stringResponse)).toModel();

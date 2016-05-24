@@ -7,6 +7,8 @@ import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.IssueDTO;
 import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Issue;
+import nl.devgames.model.Push;
+import nl.devgames.model.User;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
@@ -128,10 +130,10 @@ public class IssueDao extends AbsDao<Issue, Long> {
 
     public List<Issue> queryFromProject(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Issue)<-[:has_issues]-(b:Push)-[:pushed_to]->(c:Project) " +
+                "MATCH (a:Issue)<-[:%s]-(b:Push)-[:%s]->(c:Project) " +
                         "WHERE ID(c) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Push.Relations.HAS_ISSUE.name(), Push.Relations.PUSHED_TO.name(), id
         );
 
         List<Issue> response = new ArrayList<>();
@@ -143,10 +145,10 @@ public class IssueDao extends AbsDao<Issue, Long> {
 
     public List<Issue> getIssuesFromPush(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Issue)<-[:has_issues]-(b:Push) " +
+                "MATCH (a:Issue)<-[:%s]-(b:Push) " +
                         "WHERE ID(b) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Push.Relations.HAS_ISSUE.name(), id
         );
 
         List<Issue> response = new ArrayList<>();
@@ -158,10 +160,10 @@ public class IssueDao extends AbsDao<Issue, Long> {
 
     public List<Issue> queryByUser(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Issue)<-[:has_issues]-(b:Push)<-[:pushed_by]-(c:User) " +
+                "MATCH (a:Issue)<-[:%s]-(b:Push)<-[:%s]-(c:User) " +
                         "WHERE ID(c) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Push.Relations.HAS_ISSUE.name(), User.Relations.HAS_PUSHED.name(), id
         );
 
         List<Issue> response = new ArrayList<>();

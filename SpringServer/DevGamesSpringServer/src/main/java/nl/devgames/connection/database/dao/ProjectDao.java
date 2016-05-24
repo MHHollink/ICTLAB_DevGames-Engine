@@ -8,6 +8,7 @@ import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.ProjectDTO;
 import nl.devgames.model.Project;
+import nl.devgames.model.Push;
 import nl.devgames.model.User;
 import nl.devgames.utils.L;
 
@@ -212,10 +213,10 @@ public class ProjectDao extends AbsDao<Project, Long> {
 
     public Project getProjectByPush(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Project)<-[:pushed_to]-(b:Push) " +
+                "MATCH (a:Project)<-[:%s]-(b:Push) " +
                         "WHERE ID(b) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Push.Relations.PUSHED_TO.name(), id
         );
 
         return new ProjectDTO().createFromNeo4jData(ProjectDTO.findFirst(responseString)).toModel();
@@ -223,10 +224,10 @@ public class ProjectDao extends AbsDao<Project, Long> {
 
     public Project queryByCommit(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Project)<-[:pushed_to]-(b:Push)-[:contains_commit]->(c:Commit) " +
+                "MATCH (a:Project)<-[:%s]-(b:Push)-[:%s]->(c:Commit) " +
                         "WHERE ID(c) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Push.Relations.PUSHED_TO.name(), Push.Relations.CONTAINS_COMMIT.name(), id
         );
 
         return new ProjectDTO().createFromNeo4jData(ProjectDTO.findFirst(responseString)).toModel();
@@ -234,10 +235,10 @@ public class ProjectDao extends AbsDao<Project, Long> {
 
     public Project queryByDuplication(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Project)<-[:pushed_to]-(b:Push)-[:has_duplication]->(d:Duplication) " +
+                "MATCH (a:Project)<-[:%s]-(b:Push)-[:%s]->(d:Duplication) " +
                         "WHERE ID(d) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Push.Relations.PUSHED_TO.name(), Push.Relations.HAS_DUPLICATION.name(), id
         );
 
         return new ProjectDTO().createFromNeo4jData(ProjectDTO.findFirst(responseString)).toModel();
@@ -245,10 +246,10 @@ public class ProjectDao extends AbsDao<Project, Long> {
 
     public Project queryByIssue(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Project)<-[:pushed_to]-(b:Push)-[:has_issue]->(i:Issue) " +
+                "MATCH (a:Project)<-[:%s]-(b:Push)-[:%s]->(i:Issue) " +
                         "WHERE ID(i) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Push.Relations.PUSHED_TO.name(), Push.Relations.HAS_ISSUE.name(), id
         );
 
         return new ProjectDTO().createFromNeo4jData(ProjectDTO.findFirst(responseString)).toModel();

@@ -167,10 +167,10 @@ public class BusinessDao extends AbsDao<Business, Long> {
 
     public List<Business> queryFromProject(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Business)-[:has_project]->(b:Project) " +
+                "MATCH (a:Business)-[:%s]->(b:Project) " +
                         "WHERE ID(b) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Business.Relations.HAS_PROJECT.name(), id
         );
 
         List<Business> response = new ArrayList<>();
@@ -182,10 +182,10 @@ public class BusinessDao extends AbsDao<Business, Long> {
 
     public List<Business> queryByUser(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Business)-[:has_employee]->(b:User) " +
+                "MATCH (a:Business)-[:%s]->(b:User) " +
                         "WHERE ID(b) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Business.Relations.HAS_EMPLOYEE.name(), id
         );
 
         List<Business> response = new ArrayList<>();

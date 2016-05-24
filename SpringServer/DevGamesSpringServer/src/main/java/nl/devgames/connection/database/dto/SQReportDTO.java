@@ -6,12 +6,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.model.Commit;
-import nl.devgames.model.Duplication;
-import nl.devgames.model.DuplicationFile;
-import nl.devgames.model.Issue;
-import nl.devgames.model.Project;
-import nl.devgames.model.User;
+import nl.devgames.connection.database.dao.CommitDao;
+import nl.devgames.connection.database.dao.ProjectDao;
+import nl.devgames.connection.database.dao.PushDao;
+import nl.devgames.model.*;
 import nl.devgames.utils.L;
 
 import java.util.ArrayList;
@@ -21,6 +19,7 @@ import java.util.Set;
 
 public class SQReportDTO {
 	private Project project;
+	private String token;
 	private Long id;
 	private User author;
 	private Long timestamp;
@@ -52,11 +51,13 @@ public class SQReportDTO {
      * @param reportAsJson 		the report as json object
      * @return sqreport 		the new parsed report
      */
-	public SQReportDTO buildFromJson(JsonObject reportAsJson) throws Exception {
+	public SQReportDTO buildFromJson(JsonObject reportAsJson, String token) throws Exception {
 		L.i("Parsing SonarQube report");
 		//build project
-		Project project = parseProject(reportAsJson);
-		
+		//todo:is project necessary?
+//		Project project = parseProject(reportAsJson);
+		Project project = new ProjectDao().queryByField("token", token).get(0);
+
 		//author
 		User author = parseAuthor(reportAsJson);
 		
@@ -87,12 +88,13 @@ public class SQReportDTO {
 			sqreport.setIssues(issueList);
 			sqreport.setDuplications(duplicationsList);
 			sqreport.setTimestamp(timestamp);
+			sqreport.setProject(project);
 //		sqreport.setScore(score);
 			L.i("Done parsing SonarQube report");
 		}
 		else{
 			//throw exception
-			throw new Exception("error parsing sonar qube qreport");
+			throw new Exception("error parsing sonar qube report");
 		}
 		return sqreport;
 	}
@@ -105,6 +107,10 @@ public class SQReportDTO {
 		if(valid) {
 			//=====================NODES================
             //push push to database
+//			Push push = new Push();
+//			push.setScore(this.score);
+//			push.setTimestamp(this.timestamp);
+//			int pushResponse = new PushDao().create(push);
 			String pushResponseString = Neo4JRestService.getInstance().postQuery(
 	                 "CREATE (n:Push { " +
 	                         "timestamp: '%d', score: '%f'}) " +
@@ -116,7 +122,11 @@ public class SQReportDTO {
 			long pushId = new JsonParser().parse(pushResponseString).getAsJsonObject().get("results").getAsJsonArray()
 					.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
 			setId(pushId);
+
 		    //push commits to database
+//			for (Commit commit : this.getCommits()) {
+//				int commitResponse = new CommitDao().create(commit);
+//			}
 			for (Commit commit : this.getCommits()) {
                 String commitResponseString = Neo4JRestService.getInstance().postQuery(
                         "CREATE (n:Commit { " +
@@ -135,13 +145,13 @@ public class SQReportDTO {
             for (Issue issue : this.getIssues()) {
 				String issueResponseString = Neo4JRestService.getInstance().postQuery(
                         "CREATE (n:Issue { " +
-								"issueId: '%d', " +
+								"key: '%s', " +
                                 "severity: '%s', component: '%s', message: '%s', " +
                                 "status: '%s', resolution: '%s', dept: %d, " +
                                 "startLine: %d, endLine: %d, creationDate : %d," +
-                                "updateData: %d, closeData: %d }) " +
+                                "updateDate: %d, closeDate: %d }) " +
 								"RETURN ID(n)",
-                        issue.getId(),
+                        issue.getKey(),
 						issue.getSeverity(),
                         issue.getComponent(),
                         issue.getMessage(),
@@ -597,5 +607,12 @@ public class SQReportDTO {
 	public void setScore(double score) {
 		this.score = score;
 	}
-	
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
 }

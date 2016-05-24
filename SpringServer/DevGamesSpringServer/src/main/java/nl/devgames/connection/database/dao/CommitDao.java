@@ -5,6 +5,8 @@ import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.CommitDTO;
 import nl.devgames.model.Commit;
+import nl.devgames.model.Push;
+import nl.devgames.model.User;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
@@ -111,10 +113,10 @@ public class CommitDao extends AbsDao<Commit, Long>  {
 
     public List<Commit> queryFromProject(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Commit)<-[:contains_commits]-(b:Push)-[:pushed_to]->(c:Project) " +
+                "MATCH (a:Commit)<-[:%s]-(b:Push)-[:%s]->(c:Project) " +
                         "WHERE ID(c) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a} ",
-                id
+                Push.Relations.CONTAINS_COMMIT.name(), Push.Relations.PUSHED_TO.name(), id
         );
 
         List<Commit> response = new ArrayList<>();
@@ -126,10 +128,10 @@ public class CommitDao extends AbsDao<Commit, Long>  {
 
     public List<Commit> getCommitsFromPush(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Commit)<-[:contains_commits]-(b:Push) " +
+                "MATCH (a:Commit)<-[:%s]-(b:Push) " +
                         "WHERE ID(b) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a} ",
-                id
+                Push.Relations.CONTAINS_COMMIT.name(), id
         );
 
         List<Commit> response = new ArrayList<>();
@@ -141,10 +143,10 @@ public class CommitDao extends AbsDao<Commit, Long>  {
 
     public List<Commit> queryByUser(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Commit)<-[:contains_commits]-(b:Push)<-[:pushed_by]-(c:User) " +
+                "MATCH (a:Commit)<-[:%s]-(b:Push)<-[:%s]-(c:User) " +
                         "WHERE ID(c) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a} ",
-                id
+                Push.Relations.CONTAINS_COMMIT.name(), User.Relations.HAS_PUSHED.name(), id
         );
 
         List<Commit> response = new ArrayList<>();

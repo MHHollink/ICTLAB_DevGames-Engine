@@ -183,10 +183,10 @@ public class PushDao extends AbsDao<Push, Long>  {
 
     public List<Push> queryFromProject(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Push)-[:pushed_to]->(b:Project) " +
+                "MATCH (a:Push)-[:%s]->(b:Project) " +
                         "WHERE ID(b) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Push.Relations.PUSHED_TO.name(), id
         );
 
         List<Push> response = new ArrayList<>();
@@ -198,10 +198,10 @@ public class PushDao extends AbsDao<Push, Long>  {
 
     public Push queryByIssue(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Push)-[:has_issue]->(b:Issue) " +
+                "MATCH (a:Push)-[:%s]->(b:Issue) " +
                         "WHERE ID(b) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Push.Relations.HAS_ISSUE.name(), id
         );
 
         Push response = new PushDTO().createFromNeo4jData(PushDTO.findFirst(responseString)).toModel();
@@ -211,10 +211,10 @@ public class PushDao extends AbsDao<Push, Long>  {
 
     public Push queryByCommit(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (a:Push)-[:contains_commit]->(b:Commit) " +
+                "MATCH (a:Push)-[:%s]->(b:Commit) " +
                         "WHERE ID(b) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Push.Relations.CONTAINS_COMMIT.name(), id
         );
 
         Push response = new PushDTO().createFromNeo4jData(PushDTO.findFirst(responseString)).toModel();
@@ -227,7 +227,7 @@ public class PushDao extends AbsDao<Push, Long>  {
                 "MATCH (a:Push)-[:has_duplication]->(b:Duplication) " +
                         "WHERE ID(b) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id
+                Push.Relations.HAS_DUPLICATION.name(), id
         );
 
         Push response = new PushDTO().createFromNeo4jData(PushDTO.findFirst(responseString)).toModel();

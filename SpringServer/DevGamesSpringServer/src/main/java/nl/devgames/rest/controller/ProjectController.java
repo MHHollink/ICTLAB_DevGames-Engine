@@ -118,9 +118,9 @@ public class ProjectController extends BaseController{
         java.util.Map<String, String> result = new java.util.HashMap<>();
 
         try {
-            List<Project> projects = new ProjectDao().queryByField("token", token);
+            Project project = new ProjectDao().queryByField("token", token).get(0);
             //check if token is invalid
-            if (projects.get(0) == null)
+            if (project == null)
                 throw new NotFoundException("project with token not found!");
 
         } catch (ConnectException e) {
@@ -130,7 +130,7 @@ public class ProjectController extends BaseController{
         try {
             //parse build as SQReportDTO
             JsonObject reportAsJson = new JsonParser().parse(json).getAsJsonObject();
-            SQReportDTO testReport = new SQReportDTO().buildFromJson(reportAsJson);
+            SQReportDTO testReport = new SQReportDTO().buildFromJson(reportAsJson, token);
             //todo: get settings for project, temp testing solution below
             File testSettingsFile = new File("settingsTest.txt");
             Scanner scanner = new Scanner(testSettingsFile);
@@ -151,7 +151,7 @@ public class ProjectController extends BaseController{
 
             result.put("message", "successfully parsed and saved report");
         }catch (Exception e) {
-            L.e(e, "Error when parsing report");
+            L.e(e, "Error when parsing and saving report");
             throw new KnownInternalServerError(e.getMessage());
         }
 
