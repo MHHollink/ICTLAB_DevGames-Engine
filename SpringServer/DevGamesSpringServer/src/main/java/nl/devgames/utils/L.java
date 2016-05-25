@@ -20,7 +20,7 @@ public class L {
         FATAL,
         OFF
     }
-    public static LogLevel level = DEBUG;
+    public static LogLevel level = TRACE;
 
     // The format of the automatically created tag in each log line.
     private static final String TAG_FORMAT = "%s/ DEVGAMES: line=%d: %s#%s: ";

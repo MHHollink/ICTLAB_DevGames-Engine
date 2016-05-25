@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.ConnectException;
 import java.util.HashSet;
 import java.util.List;
@@ -152,10 +153,10 @@ public class ProjectController extends BaseController{
             );
 
             result.put("message", "successfully parsed and saved report");
-        }catch (Exception e) {
-            L.e(e, "Error when parsing and saving report");
-            throw new KnownInternalServerError(e.getMessage());
-        }
+        } catch (ConnectException e) {
+            L.e(e, "Database offline");
+            throw new DatabaseOfflineException();
+        } catch (FileNotFoundException ignored) {}
 
         return result;
     }

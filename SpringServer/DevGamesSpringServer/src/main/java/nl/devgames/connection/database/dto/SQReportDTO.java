@@ -12,10 +12,11 @@ import nl.devgames.utils.L;
 
 import java.net.ConnectException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SQReportDTO {
+
 	private Project project;
-	private String token;
 	private Long id;
 	private User author;
 	private Long timestamp;
@@ -24,335 +25,135 @@ public class SQReportDTO {
 	private List<Issue> issues;
 	private List<Duplication> duplications;
 	private Double score;
-    private Boolean valid = true;
+    private Boolean built;
+    private Boolean saved;
 
-	public SQReportDTO() {
-		
-	}
-	
-	public SQReportDTO(Project project, User author, long timestamp, ReportResultType buildResult,
-			List<Commit> commits, List<Issue> issues, List<Duplication> duplications) {
-		this.project = project;
-		this.author = author;
-		this.timestamp = timestamp;
-		this.buildResult = buildResult;
-		this.commits = commits;
-		this.issues = issues;
-		this.duplications = duplications;
+    public SQReportDTO() {
+		built = false;
+        saved = false;
 	}
 	
 	/**
      * Builds a Sonar Qube report from a json object
      *
-     * @param reportAsJson 		the report as json object
+     * @param json 		the report as json object
      * @return sqreport 		the new parsed report
      */
-	public SQReportDTO buildFromJson(JsonObject reportAsJson, String token) throws Exception {
-		L.i("Parsing SonarQube report");
-		//build project
-		//todo:is project necessary?
-//		Project project = parseProject(reportAsJson);
-		Project project = new ProjectDao().queryByField("token", token).get(0);
+	public SQReportDTO buildFromJson(JsonObject json, String token) throws ReportParseExeption {
+        try {
+            L.i("Parsing SonarQube report");
+            Project project = new ProjectDao().queryByField("token", token).get(0);
 
-		//author
-		User author = parseAuthor(reportAsJson);
-		
-		//build result
-		ReportResultType resultType = parseResultType(reportAsJson);
-		
-		//timestamp
-		Long timestamp = parseTimeStamp(reportAsJson);
-		
-		//commits
-		List<Commit> commitList = parseCommits(reportAsJson);
-		
-		//issues
-		List<Issue> issueList = parseIssues(reportAsJson);
-		
-		//duplications
-		List<Duplication> duplicationsList = parseDuplications(reportAsJson);
+            User author                         = parseAuthor(json.get("author").getAsString());
+            ReportResultType resultType         = parseResultType(json.get("result").getAsString());
+            Long timestamp                      = parseTimeStamp(json.get("timestamp").getAsString());
+            List<Commit> commitList             = parseCommits(json.get("items").getAsJsonArray());
+            List<Issue> issueList               = parseIssues(json.get("issues").getAsJsonArray());
+            List<Duplication> duplicationsList  = parseDuplications(json);
 
-		//return sqreport if valid data
-		SQReportDTO sqreport = new SQReportDTO();
-		if(valid) {
-			//setters here
-			sqreport.setProject(project);
-			sqreport.setAuthor(author);
-			sqreport.setBuildResult(resultType);
-			sqreport.setTimestamp(timestamp);
-			sqreport.setCommits(commitList);
-			sqreport.setIssues(issueList);
-			sqreport.setDuplications(duplicationsList);
-			sqreport.setTimestamp(timestamp);
-			sqreport.setProject(project);
-//		sqreport.setScore(score);
-			L.i("Done parsing SonarQube report");
-		}
-		else{
-			//throw exception
-			throw new Exception("error parsing sonar qube report");
-		}
-		return sqreport;
-	}
+            //return sqreport if valid data
+            SQReportDTO sqreport = new SQReportDTO();
+            sqreport.setProject(project);
+            sqreport.setAuthor(author);
+            sqreport.setBuildResult(resultType);
+            sqreport.setTimestamp(timestamp);
+            sqreport.setCommits(commitList);
+            sqreport.setIssues(issueList);
+            sqreport.setDuplications(duplicationsList);
+            sqreport.setTimestamp(timestamp);
+            //		sqreport.setScore(score);
+
+            L.i("Done parsing SonarQube report");
+            sqreport.isBuilt(true);
+
+            return sqreport;
+        } catch (IndexOutOfBoundsException e) {
+            L.e(e, "Getting project by token threw error, token is incorrect. token:'%s'", token);
+            throw new ReportParseExeption("Token invalid");
+        } catch (ConnectException e) {
+            L.e(e, "Database offline");
+            throw new DatabaseOfflineException();
+        }
+    }
 	
 	/**
      * Saves the report data to the neo4j database
      */
-	public void saveReportToDatabase() throws Exception {
-		if(valid) {
-			List<Commit> newCommits = new ArrayList<>();
-			List<Issue> newIssues = new ArrayList<>();
-			List<Duplication> newDuplications = new ArrayList<>();
-			PushDao pushDao = new PushDao();
-			UserDao userDao = new UserDao();
-
-			//=====================NODES================
-            //push push to database
-			final Push newPush = new PushDao().createIfNotExists(new Push(UUID.randomUUID().toString(), this.timestamp, this.score));
-//			String pushResponseString = Neo4JRestService.getInstance().postQuery(
-//	                 "CREATE (n:Push { " +
-//	                         "timestamp: '%d', score: '%f'}) " +
-//							 "RETURN ID(n)",
-//					 this.getTimestamp(),
-//					 this.getScore()
-//	         );
-			//return neo id to establish relationships
-//			long pushId = new JsonParser().parse(pushResponseString).getAsJsonObject().get("results").getAsJsonArray()
-//					.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
-//			setId(pushId);
-
-		    //push commits to database
-			for (Commit commit : this.getCommits()) {
-				newCommits.add(new CommitDao().createIfNotExists(commit));
-			}
-//			for (Commit commit : this.getCommits()) {
-//                String commitResponseString = Neo4JRestService.getInstance().postQuery(
-//                        "CREATE (n:Commit { " +
-//                                "commitId: '%s', commitMsg: '%s', timestamp: %d })" +
-//								"RETURN ID(n)",
-//                        commit.getCommitId(),
-//                        commit.getCommitMsg(),
-//                        commit.getTimeStamp()
-//                );
-//				//return neo id to establish relationships
-//				long commitId = new JsonParser().parse(commitResponseString).getAsJsonObject().get("results").getAsJsonArray()
-//						.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
-//				commit.setId(commitId);
-//            }
-            //push issues to database
-			for (Issue issue : this.getIssues()) {
-				newIssues.add(new IssueDao().createIfNotExists(issue));
-			}
-
-            System.out.println();
-//            for (Issue issue : this.getIssues()) {
-//				String issueResponseString = Neo4JRestService.getInstance().postQuery(
-//                        "CREATE (n:Issue { " +
-//								"key: '%s', " +
-//                                "severity: '%s', component: '%s', message: '%s', " +
-//                                "status: '%s', resolution: '%s', dept: %d, " +
-//                                "startLine: %d, endLine: %d, creationDate : %d," +
-//                                "updateDate: %d, closeDate: %d }) " +
-//								"RETURN ID(n)",
-//                        issue.getKey(),
-//						issue.getSeverity(),
-//                        issue.getComponent(),
-//                        issue.getMessage(),
-//                        issue.getStatus(),
-//                        issue.getResolution(),
-//                        issue.getDebt(),
-//                        issue.getStartLine(),
-//                        issue.getEndLine(),
-//                        issue.getCreationDate(),
-//                        issue.getUpdateDate(),
-//                        issue.getCloseDate()
-//                );
-//				//return neo id to establish relationships
-//				long issueId = new JsonParser().parse(issueResponseString).getAsJsonObject().get("results").getAsJsonArray()
-//						.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
-//				issue.setId(issueId);
-//            }
-            //push duplications to neo4j database
-			for(Duplication duplication : this.getDuplications()) {
-				newDuplications.add(new DuplicationDao().createIfNotExists(duplication));
-			}
-//            for (Duplication duplication : this.getDuplications()) {
-//                String duplicationResponseString = Neo4JRestService.getInstance().postQuery(
-//                        "CREATE (n:Duplication { " +
-//								"id: '%d' }) " +
-//								"RETURN ID(n)",
-//						duplication.getId()
-//                );
-//				//return neo id to establish relationships
-//				long duplicationId = new JsonParser().parse(duplicationResponseString).getAsJsonObject().get("results").getAsJsonArray()
-//						.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
-//				duplication.setId(duplicationId);
-//
-//                //push duplication files to neo4j database
-//                for (DuplicationFile duplicationFile : duplication.getFiles()) {
-//                    String duplicationFileResponseString = Neo4JRestService.getInstance().postQuery(
-//                            "CREATE (n:DuplicationFile { " +
-//									"file: '%s', beginLine: '%d', endLine: '%d', size: '%d'}) " +
-//									"RETURN ID(n)",
-//							duplicationFile.getFile(),
-//							duplicationFile.getBeginLine(),
-//							duplicationFile.getEndLine(),
-//							duplicationFile.getSize()
-//                    );
-//					//return neo id to establish relationships
-//					long duplicationFileId = new JsonParser().parse(duplicationFileResponseString).getAsJsonObject().get("results").getAsJsonArray()
-//							.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
-//					duplicationFile.setId(duplicationFileId);
-//                }
-//            }
- 			//======================RELATIONSHIPS===================
-			//push -> commit
-			newCommits.parallelStream().forEach(c->{
-                try {
-                    pushDao.saveRelationship(newPush, c);
-                } catch (ConnectException e) {
-                    L.e(e, "Database is offline!");
-                    throw new DatabaseOfflineException();
-                }
-            });
-
-			//push -> project
-			pushDao.saveRelationship(newPush, this.project);
-			//push -> duplication
-            newDuplications.parallelStream().forEach(d->{
-                try {
-                    pushDao.saveRelationship(newPush, d);
-                } catch (ConnectException e) {
-                    L.e(e, "Database is offline!");
-                    throw new DatabaseOfflineException();
-                }
-            });
-			//push -> issue
-            newIssues.parallelStream().forEach(i->{
-                try {
-                    pushDao.saveRelationship(newPush, i);
-                } catch (ConnectException e) {
-                    L.e(e, "Database is offline!");
-                    throw new DatabaseOfflineException();
-                }
-            });
-			//user -> push
-			userDao.saveRelationship(this.author, newPush);
-
-//			//push push relations to database
-//			for (Commit commit : this.getCommits()) {
-//				Neo4JRestService.getInstance().postQuery(
-//						"MATCH (a:Push), (b:Commit) " +
-//								"WHERE ID(a) = %d AND ID(b) = %d " +
-//								"CREATE (a)-[:contains_commits]->(b)",
-//						this.getId(),
-//						commit.getId()
-//				);
-//			}
-//			//push - user
-//			Neo4JRestService.getInstance().postQuery(
-//				"MATCH (a:User), (b:Push) " +
-//						"WHERE a.gitUsername = '%s' " +
-//						"CREATE (a)-[:pushed_by]->(b)"
-//			);
-//			//push issue relations to database
-//			for (Issue issue : this.getIssues()) {
-//				Neo4JRestService.getInstance().postQuery(
-//						"MATCH (a:Push), (b:Issue) " +
-//								"WHERE ID(a) = %d AND ID(b) = %d " +
-//								"CREATE (a)-[:contains_issues]->(b)",
-//						this.getId(),
-//						issue.getId()
-//				);
-//			}
-//			//push duplication to database
-//			for(Duplication duplication : this.getDuplications()) {
-//				Neo4JRestService.getInstance().postQuery(
-//						"MATCH (a:Push), (b:Duplication) " +
-//								"WHERE ID(a) = %d AND ID(b) = %d " +
-//								"CREATE (a)-[:contains_duplications]->(b)",
-//						this.getId(),
-//						duplication.getId()
-//				);
-//				//push duplication files to database
-//				for(DuplicationFile duplicationFile : duplication.getFiles()) {
-//					Neo4JRestService.getInstance().postQuery(
-//							"MATCH (a:Duplication), (b:DuplicationFile) " +
-//									"WHERE ID(a) = %d AND ID(b) = %d " +
-//									"CREATE (a)-[:contains_files]->(b)",
-//							duplication.getId(),
-//							duplicationFile.getId()
-//					);
-//				}
-//			}
+	public void saveReportToDatabase() throws ConnectException {
+        if(!hasBeenBuilt()) {
+            L.w("Hey developer! wake up! you forgot to build the report.");
+            return;
         }
-		else {
-			throw new Exception("cannot save report due to invalid data");
-		}
-	}
+        if(hasBeenSaved()) {
+            L.w("Hey developer! wake up! saving twice is really stupid.");
+            return;
+        }
+
+        //=====================NODES================
+        //push push to database
+        PushDao pushDAO = new PushDao();
+        Push newPush = pushDAO.createIfNotExists(new Push(UUID.randomUUID().toString(), this.timestamp, this.score));
+
+        CommitDao commitDao = new CommitDao();
+        commits.parallelStream().forEach(commit -> {
+                    try {
+                        Commit c = commitDao.createIfNotExists(commit);
+                        pushDAO.saveRelationship(newPush, c);
+                    } catch (ConnectException e) {
+                        L.e("Database offline");
+                        throw new DatabaseOfflineException();
+                    }
+                }
+        );
+
+        IssueDao issueDao = new IssueDao();
+        issues.stream().forEach(
+                issue -> {
+                    try {
+                        Issue i = issueDao.createIfNotExists(issue);
+                        pushDAO.saveRelationship(newPush, i);
+                    } catch (ConnectException e) {
+                        L.e("Database offline");
+                        throw new DatabaseOfflineException();
+                    }
+                }
+        );
+
+        DuplicationDao duplicationDAO = new DuplicationDao();
+        duplications.stream().forEach(
+                duplication -> {
+                    try {
+                        Duplication d = duplicationDAO.createIfNotExists(duplication);
+                        pushDAO.saveRelationship(newPush, d);
+                    } catch (ConnectException e) {
+                        L.e("Database offline");
+                        throw new DatabaseOfflineException();
+                    }
+                }
+        );
+
+        new UserDao().saveRelationship(author, newPush);
+
+        saved = true;
+    }
 
 	/**
 	 * ==========================Convenience methods=========================
 	 */
-	
-	/**
-	 * Parses the project name from the json object
-	 * @param reportAsJson		the json object of the report
-	 * @return project			the project with the project name
-	 */
-	private Project parseProject(JsonObject reportAsJson) {
 
-		String projectName = reportAsJson.get("projectName").getAsString();
-		Project project = new Project();
-		if(projectName!=null) {
-			project.setName(projectName);
-		}
-		else {
-			valid = false;
-			L.e("error parsing project name");
-		}
-		return project;
-	}
-	
 	/**
 	 * Parses the push author from the json object
-	 * @param reportAsJson		the json object of the report
+	 * @param username		    the gitUsername of the user who pushed
 	 * @return project			the project with the project name
 	 */
-	private User parseAuthor(JsonObject reportAsJson) throws ConnectException {
-		//default
-		String gitUsername = reportAsJson.get("author").getAsString();
+	private User parseAuthor(String username) throws ConnectException {
         try {
-            author = new UserDao().queryByField("gitUsername", gitUsername).get(0);
+            author = new UserDao().queryByField("gitUsername", username).get(0);
         } catch (IndexOutOfBoundsException e) {
-            L.e(e, "User queried by gitUsername threw error: gitUsername: '%s'",
-                    gitUsername);
+            L.e(e, "User queried by gitUsername threw error: gitUsername:'%s'", username);
             throw new ReportParseExeption("User with gitUsername:'%s' is not in the database or linked to the project");
         }
 		return author;
-//		User author = new User();
-//		if(pushAuthor!=null) {
-//			author.setGitUsername(pushAuthor);
-//			old author was surname, tween, name
-//			String[] names = pushAuthor.split("\\s+");
-//			if(names.length == 1) {
-//				author.setFirstName(names[0]);
-//			}
-//			else if(names.length == 2) {
-//				author.setFirstName(names[0]);
-//				author.setLastName(names[1]);
-//			}
-//			else if(names.length == 3) {
-//				author.setFirstName(names[0]);
-//				author.setTween(names[1]);
-//				author.setFirstName(names[2]);
-//			}
-//		}
-//		else {
-//			L.e("error parsing author");
-//			valid = false;
-//		}
-//		return author;
 	}
 	
 	/**
@@ -360,27 +161,16 @@ public class SQReportDTO {
 	 * @param reportAsJson		the json object of the report
 	 * @return resultType		the push result as ReportResultType
 	 */
-	private ReportResultType parseResultType(JsonObject reportAsJson) {
-		//default
-		ReportResultType resultType = ReportResultType.UNDEFINED;
-		String buildResult = reportAsJson.get("result").getAsString();
-		if(buildResult!=null) {
+	private ReportResultType parseResultType(String buildResult) {
+		if(buildResult != null) {
 			switch (buildResult) {
-			case "SUCCESS":
-				resultType = ReportResultType.SUCCESS;
-				break;
-			case "FAILED":
-				resultType = ReportResultType.FAILED;
-				break;
-			default:
-				resultType = ReportResultType.UNDEFINED;
-				break;
+                case "SUCCESS": return ReportResultType.SUCCESS;
+                case "FAILED": return ReportResultType.FAILED;
+
+                default: return ReportResultType.UNDEFINED;
 			}
 		}
-		else {
-			valid = false;
-		}
-		return resultType;
+        throw new ReportParseExeption("Build result was null, did you succeed or fail?");
 	}
 	
 	/**
@@ -388,66 +178,35 @@ public class SQReportDTO {
 	 * @param reportAsJson		the json object of the report
 	 * @return timestamp		the push timestamp as a Long
 	 */
-	private Long parseTimeStamp(JsonObject reportAsJson) {
-		//default
-		Long timestamp = System.currentTimeMillis();
-		String buildTimestamp = reportAsJson.get("timestamp").getAsString();
-		if(buildTimestamp!=null) {
+	private Long parseTimeStamp(String buildTimestamp) {
+		if(buildTimestamp != null) {
 			try{
-				timestamp = Long.parseLong(buildTimestamp);
+				return Long.parseLong(buildTimestamp);
 			}
 			catch(Exception e) {
-				L.i("invalid timestamp while parsing the report, set to current time");
-				timestamp = System.currentTimeMillis();
+                return System.currentTimeMillis();
 			}
 		}
-		else {
-			valid = false;
-		}
-		return timestamp;
-	}
+        throw new ReportParseExeption("Time of the build was empty. we could not parse!");
+    }
 	
 	/**
 	 * Parses the push commits from the json object
 	 * @param reportAsJson		the json object of the report
 	 * @return commitsList		the push commits as a List of commits
 	 */
-	private List<Commit> parseCommits(JsonObject reportAsJson) {
-		//default
-		List<Commit> commitList = new ArrayList<>();
-		JsonArray commitArray = reportAsJson.get("items").getAsJsonArray();
-		for(JsonElement commitElement : commitArray) {	
-			JsonObject object = commitElement.getAsJsonObject();
-			CommitDTO commit = new Gson().fromJson(object, CommitDTO.class);
-			//check if fields aren't empty
-			if(commit.isValid()) {
-				commitList.add(commit.toModel());
-			}
-			else {
-				valid = false;
-			}
-//			String commitId = commitElement.getAsJsonObject().get("commitId").getAsString();
-//			String commitMsg = commitElement.getAsJsonObject().get("commitMsg").getAsString();
-//			String commitDate = commitElement.getAsJsonObject().get("date").getAsString();
-//			Long commitTimestamp = null;
-//			try{
-//				//parse date to epoch
-//			    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss Z");
-//			    Date parsedDate = dateFormat.parse(commitDate);
-//			    commitTimestamp = parsedDate.getTime();
-//			}
-//			catch(Exception e){
-//				L.og("error parsing timestamp of commit with id: %d ,set to current time" + commitId);
-//				commitTimestamp = System.currentTimeMillis();
-//			}
-//			if(commitId!=null && commitMsg!=null && commitTimestamp!=null) {
-//				commitList.add(new Commit(commitId, commitMsg, commitTimestamp));
-//			}
-//			else{
-//				L.og("error parsing commit with id: %s", commitId);
-//			}
-		}
-		return commitList;
+	private List<Commit> parseCommits(JsonArray commitsArray) {
+        List<Commit> commits = new ArrayList<>();
+        commitsArray.forEach(commit -> {
+            commits.add(
+                new Gson().fromJson(commit, Commit.class)
+            );
+        });
+       if (commits.size() == 0) {
+           L.e("we had 0 commits. If no changes in code were made, why did you build?");
+           throw new ReportParseExeption("we had 0 commits. If no changes in code were made, why did you build?");
+       }
+        return commits;
 	}
 	
 	/**
@@ -455,76 +214,14 @@ public class SQReportDTO {
 	 * @param reportAsJson		the json object of the report
 	 * @return issueList		the push issues as a List of issues
 	 */
-	private List<Issue> parseIssues(JsonObject reportAsJson) {
-		//default
-		List<Issue> issueList = new ArrayList<>();
-		JsonArray issueArray = reportAsJson.get("issues").getAsJsonArray();
-		for(JsonElement issueElement : issueArray) {
-            JsonObject object = issueElement.getAsJsonObject();
-            IssueDTO issue = new Gson().fromJson(object, IssueDTO.class);
-            //check if fields aren't empty
-            if(issue.isValid()) {
-                issueList.add(issue.toModel());
-            }
-            else {
-                valid = false;
-            }
-//			String issueSeverity = issueElement.getAsJsonObject().get("severity").getAsString();
-//			String issueComponent = issueElement.getAsJsonObject().get("component").getAsString();
-//			//range
-//			JsonObject issueTextRange = issueElement.getAsJsonObject().get("textRange").getAsJsonObject();
-//			Integer issueStartLine = issueTextRange.get("startLine").getAsInt();
-//		    Integer issueEndLine = issueTextRange.get("endLine").getAsInt();
-//
-//		    String status = issueElement.getAsJsonObject().get("status").getAsString();
-//		    String resolution = issueElement.getAsJsonObject().get("resolution").getAsString();
-//		    String message = issueElement.getAsJsonObject().get("message").getAsString();
-//
-//		    //convert debt to int
-//		    String debtAsString = "";
-//		    Integer debt = 0;
-//		    try{
-//		        debtAsString = issueElement.getAsJsonObject().get("debt").getAsString();
-//			    debt = Integer.parseInt(debtAsString.substring(0, debtAsString.length()-3));
-//		    }
-//		    catch(Exception e) {
-//		    	L.og("error parsing debt of issue with message: %s", message);
-//		    }
-//
-//		    //timestamps
-//		    String creationDate = issueElement.getAsJsonObject().get("creationDate").getAsString();
-//		    String updateDate = issueElement.getAsJsonObject().get("updateDate").getAsString();
-//		    String closeDate = issueElement.getAsJsonObject().get("closeDate").getAsString();
-//		    Long creationTimestamp = null;
-//		    Long updateTimestamp = null;;
-//		    Long closeTimestamp = null;;
-//			try{
-//				//parse date to epoch
-//			    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss Z");
-//			    Date parsedCreationDate = dateFormat.parse(creationDate);
-//			    Date parsedUpdateDate = dateFormat.parse(updateDate);
-//			    Date parsedCloseDate = dateFormat.parse(closeDate);
-//			    creationTimestamp = parsedCreationDate.getTime();
-//			    updateTimestamp = parsedUpdateDate.getTime();
-//			    closeTimestamp = parsedCloseDate.getTime();
-//			}
-//			catch(Exception e){
-//				L.og("error parsing timestamp of issue with message: %s", message);
-//				creationTimestamp = System.currentTimeMillis();
-//			    updateTimestamp = System.currentTimeMillis();
-//			    closeTimestamp = System.currentTimeMillis();
-//			}
-//			if(issueSeverity!=null && issueComponent!=null && issueStartLine!=null && issueEndLine!=null
-//					&& status!=null && resolution!=null && message!=null && debtAsString!=null) {
-//				issueList.add(new Issue(issueSeverity, issueComponent, issueStartLine, issueEndLine,
-//						status, resolution, message, debt, creationTimestamp, updateTimestamp,
-//						closeTimestamp));
-//			}
-//			else{
-//				System.out.println("error parsing issue with message: " + message);
-//			}
-		}
-		return issueList;
+	private List<Issue> parseIssues(JsonArray issuesArray) {
+        List<Issue> issues = new ArrayList<>();
+        issuesArray.forEach(issue -> {
+            IssueDTO dto = new Gson().fromJson(issue, IssueDTO.class);
+            if(!dto.isValid()) throw new ReportParseExeption("Issues that we received were not correctly structured");
+            issues.add(dto.toModel());
+        });
+        return issues;
 	}
 	
 	/**
@@ -533,7 +230,8 @@ public class SQReportDTO {
 	 * @return duplicationsList		the push Duplications as a List of Duplications
 	 */
 	private List<Duplication> parseDuplications(JsonObject reportAsJson) {
-		//default
+        // FIXME: 25-5-2016 Rewrite
+        //default
 		List<Duplication> duplicationsList = new ArrayList<>();
 		JsonArray duplicationsArray = reportAsJson.get("duplications").getAsJsonArray();
 		for(JsonElement duplicationElement : duplicationsArray) {
@@ -551,23 +249,8 @@ public class SQReportDTO {
                     duplicationFilesSet.add(duplicationFile.toModel());
                 }
                 else {
-                    valid = false;
+                    throw new ReportParseExeption("Issues that we received were not correctly structured");
                 }
-//				//for each file
-//				String fileName = "unknown";
-//				try{
-//					DuplicationFile duplicationFile = new DuplicationFile();
-//					JsonObject file = fileArray.get(i).getAsJsonObject();
-//					fileName = file.get("name").getAsString();
-//				    Integer fileFromLine = file.get("from").getAsInt();
-//				    Integer fileSize = file.get("size").getAsInt();
-//				    Integer fileEndLine = fileFromLine + fileSize;
-//					//add to set
-//					duplicationFilesSet.add(duplicationFile);
-//				}
-//				catch(Exception e) {
-//					System.out.println("error parsing duplication with name: " + fileName);
-//				}
 			}
 			duplication.setFiles(duplicationFilesSet);
 			duplicationsList.add(duplication);
@@ -575,9 +258,9 @@ public class SQReportDTO {
 		return duplicationsList;
 	}
 
-	/**
-	 * getters and setters
-	 */
+    /**
+     * ==========================Getter/Setter methods=========================
+     */
 	
 	public Project getProject() {
 		return project;
@@ -651,11 +334,20 @@ public class SQReportDTO {
 		this.score = score;
 	}
 
-	public String getToken() {
-		return token;
-	}
+    public void isBuilt(boolean built) {
+        this.built = built;
+    }
 
-	public void setToken(String token) {
-		this.token = token;
-	}
+    public Boolean hasBeenBuilt() {
+        return built;
+    }
+
+    public void isSaved(boolean saved){
+        this.saved = saved;
+    }
+
+    public Boolean hasBeenSaved() {
+        return saved;
+    }
+
 }

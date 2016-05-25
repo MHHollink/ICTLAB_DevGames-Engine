@@ -79,16 +79,6 @@ public class IssueDao extends AbsDao<Issue, Long> {
                 value
         );
 
-//        List<Issue> response = new ArrayList<>();
-//        for (JsonObject object : IssueDTO.findAll(r)) {
-//            response.add(
-//                    queryById(
-//                            object.get("id").getAsLong()
-//                    )
-//            );
-//        }
-//        return response;
-
         return IssueDTO.findAll(r).stream().map(
                 o -> {
                     try {
@@ -190,13 +180,16 @@ public class IssueDao extends AbsDao<Issue, Long> {
     public int create(Issue issue) throws ConnectException, IndexOutOfBoundsException {
 
         issue.setMessage(
-                issue.getMessage().replace("\'", "|").replace("\\", "/")
+                issue.getMessage().replace("\'", "|").replace("\\", "/").replace("\"", "\\\"")
         );
 
-        String query = String.format("CREATE (n:Issue { key: '%s', severity: '%s', " +
-                        "component: '%s', startLine: %d, endLine: %d, " +
-                        "status: '%s', resolution: '%s', message: '%s', " +
-                        "debt: %d, creationDate: %d, updateDate: %d, closeDate: %d }) RETURN {id:id(n), labels: labels(n), data: n} ",
+        String query = String.format(
+                "CREATE (" +
+                            "n:Issue {" +
+                                "key: '%s', severity: '%s', component: '%s', startLine: %d, endLine: %d, status: '%s', resolution: '%s', message: '%s', debt: %d, creationDate: %d, updateDate: %d, closeDate: %d" +
+                            "}" +
+                        ") " +
+                        "RETURN {id: id(n), labels: labels(n), data: n} ",
                 issue.getKey(),
                 issue.getSeverity(),
                 issue.getComponent(),
