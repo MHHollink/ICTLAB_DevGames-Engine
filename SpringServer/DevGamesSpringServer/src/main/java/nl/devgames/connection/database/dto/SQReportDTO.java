@@ -4,18 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dao.CommitDao;
-import nl.devgames.connection.database.dao.ProjectDao;
-import nl.devgames.connection.database.dao.PushDao;
+import nl.devgames.connection.database.dao.*;
 import nl.devgames.model.*;
+import nl.devgames.rest.errors.DatabaseOfflineException;
+import nl.devgames.rest.errors.ReportParseExeption;
 import nl.devgames.utils.L;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.net.ConnectException;
+import java.util.*;
 
 public class SQReportDTO {
 	private Project project;
@@ -103,158 +99,197 @@ public class SQReportDTO {
      * Saves the report data to the neo4j database
      */
 	public void saveReportToDatabase() throws Exception {
-		//TODO: create nodes and relationships between them IN ONE CYPHER QUERY
 		if(valid) {
+			List<Commit> newCommits = new ArrayList<>();
+			List<Issue> newIssues = new ArrayList<>();
+			List<Duplication> newDuplications = new ArrayList<>();
+			PushDao pushDao = new PushDao();
+			UserDao userDao = new UserDao();
+
 			//=====================NODES================
             //push push to database
-//			Push push = new Push();
-//			push.setScore(this.score);
-//			push.setTimestamp(this.timestamp);
-//			int pushResponse = new PushDao().create(push);
-			String pushResponseString = Neo4JRestService.getInstance().postQuery(
-	                 "CREATE (n:Push { " +
-	                         "timestamp: '%d', score: '%f'}) " +
-							 "RETURN ID(n)",
-					 this.getTimestamp(),
-					 this.getScore()
-	         );
+			final Push newPush = new PushDao().createIfNotExists(new Push(UUID.randomUUID().toString(), this.timestamp, this.score));
+//			String pushResponseString = Neo4JRestService.getInstance().postQuery(
+//	                 "CREATE (n:Push { " +
+//	                         "timestamp: '%d', score: '%f'}) " +
+//							 "RETURN ID(n)",
+//					 this.getTimestamp(),
+//					 this.getScore()
+//	         );
 			//return neo id to establish relationships
-			long pushId = new JsonParser().parse(pushResponseString).getAsJsonObject().get("results").getAsJsonArray()
-					.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
-			setId(pushId);
+//			long pushId = new JsonParser().parse(pushResponseString).getAsJsonObject().get("results").getAsJsonArray()
+//					.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
+//			setId(pushId);
 
 		    //push commits to database
+			for (Commit commit : this.getCommits()) {
+				newCommits.add(new CommitDao().createIfNotExists(commit));
+			}
 //			for (Commit commit : this.getCommits()) {
-//				int commitResponse = new CommitDao().create(commit);
-//			}
-			for (Commit commit : this.getCommits()) {
-                String commitResponseString = Neo4JRestService.getInstance().postQuery(
-                        "CREATE (n:Commit { " +
-                                "commitId: '%s', commitMsg: '%s', timestamp: %d })" +
-								"RETURN ID(n)",
-                        commit.getCommitId(),
-                        commit.getCommitMsg(),
-                        commit.getTimeStamp()
-                );
-				//return neo id to establish relationships
-				long commitId = new JsonParser().parse(commitResponseString).getAsJsonObject().get("results").getAsJsonArray()
-						.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
-				commit.setId(commitId);
-            }
+//                String commitResponseString = Neo4JRestService.getInstance().postQuery(
+//                        "CREATE (n:Commit { " +
+//                                "commitId: '%s', commitMsg: '%s', timestamp: %d })" +
+//								"RETURN ID(n)",
+//                        commit.getCommitId(),
+//                        commit.getCommitMsg(),
+//                        commit.getTimeStamp()
+//                );
+//				//return neo id to establish relationships
+//				long commitId = new JsonParser().parse(commitResponseString).getAsJsonObject().get("results").getAsJsonArray()
+//						.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
+//				commit.setId(commitId);
+//            }
             //push issues to database
-            for (Issue issue : this.getIssues()) {
-				String issueResponseString = Neo4JRestService.getInstance().postQuery(
-                        "CREATE (n:Issue { " +
-								"key: '%s', " +
-                                "severity: '%s', component: '%s', message: '%s', " +
-                                "status: '%s', resolution: '%s', dept: %d, " +
-                                "startLine: %d, endLine: %d, creationDate : %d," +
-                                "updateDate: %d, closeDate: %d }) " +
-								"RETURN ID(n)",
-                        issue.getKey(),
-						issue.getSeverity(),
-                        issue.getComponent(),
-                        issue.getMessage(),
-                        issue.getStatus(),
-                        issue.getResolution(),
-                        issue.getDebt(),
-                        issue.getStartLine(),
-                        issue.getEndLine(),
-                        issue.getCreationDate(),
-                        issue.getUpdateDate(),
-                        issue.getCloseDate()
-                );
-				//return neo id to establish relationships
-				long issueId = new JsonParser().parse(issueResponseString).getAsJsonObject().get("results").getAsJsonArray()
-						.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
-				issue.setId(issueId);
-            }
-            //push duplications to neo4j database
-            for (Duplication duplication : this.getDuplications()) {
-                String duplicationResponseString = Neo4JRestService.getInstance().postQuery(
-                        "CREATE (n:Duplication { " +
-								"id: '%d' }) " +
-								"RETURN ID(n)",
-						duplication.getId()
-                );
-				//return neo id to establish relationships
-				long duplicationId = new JsonParser().parse(duplicationResponseString).getAsJsonObject().get("results").getAsJsonArray()
-						.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
-				duplication.setId(duplicationId);
-
-                //push duplication files to neo4j database
-                for (DuplicationFile duplicationFile : duplication.getFiles()) {
-                    String duplicationFileResponseString = Neo4JRestService.getInstance().postQuery(
-                            "CREATE (n:DuplicationFile { " +
-									"file: '%s', beginLine: '%d', endLine: '%d', size: '%d'}) " +
-									"RETURN ID(n)",
-							duplicationFile.getFile(),
-							duplicationFile.getBeginLine(),
-							duplicationFile.getEndLine(),
-							duplicationFile.getSize()
-                    );
-					//return neo id to establish relationships
-					long duplicationFileId = new JsonParser().parse(duplicationFileResponseString).getAsJsonObject().get("results").getAsJsonArray()
-							.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
-					duplicationFile.setId(duplicationFileId);
-                }
-            }
- 			//======================RELATIONSHIPS===================
-			//push push relations to database
-			for (Commit commit : this.getCommits()) {
-				Neo4JRestService.getInstance().postQuery(
-						"MATCH (a:Push), (b:Commit) " +
-								"WHERE ID(a) = %d AND ID(b) = %d " +
-								"CREATE (a)-[:contains_commits]->(b)",
-						this.getId(),
-						commit.getId()
-				);
-			}
-			//push - user
-			Neo4JRestService.getInstance().postQuery(
-				"MATCH (a:User), (b:Push) " +
-						"WHERE a.gitUsername = '%s' " +
-						"CREATE (a)-[:pushed_by]->(b)"
-			);
-			//push issue relations to database
 			for (Issue issue : this.getIssues()) {
-				Neo4JRestService.getInstance().postQuery(
-						"MATCH (a:Push), (b:Issue) " +
-								"WHERE ID(a) = %d AND ID(b) = %d " +
-								"CREATE (a)-[:contains_issues]->(b)",
-						this.getId(),
-						issue.getId()
-				);
+				newIssues.add(new IssueDao().createIfNotExists(issue));
 			}
-			//push duplication to database
+
+            System.out.println();
+//            for (Issue issue : this.getIssues()) {
+//				String issueResponseString = Neo4JRestService.getInstance().postQuery(
+//                        "CREATE (n:Issue { " +
+//								"key: '%s', " +
+//                                "severity: '%s', component: '%s', message: '%s', " +
+//                                "status: '%s', resolution: '%s', dept: %d, " +
+//                                "startLine: %d, endLine: %d, creationDate : %d," +
+//                                "updateDate: %d, closeDate: %d }) " +
+//								"RETURN ID(n)",
+//                        issue.getKey(),
+//						issue.getSeverity(),
+//                        issue.getComponent(),
+//                        issue.getMessage(),
+//                        issue.getStatus(),
+//                        issue.getResolution(),
+//                        issue.getDebt(),
+//                        issue.getStartLine(),
+//                        issue.getEndLine(),
+//                        issue.getCreationDate(),
+//                        issue.getUpdateDate(),
+//                        issue.getCloseDate()
+//                );
+//				//return neo id to establish relationships
+//				long issueId = new JsonParser().parse(issueResponseString).getAsJsonObject().get("results").getAsJsonArray()
+//						.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
+//				issue.setId(issueId);
+//            }
+            //push duplications to neo4j database
 			for(Duplication duplication : this.getDuplications()) {
-				Neo4JRestService.getInstance().postQuery(
-						"MATCH (a:Push), (b:Duplication) " +
-								"WHERE ID(a) = %d AND ID(b) = %d " +
-								"CREATE (a)-[:contains_duplications]->(b)",
-						this.getId(),
-						duplication.getId()
-				);
-				//push duplication files to database
-				for(DuplicationFile duplicationFile : duplication.getFiles()) {
-					Neo4JRestService.getInstance().postQuery(
-							"MATCH (a:Duplication), (b:DuplicationFile) " +
-									"WHERE ID(a) = %d AND ID(b) = %d " +
-									"CREATE (a)-[:contains_files]->(b)",
-							duplication.getId(),
-							duplicationFile.getId()
-					);
-				}
+				newDuplications.add(new DuplicationDao().createIfNotExists(duplication));
 			}
+//            for (Duplication duplication : this.getDuplications()) {
+//                String duplicationResponseString = Neo4JRestService.getInstance().postQuery(
+//                        "CREATE (n:Duplication { " +
+//								"id: '%d' }) " +
+//								"RETURN ID(n)",
+//						duplication.getId()
+//                );
+//				//return neo id to establish relationships
+//				long duplicationId = new JsonParser().parse(duplicationResponseString).getAsJsonObject().get("results").getAsJsonArray()
+//						.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
+//				duplication.setId(duplicationId);
+//
+//                //push duplication files to neo4j database
+//                for (DuplicationFile duplicationFile : duplication.getFiles()) {
+//                    String duplicationFileResponseString = Neo4JRestService.getInstance().postQuery(
+//                            "CREATE (n:DuplicationFile { " +
+//									"file: '%s', beginLine: '%d', endLine: '%d', size: '%d'}) " +
+//									"RETURN ID(n)",
+//							duplicationFile.getFile(),
+//							duplicationFile.getBeginLine(),
+//							duplicationFile.getEndLine(),
+//							duplicationFile.getSize()
+//                    );
+//					//return neo id to establish relationships
+//					long duplicationFileId = new JsonParser().parse(duplicationFileResponseString).getAsJsonObject().get("results").getAsJsonArray()
+//							.get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsLong();
+//					duplicationFile.setId(duplicationFileId);
+//                }
+//            }
+ 			//======================RELATIONSHIPS===================
+			//push -> commit
+			newCommits.parallelStream().forEach(c->{
+                try {
+                    pushDao.saveRelationship(newPush, c);
+                } catch (ConnectException e) {
+                    L.e(e, "Database is offline!");
+                    throw new DatabaseOfflineException();
+                }
+            });
+
+			//push -> project
+			pushDao.saveRelationship(newPush, this.project);
+			//push -> duplication
+            newDuplications.parallelStream().forEach(d->{
+                try {
+                    pushDao.saveRelationship(newPush, d);
+                } catch (ConnectException e) {
+                    L.e(e, "Database is offline!");
+                    throw new DatabaseOfflineException();
+                }
+            });
+			//push -> issue
+            newIssues.parallelStream().forEach(i->{
+                try {
+                    pushDao.saveRelationship(newPush, i);
+                } catch (ConnectException e) {
+                    L.e(e, "Database is offline!");
+                    throw new DatabaseOfflineException();
+                }
+            });
+			//user -> push
+			userDao.saveRelationship(this.author, newPush);
+
+//			//push push relations to database
+//			for (Commit commit : this.getCommits()) {
+//				Neo4JRestService.getInstance().postQuery(
+//						"MATCH (a:Push), (b:Commit) " +
+//								"WHERE ID(a) = %d AND ID(b) = %d " +
+//								"CREATE (a)-[:contains_commits]->(b)",
+//						this.getId(),
+//						commit.getId()
+//				);
+//			}
+//			//push - user
+//			Neo4JRestService.getInstance().postQuery(
+//				"MATCH (a:User), (b:Push) " +
+//						"WHERE a.gitUsername = '%s' " +
+//						"CREATE (a)-[:pushed_by]->(b)"
+//			);
+//			//push issue relations to database
+//			for (Issue issue : this.getIssues()) {
+//				Neo4JRestService.getInstance().postQuery(
+//						"MATCH (a:Push), (b:Issue) " +
+//								"WHERE ID(a) = %d AND ID(b) = %d " +
+//								"CREATE (a)-[:contains_issues]->(b)",
+//						this.getId(),
+//						issue.getId()
+//				);
+//			}
+//			//push duplication to database
+//			for(Duplication duplication : this.getDuplications()) {
+//				Neo4JRestService.getInstance().postQuery(
+//						"MATCH (a:Push), (b:Duplication) " +
+//								"WHERE ID(a) = %d AND ID(b) = %d " +
+//								"CREATE (a)-[:contains_duplications]->(b)",
+//						this.getId(),
+//						duplication.getId()
+//				);
+//				//push duplication files to database
+//				for(DuplicationFile duplicationFile : duplication.getFiles()) {
+//					Neo4JRestService.getInstance().postQuery(
+//							"MATCH (a:Duplication), (b:DuplicationFile) " +
+//									"WHERE ID(a) = %d AND ID(b) = %d " +
+//									"CREATE (a)-[:contains_files]->(b)",
+//							duplication.getId(),
+//							duplicationFile.getId()
+//					);
+//				}
+//			}
         }
 		else {
 			throw new Exception("cannot save report due to invalid data");
 		}
 	}
-	
-//	private void getScoreBasedOnReport() {
-//		setScore(new ScoreCalculator().calculateScoreFromReport(this));
-//	}
 
 	/**
 	 * ==========================Convenience methods=========================
@@ -284,13 +319,21 @@ public class SQReportDTO {
 	 * @param reportAsJson		the json object of the report
 	 * @return project			the project with the project name
 	 */
-	private User parseAuthor(JsonObject reportAsJson) {
+	private User parseAuthor(JsonObject reportAsJson) throws ConnectException {
 		//default
-		String pushAuthor = reportAsJson.get("author").getAsString();
-		User author = new User();
-		if(pushAuthor!=null) {
-			author.setGitUsername(pushAuthor);
-			//old author was surname, tween, name
+		String gitUsername = reportAsJson.get("author").getAsString();
+        try {
+            author = new UserDao().queryByField("gitUsername", gitUsername).get(0);
+        } catch (IndexOutOfBoundsException e) {
+            L.e(e, "User queried by gitUsername threw error: gitUsername: '%s'",
+                    gitUsername);
+            throw new ReportParseExeption("User with gitUsername:'%s' is not in the database or linked to the project");
+        }
+		return author;
+//		User author = new User();
+//		if(pushAuthor!=null) {
+//			author.setGitUsername(pushAuthor);
+//			old author was surname, tween, name
 //			String[] names = pushAuthor.split("\\s+");
 //			if(names.length == 1) {
 //				author.setFirstName(names[0]);
@@ -304,12 +347,12 @@ public class SQReportDTO {
 //				author.setTween(names[1]);
 //				author.setFirstName(names[2]);
 //			}
-		}
-		else {
-			L.e("error parsing author");
-			valid = false;
-		}
-		return author;
+//		}
+//		else {
+//			L.e("error parsing author");
+//			valid = false;
+//		}
+//		return author;
 	}
 	
 	/**

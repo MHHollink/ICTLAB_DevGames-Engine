@@ -266,10 +266,7 @@ public class ProjectController extends BaseController{
         User caller = getUserFromSession( session );
 
         //check if user has update rights for project
-        if(!caller.getMainJob().contains("admin")) {
-            L.w("User with id '%d' has no rights to update the project!", id);
-            throw new BadRequestException("User with id '%d' has no rights to update the project!", id);
-        }
+        //todo  check if user has update rights for project
 
         Project project = null;
         try {
@@ -347,10 +344,7 @@ public class ProjectController extends BaseController{
         User caller = getUserFromSession( session );
 
         //check if user has update rights for project
-        if(!caller.getMainJob().contains("admin")) {
-            L.w("User with id '%d' has no rights to update the project!", id);
-            throw new BadRequestException("User with id '%d' has no rights to update the project!", id);
-        }
+        //todo  check if user has update rights for project
         //add user to project
         try {
             int updated = new ProjectDao().addUserToProject(uid, id);

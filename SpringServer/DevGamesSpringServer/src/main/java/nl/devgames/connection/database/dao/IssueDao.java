@@ -188,8 +188,12 @@ public class IssueDao extends AbsDao<Issue, Long> {
 
     @Override
     public int create(Issue issue) throws ConnectException, IndexOutOfBoundsException {
-        String response = Neo4JRestService.getInstance().postQuery(
-                "CREATE (n:Issue { key: '%s', severity: '%s', " +
+
+        issue.setMessage(
+                issue.getMessage().replace("\'", "|").replace("\\", "/")
+        );
+
+        String query = String.format("CREATE (n:Issue { key: '%s', severity: '%s', " +
                         "component: '%s', startLine: %d, endLine: %d, " +
                         "status: '%s', resolution: '%s', message: '%s', " +
                         "debt: %d, creationDate: %d, updateDate: %d, closeDate: %d }) RETURN {id:id(n), labels: labels(n), data: n} ",
@@ -205,12 +209,17 @@ public class IssueDao extends AbsDao<Issue, Long> {
                 issue.getCreationDate(),
                 issue.getUpdateDate(),
                 issue.getCloseDate()
+        );
 
+        String response = Neo4JRestService.getInstance().postQuery(
+                query
         );
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
-        if(json.get("errors").getAsJsonArray().size() != 0)
+        if(json.get("errors").getAsJsonArray().size() != 0) {
+            L.e(query);
             L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
+        }
         return json.get("results").getAsJsonArray().size();
     }
 
