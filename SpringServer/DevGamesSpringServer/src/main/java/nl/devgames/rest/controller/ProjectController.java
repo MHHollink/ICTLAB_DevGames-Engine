@@ -141,12 +141,14 @@ public class ProjectController extends BaseController{
             testReport.setScore(new ScoreCalculator(settings).calculateScoreFromReport(testReport));
             //save report
             testReport.saveReportToDatabase();
+            //get sender(s)
+            User author = testReport.getAuthor();
             //send message
             GCMMessageComposer.sendMessage(
                     GCMMessageType.NEW_PUSH_RECEIVED,
                     "",
                     String.valueOf(testReport.getScore().intValue()),
-                    496L
+                    author.getId()
             );
 
             result.put("message", "successfully parsed and saved report");

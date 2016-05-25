@@ -246,7 +246,7 @@ public class UserDao extends AbsDao<User, Long> {
                 "MATCH (a:User)-[:%s]->(b:Project) " +
                         "WHERE ID(b) = %d " +
                         "RETURN {id:id(a), labels: labels(a), data: a}",
-                id, User.Relations.IS_DEVELOPING.name()
+                User.Relations.IS_DEVELOPING.name(), id
         );
 
         List<User> response = new ArrayList<>();
