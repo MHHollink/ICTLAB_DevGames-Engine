@@ -1,8 +1,6 @@
 package nl.devgames.connection.database.dao;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.IssueDTO;
 import nl.devgames.connection.database.dto.UserDTO;
@@ -13,11 +11,7 @@ import nl.devgames.rest.errors.DatabaseOfflineException;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -28,28 +22,63 @@ public class IssueDao extends AbsDao<Issue, Long> {
 
     @Override
     public Issue queryById(Long id) throws ConnectException, IndexOutOfBoundsException {
-        String responseString = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:Issue) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}",
-                id
+        if(id == null ) return  null;
+        L.d("Query issue with id: %d", id);
+        IssueDTO dto = null;
+        String response = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:Issue) " +
+                        "WHERE ID(a) = %d " +
+                        "OPTIONAL " +
+                        "MATCH a-[]->(b) " +
+                        "WHERE ID(a) = %d " +
+                        "RETURN {id:id(a), labels: labels(a), data: a}," +
+                        "{id:id(b), labels: labels(b)}",
+                id, id
         );
 
-        JsonObject json = new JsonParser().parse(responseString).getAsJsonObject();
+        JsonObject json = new JsonParser().parse(response).getAsJsonObject();
 
         if(json.get("errors").getAsJsonArray().size() != 0)
             L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
 
-        JsonArray data = json.get("results")
-                .getAsJsonArray()
-                .get(0)
-                .getAsJsonObject()
-                .get("data")
-                .getAsJsonArray()
-                .get(0)
-                .getAsJsonObject()
-                .get("row")
-                .getAsJsonArray();
+        JsonArray data = json.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
+        for (JsonElement element : data) {
+            JsonArray rows = element.getAsJsonObject().get("row").getAsJsonArray();
 
-        return new IssueDTO().createFromNeo4jData(data.get(0).getAsJsonObject()).toModel();
+            for ( JsonElement row : rows) {
+                JsonElement labels = row.getAsJsonObject().get("labels");
+                if (labels instanceof JsonNull)
+                    continue;
+                String label = labels.getAsJsonArray().get(0).getAsString();
+
+                switch (label) {
+                    case "Issue" :
+                        if(dto == null)
+                            dto = new IssueDTO().createFromNeo4jData(row.getAsJsonObject());
+                        else {
+                            IssueDTO iTemp = new IssueDTO().createFromNeo4jData(row.getAsJsonObject());
+                            if(!dto.equalsInContent(iTemp))
+                                L.w("Two different DTO's were found in the response. 1:'%s', 2:'%s'", dto, iTemp);
+                        }
+                        break;
+                    default:
+                        L.w("Unimplemented case detected : '%s'", label);
+                }
+            }
+        }
+        if(dto == null)
+            return null;
+        return dto.toModel();
+//        IssueDTO dto = null;
+//
+//        String responseString = Neo4JRestService.getInstance().postQuery(
+//                "MATCH (n:Issue) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}",
+//                id
+//        );
+//
+//        dto = new IssueDTO().createFromNeo4jData(IssueDTO.findFirst(responseString));
+//
+//        return dto.toModel();
     }
 
     @Override
@@ -79,16 +108,29 @@ public class IssueDao extends AbsDao<Issue, Long> {
                 value
         );
 
-        return IssueDTO.findAll(r).stream().map(
-                o -> {
-                    try {
-                        return queryById(o.get("id").getAsLong());
-                    } catch (ConnectException e) {
-                        L.e(e, "database offline");
-                        throw new DatabaseOfflineException();
-                    }
-                }
-        ).collect(Collectors.toList());
+        List<Issue> response2 = new ArrayList<>();
+        for (JsonObject object : IssueDTO.findAll(r)) {
+            response2.add(
+                    queryById(
+                            new IssueDTO().createFromNeo4jData(object).toModel().getId()
+                    )
+            );
+        }
+        return response2;
+
+//        return IssueDTO.findAll(r).stream().map(
+//                o -> {
+//                    try {
+//                        return queryById(
+//                                new IssueDTO().createFromNeo4jData(o).toModel().getId()
+//                        );
+//                        //queryById(o.get("id").getAsLong());
+//                    } catch (ConnectException e) {
+//                        L.e(e, "database offline");
+//                        throw new DatabaseOfflineException();
+//                    }
+//                }
+//        ).collect(Collectors.toList());
     }
 
     @Override

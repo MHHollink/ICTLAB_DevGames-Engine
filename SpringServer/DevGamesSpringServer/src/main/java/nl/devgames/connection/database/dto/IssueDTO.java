@@ -32,7 +32,7 @@ public class IssueDTO extends ModelDTO<IssueDTO, Issue> {
     public Issue toModel() {
         Issue issue = new Issue();
 
-        //issue.setId(id);
+        issue.setId(id);
         issue.setKey(key);
         issue.setSeverity(this.severity);
         issue.setComponent(this.component);

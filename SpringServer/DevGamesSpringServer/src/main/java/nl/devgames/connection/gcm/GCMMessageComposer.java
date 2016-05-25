@@ -56,7 +56,7 @@ public class GCMMessageComposer {
             if(userIds.length == 0) {
                 throw new BadRequestException("Dev failed to add ID to post method, slap him with a fish to wake him up!");
             } if (userIds.length == 1) {
-                query = "Match (n:User) WHERE ID(n) = "+ userIds[0] +" RETURN n.gcmRegId";
+                query = "Match (n:User) WHERE ID(n) = "+ userIds[0] +" RETURN n.gcmId";
             } else
                 query = "Match (n:User) WHERE ID(n) IN "+ Arrays.toString(userIds) +" RETURN n.gcmRegId";
 

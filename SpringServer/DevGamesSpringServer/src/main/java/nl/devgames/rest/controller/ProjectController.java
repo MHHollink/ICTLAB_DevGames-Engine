@@ -172,7 +172,7 @@ public class ProjectController extends BaseController{
                                  @RequestBody Project project) {
         L.d("Called");
         //check if session is valid
-
+        User caller = getUserFromSession( session );
 
         if (project.getName() == null) {
             throw new BadRequestException("Missing name project body 'Project{name: ?}'");
@@ -182,10 +182,17 @@ public class ProjectController extends BaseController{
         }
 
         try {
-            project.setOwner(getUserFromSession( session ));
+            //set owner
+            project.setOwner(caller);
             project.setToken(UUID.randomUUID().toString());
 
-            return new ProjectDao().createIfNotExists(project);
+            ProjectDao dao = new ProjectDao();
+            Project returnProject = dao.createIfNotExists(project);
+            //set creator of project
+            dao.saveRelationship(returnProject, caller);
+            //also add user working on
+            new UserDao().saveRelationship(caller, returnProject);
+            return returnProject;
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException();

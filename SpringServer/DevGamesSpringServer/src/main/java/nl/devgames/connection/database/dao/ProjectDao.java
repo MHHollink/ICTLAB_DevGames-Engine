@@ -347,4 +347,18 @@ public class ProjectDao extends AbsDao<Project, Long> {
             changed += deleteById(id);
         return changed;
     }
+
+    public int saveRelationship(Project project, User user) throws ConnectException {
+        if (project.getId() == null || user.getId() == null) {
+            L.e("Id from project or user was null: project[%b], user[%b]",
+                    project.getId()==null, user.getId()==null);
+            return 0;
+        }
+        L.i("Creating relationship between project: '%d' and user: '%d'",
+                project.getId(), user.getId());
+
+        String response = createRelationship(project.getId(), user.getId(), Project.Relations.CREATED_BY);
+
+        return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
+    }
 }
