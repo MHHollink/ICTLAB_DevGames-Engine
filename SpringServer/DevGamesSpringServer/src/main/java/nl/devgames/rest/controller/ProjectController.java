@@ -10,7 +10,6 @@ import nl.devgames.connection.database.dao.IssueDao;
 import nl.devgames.connection.database.dao.ProjectDao;
 import nl.devgames.connection.database.dao.PushDao;
 import nl.devgames.connection.database.dao.UserDao;
-import nl.devgames.connection.database.dto.ProjectDTO;
 import nl.devgames.connection.database.dto.SQReportDTO;
 import nl.devgames.connection.gcm.GCMMessageComposer;
 import nl.devgames.connection.gcm.GCMMessageType;
@@ -42,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/projects")
@@ -168,11 +168,20 @@ public class ProjectController extends BaseController{
     public Project createProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                  @RequestBody Project project) {
         L.d("Called");
-
         //check if session is valid
-        User caller = getUserFromSession( session );
+
+
+        if (project.getName() == null) {
+            throw new BadRequestException("Missing name project body 'Project{name: ?}'");
+        }
+        if (project.getName().length() < 8) {
+            throw new BadRequestException("Project name must at least be 8 characters long!");
+        }
 
         try {
+            project.setOwner(getUserFromSession( session ));
+            project.setToken(UUID.randomUUID().toString());
+
             return new ProjectDao().createIfNotExists(project);
         } catch (ConnectException e) {
             L.e("Database service is offline!");

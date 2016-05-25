@@ -57,9 +57,9 @@ public abstract class BaseController {
     public boolean setUpDb() throws ConnectException {
 
         // A list of all projects that are used for demo
-        Project clarity = new Project("Clarity","AR app for the Port of Rotterdam.");
+        Project clarity = new Project("Clarity","AR app for the Port of Rotterdam.", UUID.randomUUID().toString());
         Project adventure = new Project("Adventure Track", "Geolocation based Rol playing game.");
-        Project devGamesE = new Project("DevGames-Engine","RuleServer that calculates score from Plugin and Cominucates with Web/App", "RandomToken");
+        Project devGamesE = new Project("DevGames-Engine","RuleServer that calculates score from Plugin and Cominucates with Web/App", UUID.randomUUID().toString());
         Project devGamesP = new Project("DevGames-Plugin","Jenkins plugin for DevGames Project");
         Project devGamesW = new Project("DevGames-Web","Webapplication for users to configure their projects and accounts in DevGames");
         Project devGamesA = new Project("DevGames-App","App that belongs to DevGames Project");

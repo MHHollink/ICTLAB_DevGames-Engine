@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.sun.org.apache.bcel.internal.generic.DUP;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.DuplicationDTO;
 import nl.devgames.connection.database.dto.DuplicationFileDTO;
@@ -14,6 +13,7 @@ import nl.devgames.model.Duplication;
 import nl.devgames.model.DuplicationFile;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
+import nl.devgames.rest.errors.DatabaseOfflineException;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
@@ -242,15 +242,61 @@ public class DuplicationDao extends AbsDao<Duplication, Long>  {
 
     @Override
     public int create(Duplication duplication) throws ConnectException, IndexOutOfBoundsException {
+        boolean containsFiles = duplication.getFiles().size() >= 2;
+        if(!containsFiles) return 0;
+
         String response = Neo4JRestService.getInstance().postQuery(
                 "CREATE (n:Duplication {generatedUUID: '%s'}) RETURN {id:id(n), labels: labels(n), data: n} ",
                 duplication.getUuid()
         );
 
-        JsonObject json = new JsonParser().parse(response).getAsJsonObject();
+        JsonParser parser = new JsonParser();
+
+        JsonObject json = parser.parse(response).getAsJsonObject();
         if(json.get("errors").getAsJsonArray().size() != 0)
             L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
-        return json.get("results").getAsJsonArray().size();
+
+        int duplicationsCreated = json.get("results").getAsJsonArray().size();
+        if(duplicationsCreated != 1) {
+            L.w("Creating duplications, %d created", duplicationsCreated);
+            if (duplicationsCreated > 1) {
+                // TODO: 25-5-2016 rollback
+                response = Neo4JRestService.getInstance().postQuery(
+                        "MATCH (n:Duplication) WHERE n.generatedUUID = '%s' DETACH DELETE n",
+                        duplication.getUuid()
+                );
+                json = parser.parse(response).getAsJsonObject();
+                if(json.get("errors").getAsJsonArray().size() != 0)
+                    L.e("Errors were found during neo4j request : %s", json.get("errors").getAsJsonArray());
+            }
+            return 0;
+        }
+
+        duplication.getFiles().parallelStream().forEach(file -> {
+            try {
+                String r = Neo4JRestService.getInstance().postQuery(
+                        "MATCH (d:Duplication {generatedUUID: '%s'}) CREATE d-[:%s]->(f:DuplicationFile {" +
+                                "file: '%s', beginLine: %d, endLine: %d, size: %d})",
+                        duplication.getUuid(),
+                        Duplication.Relations.HAS_FILE.name(),
+                        file.getFile(),
+                        file.getBeginLine(),
+                        file.getEndLine(),
+                        file.getSize()
+                );
+
+                JsonArray errors = parser.parse(r).getAsJsonObject().get("errors").getAsJsonArray();
+                if(errors.size() > 0)
+                    L.e("Errors found in creating DuplicationFile: %s, %s",
+                            file,
+                            errors
+                    );
+            } catch (ConnectException e) {
+                throw new DatabaseOfflineException();
+            }
+        });
+
+        return 1;
     }
 
     @Override

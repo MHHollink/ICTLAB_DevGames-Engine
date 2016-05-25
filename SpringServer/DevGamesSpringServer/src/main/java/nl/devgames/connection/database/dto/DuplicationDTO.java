@@ -55,7 +55,7 @@ public class DuplicationDTO extends ModelDTO<DuplicationDTO, Duplication> {
 
     @Override
     public boolean equalsInContent(DuplicationDTO other) {
-        return false;
+        return id.longValue() == other.id.longValue();
     }
 
     @Override

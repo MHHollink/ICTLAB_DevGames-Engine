@@ -9,6 +9,7 @@ import nl.devgames.connection.database.dto.UserDTO;
 import nl.devgames.model.Issue;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
+import nl.devgames.rest.errors.DatabaseOfflineException;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
@@ -17,6 +18,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jorikito on 18-May-16.
@@ -77,15 +79,26 @@ public class IssueDao extends AbsDao<Issue, Long> {
                 value
         );
 
-        List<Issue> response = new ArrayList<>();
-        for (JsonObject object : IssueDTO.findAll(r)) {
-            response.add(
-                    queryById(
-                            object.get("id").getAsLong()
-                    )
-            );
-        }
-        return response;
+//        List<Issue> response = new ArrayList<>();
+//        for (JsonObject object : IssueDTO.findAll(r)) {
+//            response.add(
+//                    queryById(
+//                            object.get("id").getAsLong()
+//                    )
+//            );
+//        }
+//        return response;
+
+        return IssueDTO.findAll(r).stream().map(
+                o -> {
+                    try {
+                        return queryById(o.get("id").getAsLong());
+                    } catch (ConnectException e) {
+                        L.e(e, "database offline");
+                        throw new DatabaseOfflineException();
+                    }
+                }
+        ).collect(Collectors.toList());
     }
 
     @Override

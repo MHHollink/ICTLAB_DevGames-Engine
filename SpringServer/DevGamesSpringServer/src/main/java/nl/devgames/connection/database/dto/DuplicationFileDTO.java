@@ -55,7 +55,11 @@ public class DuplicationFileDTO extends ModelDTO<DuplicationFileDTO, Duplication
 
     @Override
     public DuplicationFileDTO createFromNeo4jData(JsonObject data) {
-        return null;
+        DuplicationFileDTO dto = new DuplicationFileDTO().createFromJsonObject(
+                data.get("data").getAsJsonObject()
+        );
+        dto.id = data.get("id").getAsLong();
+        return dto;
     }
 
     @Override
