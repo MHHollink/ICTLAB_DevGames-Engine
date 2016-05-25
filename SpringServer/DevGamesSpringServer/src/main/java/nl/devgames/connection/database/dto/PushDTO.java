@@ -19,6 +19,7 @@ public class PushDTO extends ModelDTO<PushDTO, Push> {
     public Set<Duplication> duplications;
     public Long timestamp;
     public String key;
+    public Double score;
 
     @Override
     public Push toModel() {
@@ -31,6 +32,7 @@ public class PushDTO extends ModelDTO<PushDTO, Push> {
         push.setIssues(this.issues);
         push.setDuplications(this.duplications);
         push.setTimestamp(this.timestamp);
+        if(score!=null) push.setScore(this.score);
 
         return push;
     }
@@ -40,6 +42,7 @@ public class PushDTO extends ModelDTO<PushDTO, Push> {
         boolean valid = project != null &&
                 commits != null &&
                 issues != null &&
+                duplications != null &&
                 duplications != null &&
                 timestamp != 0d;
 
@@ -80,7 +83,8 @@ public class PushDTO extends ModelDTO<PushDTO, Push> {
                         && (commits != null ? commits.equals(o.commits) : o.commits == null
                         && (issues != null ? issues.equals(o.issues) : o.issues == null
                         && (duplications != null ? duplications.equals(o.duplications) : o.duplications == null
-                        && (timestamp != null ? timestamp.equals(o.timestamp) : o.timestamp == null)))));
+                        && (score != null ? score.equals(o.score) : o.score == null
+                        && (timestamp != null ? timestamp.equals(o.timestamp) : o.timestamp == null))))));
     }
 
 
@@ -93,6 +97,7 @@ public class PushDTO extends ModelDTO<PushDTO, Push> {
                 ", duplications=" + duplications +
                 ", timestamp=" + timestamp +
                 ", key='" + key + '\'' +
+                ", score='" + score + '\'' +
                 "} " + super.toString();
     }
 }
