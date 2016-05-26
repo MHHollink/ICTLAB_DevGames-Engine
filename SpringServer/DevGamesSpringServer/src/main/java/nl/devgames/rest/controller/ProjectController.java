@@ -194,12 +194,18 @@ public class ProjectController extends BaseController{
             UserDao    userDAO      = new UserDao();
 
             project.setToken(UUID.randomUUID().toString());
-            project = projectDAO.createIfNotExists(project);
-
-            projectDAO.saveRelationship(project, caller); // Set caller as project owner
-            userDAO.saveRelationship(caller, project);    // Set caller as developer in project
-
-            return projectDAO.queryById(project.getId());
+            //create project if not exists
+            ProjectDao dao = new ProjectDao();
+            Project returnProject = dao.createIfNotExists(project);
+            //set creator of project
+            dao.saveRelationship(returnProject, caller);
+            //also add user working on
+            Set<User> userSet = new HashSet<>();
+            userSet.add(caller);
+            returnProject.setDevelopers(userSet);
+            //user->project relation
+            new UserDao().saveRelationship(caller, returnProject);
+            return returnProject;
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException();
@@ -242,7 +248,6 @@ public class ProjectController extends BaseController{
     public Map deleteProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                  @PathVariable(value = "id") long id) {
         L.d("Called");
-        //todo delete everything
 
         java.util.Map<String, String> result = new java.util.HashMap<>();
 
@@ -364,7 +369,8 @@ public class ProjectController extends BaseController{
         //todo  check if user has update rights for project
         //add user to project
         try {
-            int updated = new ProjectDao().addUserToProject(uid, id);
+            UserDao dao = new UserDao();
+            int updated = dao.saveRelationship(dao.queryById(uid), new ProjectDao().queryById(id));
             result.put("message", String.format("succesfully updated %d user(s)", updated));
             return result;
         } catch (ConnectException e) {
