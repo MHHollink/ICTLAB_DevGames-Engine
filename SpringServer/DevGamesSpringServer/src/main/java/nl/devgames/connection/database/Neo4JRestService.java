@@ -35,7 +35,7 @@ public class Neo4JRestService extends AbsRestService {
             L.e(e, "Failure in reading response");
             return null;
         }
-        L.t("Recieved response: %s", response);
+        L.d("Recieved response: %s", response);
         return response;
     }
 

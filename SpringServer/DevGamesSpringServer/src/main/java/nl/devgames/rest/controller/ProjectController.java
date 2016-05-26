@@ -171,31 +171,30 @@ public class ProjectController extends BaseController{
     public Project createProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                  @RequestBody Project project) {
         L.d("Called");
-        //check if session is valid
-        User caller = getUserFromSession( session );
+        User caller = getUserFromSession( session ); // contains session valid check
 
         if (project.getName() == null) {
+            L.w("Project not created, no name supplied");
             throw new BadRequestException("Missing name project body 'Project{name: ?}'");
         }
         if (project.getName().length() < 8) {
+            L.w("Project not created, name length to short");
             throw new BadRequestException("Project name must at least be 8 characters long!");
         }
 
         try {
-            //set owner
-            project.setOwner(caller);
-            project.setToken(UUID.randomUUID().toString());
+            L.d("Creating project: '%s'", project.getName());
 
-            ProjectDao dao = new ProjectDao();
-            Project returnProject = dao.createIfNotExists(project);
-            //set creator of project
-            dao.saveRelationship(returnProject, caller);
-            //also add user working on
-            Set<User> userSet = new HashSet<>();
-            userSet.add(caller);
-            returnProject.setDevelopers(userSet);
-            new UserDao().saveRelationship(caller, returnProject);
-            return returnProject;
+            ProjectDao projectDAO   = new ProjectDao();
+            UserDao    userDAO      = new UserDao();
+
+            project.setToken(UUID.randomUUID().toString());
+            project = projectDAO.createIfNotExists(project);
+
+            projectDAO.saveRelationship(project, caller); // Set caller as project owner
+            userDAO.saveRelationship(caller, project);    // Set caller as developer in project
+
+            return projectDAO.queryById(project.getId());
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException();

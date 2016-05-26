@@ -161,7 +161,7 @@ public class UserDao extends AbsDao<User, Long> {
 
     @Override
     public List<User> queryForAll() throws ConnectException {
-        L.i("Query user all users");
+        L.d("Query user all users");
         String r = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:User) RETURN {id:id(u), labels: labels(u), data: u}"
         );
@@ -175,7 +175,7 @@ public class UserDao extends AbsDao<User, Long> {
 
     @Override
     public List<User> queryByField(String fieldName, Object value) throws ConnectException {
-        L.i("Query users with %s: %s", fieldName, value);
+        L.d("Query users with %s: %s", fieldName, value);
         String queryFormat;
         if(value instanceof Number)
             queryFormat = "MATCH (n:User) WHERE n.%s = %s RETURN {id:id(n), labels: labels(n), data: n}";
@@ -201,7 +201,7 @@ public class UserDao extends AbsDao<User, Long> {
 
     @Override
     public List<User> queryByFields(Map<String, Object> fieldValues) throws ConnectException {
-        L.i("Query users with fields: %s", fieldValues.toString());
+        L.d("Query users with fields: %s", fieldValues.toString());
         String queryFormat = "MATCH (n:User) WHERE ";
 
         Iterator<String> iterator = fieldValues.keySet().iterator();
@@ -237,7 +237,7 @@ public class UserDao extends AbsDao<User, Long> {
 
     @Override
     public User queryBySameId(User user) throws ConnectException {
-        L.i("Query user with same id as user: %s", user);
+        L.d("Query user with same id as user: %s", user);
         return queryById(user.getId());
     }
 
@@ -340,13 +340,13 @@ public class UserDao extends AbsDao<User, Long> {
 
     @Override
     public int delete(User user) throws ConnectException {
-        L.i("Deleting user: %s", user);
+        L.d("Deleting user: %s", user);
         return deleteById(user.getId());
     }
 
     @Override
     public int deleteById(Long id) throws ConnectException {
-        L.i("Deleting user with id: %d", id);
+        L.d("Deleting user with id: %d", id);
         if(queryById(id) == null)
             return 0;
         String response = Neo4JRestService.getInstance().postQuery(
@@ -366,7 +366,7 @@ public class UserDao extends AbsDao<User, Long> {
 
     @Override
     public int delete(Collection<User> users) throws ConnectException {
-        L.i("Deleting users: %s", users);
+        L.d("Deleting users: %s", users);
         int changed = 0;
         for(User user : users)
             changed += delete(user);
@@ -375,7 +375,7 @@ public class UserDao extends AbsDao<User, Long> {
 
     @Override
     public int deleteIds(Collection<Long> ids) throws ConnectException {
-        L.i("Deleting users with ids: %d", ids);
+        L.d("Deleting users with ids: %d", ids);
         int changed = 0;
         for(Long id : ids)
             changed += deleteById(id);
@@ -398,7 +398,7 @@ public class UserDao extends AbsDao<User, Long> {
                     user.getId()==null, project.getId()==null);
             return 0;
         }
-        L.i("Creating relationship between user: '%d' and project: '%d'",
+        L.d("Creating relationship between user: '%d' and project: '%d'",
                 user.getId(), project.getId());
 
         String response = createRelationship(user.getId(), project.getId(), User.Relations.IS_DEVELOPING);
@@ -422,7 +422,7 @@ public class UserDao extends AbsDao<User, Long> {
                     user.getId()==null, push.getId()==null);
             return 0;
         }
-        L.i("Creating relationship between user: %d and push: %d",
+        L.d("Creating relationship between user: %d and push: %d",
                 user.getId(), push.getId());
 
         String response = createRelationship(user.getId(), push.getId(), User.Relations.HAS_PUSHED);

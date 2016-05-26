@@ -208,7 +208,7 @@ public class CommitDao extends AbsDao<Commit, Long>  {
 
     @Override
     public int delete(Commit commit) throws ConnectException, IndexOutOfBoundsException {
-        L.i("Deleting commit: '%s'", commit);
+        L.d("Deleting commit: '%s'", commit);
         return deleteById(commit.getId());
     }
 

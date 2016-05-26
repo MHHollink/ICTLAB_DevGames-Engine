@@ -29,6 +29,8 @@ import java.util.Set;
 public class BusinessDao extends AbsDao<Business, Long> {
     @Override
     public Business queryById(Long id) throws ConnectException, IndexOutOfBoundsException {
+        L.d("Query for business:%d",id);
+
         BusinessDTO dto = null;
         Set<User> employees = new HashSet<>();
         Set<Project> projects = new HashSet<>();
@@ -89,6 +91,7 @@ public class BusinessDao extends AbsDao<Business, Long> {
 
     @Override
     public List<Business> queryForAll() throws ConnectException, IndexOutOfBoundsException {
+        L.d("Querying all businesses");
         String r = Neo4JRestService.getInstance().postQuery(
                 "MATCH (n:Business) RETURN {id:id(n), labels: labels(n), data: n}"
         );
@@ -102,6 +105,7 @@ public class BusinessDao extends AbsDao<Business, Long> {
 
     @Override
     public List<Business> queryByField(String fieldName, Object value) throws ConnectException, IndexOutOfBoundsException {
+        L.d("Querying businesses by field:%s",fieldName);
         String queryFormat;
         if(value instanceof Number)
             queryFormat = "MATCH (n:Business) WHERE n.%s =  %s  RETURN {id:id(n), labels: labels(n), data: n}";
@@ -127,6 +131,7 @@ public class BusinessDao extends AbsDao<Business, Long> {
 
     @Override
     public List<Business> queryByFields(Map<String, Object> fieldValues) throws ConnectException, IndexOutOfBoundsException {
+        L.d("Querying businesses by field:%s",fieldValues.keySet().toString());
         String queryFormat = "MATCH (n:Business) WHERE ";
 
         Iterator<String> iterator = fieldValues.keySet().iterator();
@@ -286,7 +291,7 @@ public class BusinessDao extends AbsDao<Business, Long> {
                     user.getId()==null, business.getId()==null);
             return 0;
         }
-        L.i("Creating relationship between user: '%d' and business: '%d'",
+        L.d("Creating relationship between user: '%d' and business: '%d'",
                 user.getId(), business.getId());
 
         String response = createRelationship(business.getId(), user.getId(), Business.Relations.HAS_EMPLOYEE);
@@ -301,7 +306,7 @@ public class BusinessDao extends AbsDao<Business, Long> {
                     business.getId()==null, project.getId()==null);
             return 0;
         }
-        L.i("Creating relationship between business: '%d' and project: '%d'",
+        L.d("Creating relationship between business: '%d' and project: '%d'",
                 business.getId(), project.getId());
 
         String response = createRelationship(business.getId(), project.getId(), Business.Relations.HAS_PROJECT);

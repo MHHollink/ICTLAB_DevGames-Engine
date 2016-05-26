@@ -1,7 +1,11 @@
 package nl.devgames.connection.database.dao;
 
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.model.*;
+import nl.devgames.model.Business;
+import nl.devgames.model.Duplication;
+import nl.devgames.model.Project;
+import nl.devgames.model.Push;
+import nl.devgames.model.User;
 
 import java.net.ConnectException;
 

@@ -2,6 +2,8 @@ package nl.devgames.connection.gcm;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import nl.devgames.connection.AbsRestService;
 import nl.devgames.utils.L;
 import nl.devgames.utils.Tuple;
@@ -41,9 +43,16 @@ public class GCMRestService extends AbsRestService {
                     )
             );
         } catch (IOException e) {
-            e.printStackTrace();
+            L.e(e, "Failure in reading response");
+            return null;
         }
         L.d("Recieved response: %s", response);
+
+        JsonObject r = new JsonParser().parse(response).getAsJsonObject();
+        L.i("GCM-Message send! Success:%d, Failure:%d",
+                r.get("success").getAsInt(),
+                r.get("failure").getAsInt()
+        );
         return response;
     }
 
@@ -69,7 +78,7 @@ public class GCMRestService extends AbsRestService {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(message);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            L.e(e, "Writing message to Json");
         }
         return null;
     }

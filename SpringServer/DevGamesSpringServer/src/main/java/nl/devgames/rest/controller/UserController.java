@@ -36,7 +36,7 @@ public class UserController extends BaseController {
 
     @RequestMapping(method = RequestMethod.POST)
     public User createNewUser(@RequestBody User user) {
-        L.i("Called");
+        L.d("Called");
         L.t("Creating user: %s", user);
         try {
 
@@ -68,7 +68,7 @@ public class UserController extends BaseController {
     @RequestMapping(method = RequestMethod.GET)
     public User getOwnUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session) {
         User caller = getUserFromSession( session );
-        L.i("Called");
+        L.d("Called");
         return caller;
     }
 
@@ -77,7 +77,7 @@ public class UserController extends BaseController {
                         @PathVariable Long id)
     {
         getUserFromSession( session );
-        L.i("Called");
+        L.d("Called");
         try {
             return new UserDao().queryById(id);
         } catch (ConnectException e) {
@@ -94,7 +94,7 @@ public class UserController extends BaseController {
                               @PathVariable long id,
                               @RequestBody User userWithUpdateFields)
     {
-        L.i("Called");
+        L.d("Called");
 
         if(userWithUpdateFields == null) {
             L.w("Update user received with empty body");
@@ -144,7 +144,7 @@ public class UserController extends BaseController {
     public Map deleteUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                           @PathVariable long id)
     {
-        L.i("Called");
+        L.d("Called");
 
         User caller = getUserFromSession( session );
         if(caller.getId() != id) throw new BadRequestException( "Session does not match session for user with id '%d'", id );
@@ -165,7 +165,7 @@ public class UserController extends BaseController {
                                      @PathVariable Long id)
     {
         getUserFromSession( session );
-        L.i("Called");
+        L.d("Called");
         try {
             return new UserDao().queryById(id).getProjects().stream()
                     .map( p -> {
@@ -191,7 +191,7 @@ public class UserController extends BaseController {
                                 @PathVariable Long id)
     {
         getUserFromSession( session );
-        L.i("Called");
+        L.d("Called");
         try {
             return new UserDao().queryById(id).getPushes().stream()
                     .map( p -> {
@@ -216,7 +216,7 @@ public class UserController extends BaseController {
                                    @PathVariable Long id)
     {
         getUserFromSession( session );
-        L.i("Called");
+        L.d("Called");
 
         try {
             return new HashSet<Commit>(new CommitDao().queryByUser(id));
@@ -234,7 +234,7 @@ public class UserController extends BaseController {
                                  @PathVariable Long id)
     {
         getUserFromSession( session );
-        L.i("Called");
+        L.d("Called");
 
         try {
             return new HashSet<Issue>(new IssueDao().queryByUser(id));
@@ -252,7 +252,7 @@ public class UserController extends BaseController {
                                 @PathVariable Long id)
     {
         getUserFromSession( session );
-        L.i("Called");
+        L.d("Called");
 
         try {
             return new HashSet<Duplication>(new DuplicationDao().queryByUser(id));
@@ -270,7 +270,7 @@ public class UserController extends BaseController {
                                        @PathVariable Long id)
     {
         getUserFromSession( session );
-        L.i("Called");
+        L.d("Called");
 
         try {
             return new HashSet<Business>(new BusinessDao().queryByUser(id));

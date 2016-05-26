@@ -313,7 +313,7 @@ public class PushDao extends AbsDao<Push, Long>  {
                     push.getId()==null, commit.getId()==null);
             return 0;
         }
-        L.i("Creating relationship between push: '%d' and commit: '%d'",
+        L.d("Creating relationship between push: '%d' and commit: '%d'",
                 push.getId(), commit.getId());
 
         String response = createRelationship(push.getId(), commit.getId(), Push.Relations.CONTAINS_COMMIT);
@@ -327,7 +327,7 @@ public class PushDao extends AbsDao<Push, Long>  {
                     push.getId()==null, duplication.getId()==null);
             return 0;
         }
-        L.i("Creating relationship between push: '%d' and duplication: '%d'",
+        L.d("Creating relationship between push: '%d' and duplication: '%d'",
                 push.getId(), duplication.getId());
 
         String response = createRelationship(push.getId(), duplication.getId(), Push.Relations.HAS_DUPLICATION);
@@ -341,7 +341,7 @@ public class PushDao extends AbsDao<Push, Long>  {
                     push.getId()==null, issue.getId()==null);
             return 0;
         }
-        L.i("Creating relationship between push: '%d' and issue: '%d'",
+        L.d("Creating relationship between push: '%d' and issue: '%d'",
                 push.getId(), issue.getId());
 
         String response = createRelationship(push.getId(), issue.getId(), Push.Relations.HAS_ISSUE);
@@ -355,7 +355,7 @@ public class PushDao extends AbsDao<Push, Long>  {
                     push.getId()==null, project.getId()==null);
             return 0;
         }
-        L.i("Creating relationship between push: '%d' and project: '%d'",
+        L.d("Creating relationship between push: '%d' and project: '%d'",
                 push.getId(), project.getId());
 
         String response = createRelationship(push.getId(), project.getId(), Push.Relations.PUSHED_TO);

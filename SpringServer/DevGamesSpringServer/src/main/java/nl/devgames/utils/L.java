@@ -20,7 +20,7 @@ public class L {
         FATAL,
         OFF
     }
-    public static LogLevel level = TRACE;
+    public static LogLevel level = INFO;
 
     // The format of the automatically created tag in each log line.
     private static final String TAG_FORMAT = "%s/ DEVGAMES: line=%d: %s#%s: ";
@@ -64,6 +64,8 @@ public class L {
         if(level.ordinal() <= WARN.ordinal()) {
             System.out.print("\u001B[33m");
             printLog(message, args);
+            System.out.print("\u001B[0m");
+
         }
     }
 
@@ -71,6 +73,7 @@ public class L {
         if(level.ordinal() <= WARN.ordinal()) {
             System.out.print("\u001B[33m");
             printLog(throwable, message, args);
+            System.out.print("\u001B[0m");
         }
     }
 
@@ -78,6 +81,7 @@ public class L {
         if(level.ordinal() <= ERROR.ordinal()) {
             System.out.print("\u001B[31m");
             printLog(message, args);
+            System.out.print("\u001B[0m");
         }
     }
 
@@ -85,6 +89,7 @@ public class L {
         if(level.ordinal() <= ERROR.ordinal()) {
             System.out.print("\u001B[31m");
             printLog(throwable, message, args);
+            System.out.print("\u001B[0m");
         }
     }
 
@@ -137,8 +142,7 @@ public class L {
     private static void printLog(String message, Object... args) {
         System.out.println(
                 createTag()+
-                        String.format(message, args == null ? NO_ARGS : args)+
-                        "\u001B[0m" // RESET COLOR IF CHANGED
+                        String.format(message, args == null ? NO_ARGS : args)
         );
     }
 }

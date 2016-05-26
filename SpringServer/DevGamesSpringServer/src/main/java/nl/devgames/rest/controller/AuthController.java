@@ -36,10 +36,10 @@ public class AuthController extends BaseController{
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public Map<String,String> login(@RequestParam(value="username") String username, @RequestParam(value="password") String password) {
 
-        L.i("Called");
+        L.d("Called");
 
         if (password == null || password.isEmpty() || username == null || username.isEmpty()) {
-            L.d("Throwing BadRequestException, Username or password was missing...");
+            L.w("Throwing BadRequestException, Username or password was missing...");
             throw new BadRequestException("Username or password was missing");
         }
 

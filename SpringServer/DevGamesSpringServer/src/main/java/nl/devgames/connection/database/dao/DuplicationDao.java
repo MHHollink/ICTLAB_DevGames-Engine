@@ -376,7 +376,7 @@ public class DuplicationDao extends AbsDao<Duplication, Long>  {
                     duplication.getId()==null, duplicationFile.getId()==null);
             return 0;
         }
-        L.i("Creating relationship between duplication: '%d' and duplicationFile: '%d'",
+        L.d("Creating relationship between duplication: '%d' and duplicationFile: '%d'",
                 duplication.getId(), duplicationFile.getId());
 
         String response = createRelationship(duplication.getId(), duplicationFile.getId(), Duplication.Relations.HAS_FILE);

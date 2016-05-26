@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class ProjectDao extends AbsDao<Project, Long> {
 
@@ -266,7 +267,7 @@ public class ProjectDao extends AbsDao<Project, Long> {
                 "CREATE (n:Project { name: '%s', description: '%s', token: '%s' }) RETURN {id:id(n), labels: labels(n), data: n} ",
                 project.getName(),
                 project.getDescription(),
-                project.getToken()
+                UUID.randomUUID().toString()
         );
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
@@ -354,7 +355,7 @@ public class ProjectDao extends AbsDao<Project, Long> {
                     project.getId()==null, user.getId()==null);
             return 0;
         }
-        L.i("Creating relationship between project: '%d' and user: '%d'",
+        L.d("Creating relationship between project: '%d' and user: '%d'",
                 project.getId(), user.getId());
 
         String response = createRelationship(project.getId(), user.getId(), Project.Relations.CREATED_BY);

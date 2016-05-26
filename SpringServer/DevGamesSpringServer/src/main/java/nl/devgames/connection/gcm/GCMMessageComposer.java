@@ -45,7 +45,7 @@ public class GCMMessageComposer {
 	 * messageText = string to send as message text
 	 */
 	public static void sendMessage(GCMMessageType messageType, String messageTitle, String messageText, Long... userIds) {
-    	L.d( "Sending POST to GCM" );
+    	L.i( "Sending POST to GCM" );
 
     	//create message
     	GCMMessage message = createGCMMessage(messageType, messageTitle, messageText);
