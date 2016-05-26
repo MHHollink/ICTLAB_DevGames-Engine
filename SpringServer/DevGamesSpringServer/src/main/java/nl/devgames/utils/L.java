@@ -23,7 +23,7 @@ public class L {
     public static LogLevel level = TRACE;
 
     // The format of the automatically created tag in each log line.
-    private static final String TAG_FORMAT = "%s/ DEVGAMES: line=%d: %s#%s: ";
+    private static final String TAG_FORMAT = "%s/[%d] DEVGAMES: line=%d: %s#%s: ";
 
     private static final Pattern ANONYMOUS_CLASS_PATTERN = Pattern.compile("\\$\\d+$");
 
@@ -107,6 +107,7 @@ public class L {
 
         try {
             StackTraceElement[] traces = Thread.currentThread().getStackTrace();
+            long threadName = Thread.currentThread().getId();
             StackTraceElement trace = traces[4];
             String tag = trace.getClassName();
             String lvl = traces[3].getMethodName().toUpperCase();
@@ -120,6 +121,7 @@ public class L {
 
             return String.format(TAG_FORMAT,
                     lvl,
+                    threadName,
                     trace.getLineNumber(),
                     className,
                     trace.getMethodName()

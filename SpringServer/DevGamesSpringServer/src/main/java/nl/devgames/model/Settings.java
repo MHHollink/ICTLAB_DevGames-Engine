@@ -10,8 +10,8 @@ public class Settings {
 
     Project project;
     String scoreMethod;
-    boolean pointStealing;
     double issuesPerCommitThreshold;
+    boolean pointStealing;
     boolean negativeScores;
 
     public Settings() {
