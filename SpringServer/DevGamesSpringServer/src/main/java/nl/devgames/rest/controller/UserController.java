@@ -12,6 +12,7 @@ import nl.devgames.model.Push;
 import nl.devgames.model.User;
 import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.DatabaseOfflineException;
+import nl.devgames.rest.errors.EntityAlreadyExistsException;
 import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.utils.L;
@@ -48,11 +49,11 @@ public class UserController extends BaseController {
                 boolean git_user = dao.queryByField("gitUsername", dto.gitUsername).size() != 0;
 
                 if (username && git_user)
-                    throw new UserAlreadyExistsException("Username and Git-Username already in use");
+                    throw new EntityAlreadyExistsException("Username and Git-Username already in use");
                 else if(username)
-                    throw new UserAlreadyExistsException("Username already in use");
+                    throw new EntityAlreadyExistsException("Username already in use");
                 else if(git_user)
-                    throw new UserAlreadyExistsException("Git-Username already in use");
+                    throw new EntityAlreadyExistsException("Git-Username already in use");
 
                 return dao.createIfNotExists(user);
             } else

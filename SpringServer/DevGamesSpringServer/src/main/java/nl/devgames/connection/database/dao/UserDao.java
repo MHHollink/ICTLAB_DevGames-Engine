@@ -15,6 +15,7 @@ import nl.devgames.utils.L;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -296,14 +297,19 @@ public class UserDao extends AbsDao<User, Long> {
     @Override
     public User createIfNotExists(User user) throws ConnectException {
         L.d("Creating user if it does not exist: %s", user);
-        User u = queryById(user.getId());
-        if (u == null || !u.equals(user)) {
+
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("username", user.getUsername());
+        fields.put("gitUsername", user.getGitUsername());
+
+        List<User> u = queryByFields(fields);
+        if (u.size() != 0) {
             int inserted = create(user);
             if (inserted == 0)
                 return null;
             L.d("Created %d rows", inserted);
             return queryByField("username",user.getUsername()).get(0);
-        } else return u;
+        } else return u.get(0);
     }
 
     @Override
