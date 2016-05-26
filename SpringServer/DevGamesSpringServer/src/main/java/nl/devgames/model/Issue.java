@@ -97,11 +97,11 @@ public class Issue extends Model {
         this.component = component;
     }
 
-    public void setStartLine(int startLine) {
+    public void setStartLine(Integer startLine) {
         this.startLine = startLine;
     }
 
-    public void setEndLine(int endLine) {
+    public void setEndLine(Integer endLine) {
         this.endLine = endLine;
     }
 
@@ -117,15 +117,15 @@ public class Issue extends Model {
         this.message = message;
     }
 
-    public void setDebt(int debt) {
+    public void setDebt(Integer debt) {
         this.debt = debt;
     }
 
-    public void setCreationDate(long creationDate) {
+    public void setCreationDate(Long creationDate) {
         this.creationDate = creationDate;
     }
 
-    public void setUpdateDate(long updateDate) {
+    public void setUpdateDate(Long updateDate) {
         this.updateDate = updateDate;
     }
 

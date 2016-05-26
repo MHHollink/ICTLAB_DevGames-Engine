@@ -164,7 +164,7 @@ public class UserDao extends AbsDao<User, Long> {
     public List<User> queryForAll() throws ConnectException {
         L.d("Query user all users");
         String r = Neo4JRestService.getInstance().postQuery(
-                "MATCH (n:User) RETURN {id:id(u), labels: labels(u), data: u}"
+                "MATCH (u:User) RETURN {id:id(u), labels: labels(u), data: u}"
         );
 
         List<User> response = new ArrayList<>();

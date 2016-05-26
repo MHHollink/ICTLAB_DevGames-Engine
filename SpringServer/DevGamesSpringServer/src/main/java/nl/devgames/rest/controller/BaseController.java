@@ -8,9 +8,6 @@ import nl.devgames.connection.database.dao.IssueDao;
 import nl.devgames.connection.database.dao.ProjectDao;
 import nl.devgames.connection.database.dao.PushDao;
 import nl.devgames.connection.database.dao.UserDao;
-import nl.devgames.connection.gcm.GCMMessage;
-import nl.devgames.connection.gcm.GCMMessageType;
-import nl.devgames.connection.gcm.GCMRestService;
 import nl.devgames.model.Business;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Duplication;
@@ -27,8 +24,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.ConnectException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -226,18 +226,22 @@ public abstract class BaseController {
         return true;
     }
 
-    @RequestMapping(value = "/test/push", method = RequestMethod.POST)
-    public String gcmTestNotification() throws ConnectException {
-        UserDao dao = new UserDao();
-        List<User> users = dao.queryForAll();
-        GCMMessage message = new GCMMessage();
-        message.createNotification(
-                GCMMessageType.NEW_PUSH_RECEIVED,
-                "",
-                String.valueOf(400)
-        );
-        users.parallelStream().filter(user -> user.getGcmId() != null).forEach( u -> message.addToken(u.getGcmId()) );
-        return GCMRestService.getInstance().postMessage(message);
+    @RequestMapping(value = "/test/db", method = RequestMethod.GET)
+    public Map<String, List<Object>> dumpDB() throws ConnectException {
+
+        Map<String, List<Object>> data = new HashMap<>();
+
+        data.put("business", new ArrayList<>(new BusinessDao().queryForAll()));
+        data.put("users", new ArrayList<>(new UserDao().queryForAll()));
+        data.put("projects", new ArrayList<>(new ProjectDao().queryForAll()));
+        data.put("pushes", new ArrayList<>(new PushDao().queryForAll()));
+        data.put("commits", new ArrayList<>(new CommitDao().queryForAll()));
+        data.put("issues", new ArrayList<>(new IssueDao().queryForAll()));
+        data.put("duplication", new ArrayList<>(new DuplicationDao().queryForAll()));
+
+        return data;
     }
+
+
 
 }

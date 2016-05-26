@@ -194,18 +194,12 @@ public class ProjectController extends BaseController{
             UserDao    userDAO      = new UserDao();
 
             project.setToken(UUID.randomUUID().toString());
-            //create project if not exists
-            ProjectDao dao = new ProjectDao();
-            Project returnProject = dao.createIfNotExists(project);
-            //set creator of project
-            dao.saveRelationship(returnProject, caller);
-            //also add user working on
-            Set<User> userSet = new HashSet<>();
-            userSet.add(caller);
-            returnProject.setDevelopers(userSet);
-            //user->project relation
-            new UserDao().saveRelationship(caller, returnProject);
-            return returnProject;
+            project = projectDAO.createIfNotExists(project);
+
+            projectDAO.saveRelationship(project, caller); // Set caller as project owner
+            userDAO.saveRelationship(caller, project);    // Set caller as developer in project
+
+            return projectDAO.queryById(project.getId());
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException();
