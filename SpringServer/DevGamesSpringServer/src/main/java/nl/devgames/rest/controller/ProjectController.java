@@ -22,6 +22,7 @@ import nl.devgames.model.Push;
 import nl.devgames.model.User;
 import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.DatabaseOfflineException;
+import nl.devgames.rest.errors.EntityAlreadyExistsException;
 import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.rest.errors.NotFoundException;
@@ -182,10 +183,14 @@ public class ProjectController extends BaseController{
             throw new BadRequestException("Project name must at least be 8 characters long!");
         }
 
-        try {
-            L.d("Creating project: '%s'", project.getName());
 
+        try {
             ProjectDao projectDAO   = new ProjectDao();
+            boolean projectExist = projectDAO.queryByField("name", project.getName()).size() != 0;
+            if(projectExist)
+                throw new EntityAlreadyExistsException("Project name already found");
+
+            L.d("Creating project: '%s'", project.getName());
             UserDao    userDAO      = new UserDao();
 
             project.setToken(UUID.randomUUID().toString());

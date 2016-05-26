@@ -14,7 +14,6 @@ import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.DatabaseOfflineException;
 import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.KnownInternalServerError;
-import nl.devgames.rest.errors.UserAlreadyExistsException;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
