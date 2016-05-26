@@ -19,8 +19,6 @@ public class ScoreCalculator {
         if(settings == null) {
             Settings s = new Settings();
             s.setDefault();
-
-            scoreMethod = s.getScoreMethod();
             issuePerCommitThreshold = s.getIssuesPerCommitThreshold();
         }
 	}

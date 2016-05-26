@@ -9,7 +9,6 @@ package nl.devgames.model;
 public class Settings {
 
     Project project;
-    String scoreMethod;
     double issuesPerCommitThreshold;
     boolean pointStealing;
     boolean negativeScores;
@@ -17,9 +16,8 @@ public class Settings {
     public Settings() {
     }
 
-    public Settings(Project project, String scoreMethod, boolean pointStealing, double issuesPerCommitThreshold, boolean negativeScores) {
+    public Settings(Project project, boolean pointStealing, double issuesPerCommitThreshold, boolean negativeScores) {
         this.project = project;
-        this.scoreMethod = scoreMethod;
         this.pointStealing = pointStealing;
         this.issuesPerCommitThreshold = issuesPerCommitThreshold;
         this.negativeScores = negativeScores;
@@ -27,7 +25,6 @@ public class Settings {
 
     public void setDefault() {
         this.project = null;
-        this.scoreMethod = "SUB";
         this.pointStealing = false;
         this.issuesPerCommitThreshold = 10.0;
         this.negativeScores = false;
@@ -41,13 +38,6 @@ public class Settings {
         this.project = project;
     }
 
-    public String getScoreMethod() {
-        return scoreMethod;
-    }
-
-    public void setScoreMethod(String scoreMethod) {
-        this.scoreMethod = scoreMethod;
-    }
 
     public boolean isPointStealing() {
         return pointStealing;
