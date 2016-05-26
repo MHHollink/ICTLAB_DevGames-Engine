@@ -94,6 +94,9 @@ public class SQReportDTO {
         PushDao pushDAO = new PushDao();
         Push newPush = pushDAO.createIfNotExists(new Push(UUID.randomUUID().toString(), this.timestamp, this.score));
 
+        //push->project
+        pushDAO.saveRelationship(newPush, project);
+
         CommitDao commitDao = new CommitDao();
         commits.parallelStream().forEach(commit -> {
                     try {

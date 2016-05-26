@@ -191,6 +191,9 @@ public class ProjectController extends BaseController{
             //set creator of project
             dao.saveRelationship(returnProject, caller);
             //also add user working on
+            Set<User> userSet = new HashSet<>();
+            userSet.add(caller);
+            returnProject.setDevelopers(userSet);
             new UserDao().saveRelationship(caller, returnProject);
             return returnProject;
         } catch (ConnectException e) {

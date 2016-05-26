@@ -16,13 +16,7 @@ import nl.devgames.model.Push;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Jorikito on 18-May-16.
@@ -238,8 +232,11 @@ public class PushDao extends AbsDao<Push, Long>  {
     @Override
     public int create(Push push) throws ConnectException, IndexOutOfBoundsException {
         String response = Neo4JRestService.getInstance().postQuery(
-                "CREATE (n:Push { key: '%s' }) RETURN {id:id(n), labels: labels(n), data: n} ",
-                push.getKey()
+                "CREATE (n:Push { key: '%s', timestamp: %d, score: %s } ) RETURN {id:id(n), labels: labels(n), data: n} ",
+//                "CREATE (n:Push { key: '%s' }) RETURN {id:id(n), labels: labels(n), data: n} ",
+                push.getKey(),
+                push.getTimestamp(),
+                new Formatter(Locale.US).format("%.2f", push.getScore())
         );
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
@@ -267,7 +264,7 @@ public class PushDao extends AbsDao<Push, Long>  {
             String response = Neo4JRestService.getInstance().postQuery(
                     "MATCH (n:Push) " +
                             "WHERE ID(n) = %d " +
-                            "SET n.key = '%s', n.score = %d, n.timeStamp = %d " +
+                            "SET n.key = '%s', n.score = %f, n.timeStamp = %d " +
                             "RETURN {id:id(n), labels: labels(n), data: n} ",
                     push.getId(),
                     push.getKey(),
