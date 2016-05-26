@@ -122,7 +122,7 @@ public class UserController extends BaseController {
         if(userWithUpdateFields.getGcmId() != null )
             caller.setGcmId(userWithUpdateFields.getGcmId());
 
-        if(userWithUpdateFields.getAge() != 0 )
+        if(userWithUpdateFields.getAge() != null )
             caller.setAge(userWithUpdateFields.getAge());
 
         if(userWithUpdateFields.getMainJob() != null)
