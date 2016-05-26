@@ -29,6 +29,7 @@ public class PushDao extends AbsDao<Push, Long>  {
         Set<Commit> commits = new HashSet<>();
         Set<Issue> issues = new HashSet<>();
         Set<Duplication> duplications = new HashSet<>();
+        Project p = null;
         String response = Neo4JRestService.getInstance().postQuery(
                 "MATCH (a:Push) " +
                         "WHERE ID(a) = %d " +
@@ -83,6 +84,11 @@ public class PushDao extends AbsDao<Push, Long>  {
                         );
                         duplications.add(d);
                         break;
+                    case "Project" :
+                        p = new Project();
+                        p.setId(
+                                row.getAsJsonObject().get("id").getAsLong()
+                        );
                     default:
                         L.w("Unimplemented case detected : '%s'", label);
                 }
@@ -93,6 +99,7 @@ public class PushDao extends AbsDao<Push, Long>  {
         dto.commits = commits;
         dto.issues = issues;
         dto.duplications = duplications;
+        dto.project = p;
 
         return dto.toModel();
     }

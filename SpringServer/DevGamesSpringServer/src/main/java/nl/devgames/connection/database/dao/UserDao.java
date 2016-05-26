@@ -303,7 +303,7 @@ public class UserDao extends AbsDao<User, Long> {
         fields.put("gitUsername", user.getGitUsername());
 
         List<User> u = queryByFields(fields);
-        if (u.size() != 0) {
+        if (u.size() == 0) {
             int inserted = create(user);
             if (inserted == 0)
                 return null;

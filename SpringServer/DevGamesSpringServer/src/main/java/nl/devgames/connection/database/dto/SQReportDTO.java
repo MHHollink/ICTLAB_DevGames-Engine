@@ -65,7 +65,6 @@ public class SQReportDTO {
             sqreport.setIssues(issueList);
             sqreport.setDuplications(duplicationsList);
             sqreport.setTimestamp(timestamp);
-            //		sqreport.setScore(score);
 
             L.i("Done parsing SonarQube report [%d]", identifier);
             sqreport.isBuilt(true);
