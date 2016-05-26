@@ -35,13 +35,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.net.ConnectException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.UUID;
 
@@ -133,19 +130,17 @@ public class ProjectController extends BaseController{
             //parse build as SQReportDTO
             JsonObject reportAsJson = new JsonParser().parse(json).getAsJsonObject();
             SQReportDTO testReport = new SQReportDTO().buildFromJson(reportAsJson, token);
-            //todo: get settings for project, temp testing solution below
-            File testSettingsFile = new File("settingsTest.txt");
-            Scanner scanner = new Scanner(testSettingsFile);
-            String settingsAsString = scanner.useDelimiter("\\Z").next();
-            scanner.close();
-            JsonObject settings = new JsonParser().parse(settingsAsString).getAsJsonObject();
-            //calculate score with project settings and report
-            testReport.setScore(new ScoreCalculator(settings).calculateScoreFromReport(testReport));
-            //save report
+
+
+            testReport.setScore(
+                    new ScoreCalculator(null).calculateScoreFromReport(testReport)
+            );
+
             testReport.saveReportToDatabase();
-            //get sender(s)
+
             User author = testReport.getAuthor();
-            //send message
+
+            L.i("Sending GCM message to %s", author.getUsername());
             GCMMessageComposer.sendMessage(
                     GCMMessageType.NEW_PUSH_RECEIVED,
                     "",
@@ -157,7 +152,7 @@ public class ProjectController extends BaseController{
         } catch (ConnectException e) {
             L.e(e, "Database offline");
             throw new DatabaseOfflineException();
-        } catch (FileNotFoundException ignored) {}
+        }
 
         return result;
     }

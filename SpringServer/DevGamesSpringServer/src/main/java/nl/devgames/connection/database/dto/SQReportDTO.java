@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 public class SQReportDTO {
 
+    private int identifier;
+
 	private Project project;
 	private Long id;
 	private User author;
@@ -41,15 +43,17 @@ public class SQReportDTO {
      */
 	public SQReportDTO buildFromJson(JsonObject json, String token) throws ReportParseExeption {
         try {
-            L.i("Parsing SonarQube report");
+            identifier = new Random().nextInt();
+
+            L.i("Parsing SonarQube report [%d]", identifier);
             Project project = new ProjectDao().queryByField("token", token).get(0);
 
-            User author                         = parseAuthor(json.get("author").getAsString());
-            ReportResultType resultType         = parseResultType(json.get("result").getAsString());
-            Long timestamp                      = parseTimeStamp(json.get("timestamp").getAsString());
-            List<Commit> commitList             = parseCommits(json.get("items").getAsJsonArray());
-            List<Issue> issueList               = parseIssues(json.get("issues").getAsJsonArray());
-            List<Duplication> duplicationsList  = parseDuplications(json);
+            User author = parseAuthor(json.get("author").getAsString());
+            ReportResultType resultType = parseResultType(json.get("result").getAsString());
+            Long timestamp = parseTimeStamp(json.get("timestamp").getAsString());
+            List<Commit> commitList = parseCommits(json.get("items").getAsJsonArray());
+            List<Issue> issueList = parseIssues(json.get("issues").getAsJsonArray());
+            List<Duplication> duplicationsList = parseDuplications(json);
 
             //return sqreport if valid data
             SQReportDTO sqreport = new SQReportDTO();
@@ -63,8 +67,9 @@ public class SQReportDTO {
             sqreport.setTimestamp(timestamp);
             //		sqreport.setScore(score);
 
-            L.i("Done parsing SonarQube report");
+            L.i("Done parsing SonarQube report [%d]", identifier);
             sqreport.isBuilt(true);
+            sqreport.setIdentifier(identifier);
 
             return sqreport;
         } catch (IndexOutOfBoundsException e) {
@@ -89,6 +94,7 @@ public class SQReportDTO {
             return;
         }
 
+        L.i("Saving report to database [%d]", identifier);
         //=====================NODES================
         //push push to database
         PushDao pushDAO = new PushDao();
@@ -138,6 +144,7 @@ public class SQReportDTO {
         new UserDao().saveRelationship(author, newPush);
 
         saved = true;
+        L.i("completed saving report to database [%d]", identifier);
     }
 
 	/**
@@ -218,13 +225,19 @@ public class SQReportDTO {
 	 * @return issueList		the push issues as a List of issues
 	 */
 	private List<Issue> parseIssues(JsonArray issuesArray) {
-        List<Issue> issues = new ArrayList<>();
-        issuesArray.forEach(issue -> {
-            IssueDTO dto = new Gson().fromJson(issue, IssueDTO.class);
-            if(!dto.isValid()) throw new ReportParseExeption("Issues that we received were not correctly structured");
-            issues.add(dto.toModel());
-        });
-        return issues;
+        try {
+            List<Issue> issues = new ArrayList<>();
+            issuesArray.forEach(issue -> {
+                IssueDTO dto = new Gson().fromJson(issue, IssueDTO.class);
+                if (!dto.isValid())
+                    throw new ReportParseExeption("Issues that we received were not correctly structured");
+                issues.add(dto.toModel());
+            });
+            return issues;
+        } catch (NullPointerException e) {
+            L.e(e, "Error parsing issues");
+            throw new ReportParseExeption("Issues could not be parsed. however: this should not happen!");
+        }
 	}
 	
 	/**
@@ -235,30 +248,33 @@ public class SQReportDTO {
 	private List<Duplication> parseDuplications(JsonObject reportAsJson) {
         // FIXME: 25-5-2016 Rewrite
         //default
-		List<Duplication> duplicationsList = new ArrayList<>();
-		JsonArray duplicationsArray = reportAsJson.get("duplications").getAsJsonArray();
-		for(JsonElement duplicationElement : duplicationsArray) {
-			//ONE duplication
-			Duplication duplication = new Duplication();
-			Set<DuplicationFile> duplicationFilesSet = new HashSet<>();
-			JsonArray fileArray = duplicationElement.getAsJsonObject().get("files").getAsJsonArray();
-            //for each duplication file
-			for(int i = 0; i < fileArray.size(); i++)
-			{
-                JsonObject object = fileArray.get(i).getAsJsonObject();
-                DuplicationFileDTO duplicationFile = new Gson().fromJson(object, DuplicationFileDTO.class);
-                //check if fields aren't empty
-                if(duplicationFile.isValid()) {
-                    duplicationFilesSet.add(duplicationFile.toModel());
+		try {
+            List<Duplication> duplicationsList = new ArrayList<>();
+            JsonArray duplicationsArray = reportAsJson.get("duplications").getAsJsonArray();
+            for (JsonElement duplicationElement : duplicationsArray) {
+                //ONE duplication
+                Duplication duplication = new Duplication();
+                Set<DuplicationFile> duplicationFilesSet = new HashSet<>();
+                JsonArray fileArray = duplicationElement.getAsJsonObject().get("files").getAsJsonArray();
+                //for each duplication file
+                for (int i = 0; i < fileArray.size(); i++) {
+                    JsonObject object = fileArray.get(i).getAsJsonObject();
+                    DuplicationFileDTO duplicationFile = new Gson().fromJson(object, DuplicationFileDTO.class);
+                    //check if fields aren't empty
+                    if (duplicationFile.isValid()) {
+                        duplicationFilesSet.add(duplicationFile.toModel());
+                    } else {
+                        throw new ReportParseExeption("Issues that we received were not correctly structured");
+                    }
                 }
-                else {
-                    throw new ReportParseExeption("Issues that we received were not correctly structured");
-                }
-			}
-			duplication.setFiles(duplicationFilesSet);
-			duplicationsList.add(duplication);
-		}
-		return duplicationsList;
+                duplication.setFiles(duplicationFilesSet);
+                duplicationsList.add(duplication);
+            }
+            return duplicationsList;
+        } catch (NullPointerException e) {
+            L.e(e, "Error parsing duplication");
+            throw new ReportParseExeption("Dupplications could not be parsed. however: this should not happen!");
+        }
 	}
 
     /**
@@ -352,5 +368,14 @@ public class SQReportDTO {
     public Boolean hasBeenSaved() {
         return saved;
     }
+
+    public int getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(int identifier) {
+        this.identifier = identifier;
+    }
+
 
 }

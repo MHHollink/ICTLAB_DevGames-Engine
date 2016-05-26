@@ -129,7 +129,7 @@ public class Issue extends Model {
         this.updateDate = updateDate;
     }
 
-    public void setCloseDate(long closeDate) {
+    public void setCloseDate(Long closeDate) {
         this.closeDate = closeDate;
     }
 

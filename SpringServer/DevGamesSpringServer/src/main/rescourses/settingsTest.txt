@@ -4,5 +4,4 @@
     pointStealing: "false",
     issuesPerCommitThreshold: "10.0",
     negativeScores: "false"
-
 }

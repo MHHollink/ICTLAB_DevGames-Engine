@@ -1,10 +1,10 @@
 package nl.devgames.rules;
 
-import com.google.gson.JsonObject;
 import nl.devgames.connection.database.dto.ReportResultType;
 import nl.devgames.connection.database.dto.SQReportDTO;
 import nl.devgames.model.Commit;
 import nl.devgames.model.Issue;
+import nl.devgames.model.Settings;
 import nl.devgames.utils.L;
 
 import java.util.List;
@@ -14,24 +14,15 @@ public class ScoreCalculator {
 	String scoreMethod;
 	double issuePerCommitThreshold;
 	
-	public ScoreCalculator(JsonObject settings) {
-		//get scoremethod
-		if(settings.get("scoreMethod")!=null) {
-			scoreMethod = settings.get("scoreMethod").getAsString();
-		}
-		else {
-			scoreMethod = "UNDEFINED";
-			L.w("Scoring method could not be read from the settings");
-		}
-		//get issuesPerCommitThreshold
-		if(settings.get("issuesPerCommitThreshold").getAsDouble()!= Double.NaN) {
-			issuePerCommitThreshold = settings.get("issuesPerCommitThreshold").getAsDouble();
-		}
-		else {
-			//default
-			issuePerCommitThreshold = 10.0;
-			L.w("IssuePerCommitThreshold could not be read from the settings");
-		}
+	public ScoreCalculator(Settings settings) {
+
+        if(settings == null) {
+            Settings s = new Settings();
+            s.setDefault();
+
+            scoreMethod = s.getScoreMethod();
+            issuePerCommitThreshold = s.getIssuesPerCommitThreshold();
+        }
 	}
 
 	/**
@@ -40,6 +31,8 @@ public class ScoreCalculator {
 	 * @return the score based on the sent in report as a double
 	 */
 	public double calculateScoreFromReport(SQReportDTO sqReportDTO) {
+		L.i("Calculating score for report [%d]", sqReportDTO.getIdentifier());
+
 		this.sqReporDTO = sqReportDTO;
 		double score;
 
@@ -60,10 +53,12 @@ public class ScoreCalculator {
 				score = addIssuePoints(score);
 				break;
 			default:
+				L.w("Un implemented score method [%s]", scoreMethod);
 				score = 0;
 				break;
 		}
-		
+
+		L.d("Calculated score for report [%d]", sqReportDTO.getIdentifier());
 		return score;
 	}
 
