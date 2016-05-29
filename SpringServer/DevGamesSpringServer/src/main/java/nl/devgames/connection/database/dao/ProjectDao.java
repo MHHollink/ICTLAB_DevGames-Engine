@@ -9,6 +9,7 @@ import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.ProjectDTO;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
+import nl.devgames.model.Settings;
 import nl.devgames.model.User;
 import nl.devgames.utils.L;
 
@@ -359,6 +360,20 @@ public class ProjectDao extends AbsDao<Project, Long> {
                 project.getId(), user.getId());
 
         String response = createRelationship(project.getId(), user.getId(), Project.Relations.CREATED_BY);
+
+        return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
+    }
+
+    public int saveRelationship(Project project, Settings settings) throws ConnectException {
+        if (project.getId() == null || settings.getId() == null) {
+            L.e("Id from project or settings was null: project[%b], settings[%b]",
+                    project.getId()==null, settings.getId()==null);
+            return 0;
+        }
+        L.d("Creating relationship between project: '%d' and settings: '%d'",
+                project.getId(), settings.getId());
+
+        String response = createRelationship(project.getId(), settings.getId(), Project.Relations.HAS_SETTINGS);
 
         return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
     }

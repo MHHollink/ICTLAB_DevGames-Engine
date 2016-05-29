@@ -6,7 +6,7 @@ package nl.devgames.model;
  * @author Marcel
  * @since 26-5-2016.
  */
-public class Settings {
+public class Settings extends Model {
 
     Project project;
     double issuesPerCommitThreshold;

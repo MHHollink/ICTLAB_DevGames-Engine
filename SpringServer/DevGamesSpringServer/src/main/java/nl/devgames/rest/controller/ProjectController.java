@@ -13,13 +13,7 @@ import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.connection.database.dto.SQReportDTO;
 import nl.devgames.connection.gcm.GCMMessageComposer;
 import nl.devgames.connection.gcm.GCMMessageType;
-import nl.devgames.model.Business;
-import nl.devgames.model.Commit;
-import nl.devgames.model.Duplication;
-import nl.devgames.model.Issue;
-import nl.devgames.model.Project;
-import nl.devgames.model.Push;
-import nl.devgames.model.User;
+import nl.devgames.model.*;
 import nl.devgames.rest.errors.BadRequestException;
 import nl.devgames.rest.errors.DatabaseOfflineException;
 import nl.devgames.rest.errors.EntityAlreadyExistsException;
@@ -190,6 +184,11 @@ public class ProjectController extends BaseController{
 
             project.setToken(UUID.randomUUID().toString());
             project = projectDAO.createIfNotExists(project);
+
+            Settings s = new Settings();
+            s.setDefault();
+            s = new SettingsDao().createIfNotExists(s); // Set default and create settings
+            projectDAO.saveRelationship(project, s); // Set settings as project settings
 
             projectDAO.saveRelationship(project, caller); // Set caller as project owner
             userDAO.saveRelationship(caller, project);    // Set caller as developer in project

@@ -6,7 +6,7 @@ public class Project extends Model {
 
 
     public enum Relations {
-        IS_LEAD_BY, CREATED_BY
+        IS_LEAD_BY, CREATED_BY, HAS_SETTINGS
     }
 
     private String name;
