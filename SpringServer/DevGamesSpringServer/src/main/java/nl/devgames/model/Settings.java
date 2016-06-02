@@ -10,23 +10,26 @@ public class Settings extends Model {
 
     Project project;
     double issuesPerCommitThreshold;
+    double startScore;
     boolean pointStealing;
     boolean negativeScores;
 
     public Settings() {
     }
 
-    public Settings(Project project, boolean pointStealing, double issuesPerCommitThreshold, boolean negativeScores) {
+    public Settings(Project project, boolean pointStealing, double issuesPerCommitThreshold, boolean negativeScores, double startScore) {
         this.project = project;
         this.pointStealing = pointStealing;
         this.issuesPerCommitThreshold = issuesPerCommitThreshold;
         this.negativeScores = negativeScores;
+        this.startScore = startScore;
     }
 
     public void setDefault() {
         this.project = null;
         this.pointStealing = false;
         this.issuesPerCommitThreshold = 10.0;
+        this.issuesPerCommitThreshold = 1000.0;
         this.negativeScores = false;
 }
 
@@ -61,5 +64,13 @@ public class Settings extends Model {
 
     public void setNegativeScores(boolean negativeScores) {
         this.negativeScores = negativeScores;
+    }
+
+    public double getStartScore() {
+        return startScore;
+    }
+
+    public void setStartScore(double startScore) {
+        this.startScore = startScore;
     }
 }

@@ -1,5 +1,6 @@
 package nl.devgames.connection.database.dto;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Project;
 import nl.devgames.model.Settings;
@@ -31,17 +32,13 @@ public class SettingsDTO extends ModelDTO<SettingsDTO, Settings>{
     @Override
     public boolean isValid() {
         boolean valid = project != null &&
-                issuesPerCommitThreshold != 0d &&
-                pointStealing != null &&
-                negativeScores != null;
+                issuesPerCommitThreshold != 0d;
 
         if(!valid) {
             L.w("Settings is not valid! False indicates a problem: " +
-                            "project:'%b', issuesPerCommitThreshold:'%b', pointStealing:'%b', negativeScores:'%b' ",
+                            "project:'%b', issuesPerCommitThreshold:'%b' ",
                     project != null,
-                    issuesPerCommitThreshold != 0d,
-                    pointStealing != null,
-                    negativeScores != null
+                    issuesPerCommitThreshold != 0d
             );
         }
 
@@ -50,16 +47,31 @@ public class SettingsDTO extends ModelDTO<SettingsDTO, Settings>{
 
     @Override
     public SettingsDTO createFromJsonObject(JsonObject object) {
-        return null;
+        return new Gson().fromJson(object, SettingsDTO.class);
     }
 
     @Override
     public SettingsDTO createFromNeo4jData(JsonObject data) {
-        return null;
+        SettingsDTO dto = new SettingsDTO().createFromJsonObject(
+                data.get("data").getAsJsonObject()
+        );
+        dto.id = data.get("id").getAsLong();
+        return dto;
     }
 
     @Override
-    public boolean equalsInContent(SettingsDTO other) {
-        return false;
+    public boolean equalsInContent(SettingsDTO o) {
+        return
+                false;
+    }
+
+    @Override
+    public String toString() {
+        return "SettingsDTO{" +
+                "project=" + project +
+                ", issuesPerCommitThreshold=" + issuesPerCommitThreshold +
+                ", pointStealing=" + pointStealing +
+                ", negativeScores=" + negativeScores + '\'' +
+                "} " + super.toString();
     }
 }

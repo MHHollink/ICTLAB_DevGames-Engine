@@ -3,13 +3,7 @@ package nl.devgames.rest.controller;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.Application;
-import nl.devgames.connection.database.dao.BusinessDao;
-import nl.devgames.connection.database.dao.CommitDao;
-import nl.devgames.connection.database.dao.DuplicationDao;
-import nl.devgames.connection.database.dao.IssueDao;
-import nl.devgames.connection.database.dao.ProjectDao;
-import nl.devgames.connection.database.dao.PushDao;
-import nl.devgames.connection.database.dao.UserDao;
+import nl.devgames.connection.database.dao.*;
 import nl.devgames.connection.database.dto.SQReportDTO;
 import nl.devgames.connection.gcm.GCMMessageComposer;
 import nl.devgames.connection.gcm.GCMMessageType;
@@ -110,8 +104,9 @@ public class ProjectController extends BaseController{
 
         java.util.Map<String, String> result = new java.util.HashMap<>();
 
+        Project project;
         try {
-            Project project = new ProjectDao().queryByField("token", token).get(0);
+            project = new ProjectDao().queryByField("token", token).get(0);
             //check if token is invalid
             if (project == null)
                 throw new NotFoundException("project with token not found!");
@@ -123,22 +118,23 @@ public class ProjectController extends BaseController{
         try {
             //parse build as SQReportDTO
             JsonObject reportAsJson = new JsonParser().parse(json).getAsJsonObject();
-            SQReportDTO testReport = new SQReportDTO().buildFromJson(reportAsJson, token);
+            SQReportDTO report = new SQReportDTO().buildFromJson(reportAsJson, token);
 
-
-            testReport.setScore(
-                    new ScoreCalculator(null).calculateScoreFromReport(testReport)
+            //get settings and calculate score
+            Settings settings = new SettingsDao().queryByProject(project.getId());
+            report.setScore(
+                    new ScoreCalculator(settings).calculateScoreFromReport(report)
             );
 
-            testReport.saveReportToDatabase();
+            report.saveReportToDatabase();
 
-            User author = testReport.getAuthor();
+            User author = report.getAuthor();
 
             L.i("Sending GCM message to %s", author.getUsername());
             GCMMessageComposer.sendMessage(
                     GCMMessageType.NEW_PUSH_RECEIVED,
                     "",
-                    String.valueOf(testReport.getScore().intValue()),
+                    String.valueOf(report.getScore().intValue()),
                     author.getId()
             );
 

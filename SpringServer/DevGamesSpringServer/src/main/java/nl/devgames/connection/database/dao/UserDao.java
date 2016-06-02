@@ -264,7 +264,6 @@ public class UserDao extends AbsDao<User, Long> {
                         "RETURN {id:id(a), labels: labels(a), data: a}",
                 id, User.Relations.IS_DEVELOPING.name()
         );
-        //todo make new relationship
 
         List<User> response = new ArrayList<>();
         for (JsonObject object : UserDTO.findAll(responseString)) {
@@ -277,7 +276,8 @@ public class UserDao extends AbsDao<User, Long> {
     public int create(User user) throws ConnectException {
         L.d("Creating user: %s", user);
         String response = Neo4JRestService.getInstance().postQuery(
-                "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmId: '%s' }) RETURN n ",
+                "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmId: '%s' }) " +
+                        "RETURN {id:id(n), labels: labels(n), data: n} ",
                 user.getUsername(),
                 user.getGitUsername(),
                 user.getFirstName(),

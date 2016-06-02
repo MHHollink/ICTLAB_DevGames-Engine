@@ -11,15 +11,20 @@ import java.util.List;
 
 public class ScoreCalculator {
 	SQReportDTO sqReporDTO;
-	String scoreMethod;
 	double issuePerCommitThreshold;
-	
+	double startScore;
+	boolean isPointStealing;
+	boolean isNegativeScores;
+
 	public ScoreCalculator(Settings settings) {
 
         if(settings == null) {
             Settings s = new Settings();
             s.setDefault();
             issuePerCommitThreshold = s.getIssuesPerCommitThreshold();
+            isPointStealing = s.isPointStealing();
+			isNegativeScores = s.isNegativeScores();
+			startScore = s.getStartScore();
         }
 	}
 
@@ -32,29 +37,12 @@ public class ScoreCalculator {
 		L.i("Calculating score for report [%d]", sqReportDTO.getIdentifier());
 
 		this.sqReporDTO = sqReportDTO;
-		double score;
+		double score = startScore;
 
-		//check point system
-		switch(scoreMethod) {
-			case "SUB":
-				score = 1000;
-				//build points
-				score = subtractBuildPoints(score);
-				//issue points
-				score = subtractIssuePoints(score, issuePerCommitThreshold);
-				break;
-			case "ADD":
-				score = 0;
-				//build points
-				score = addBuildPoints(score);
-				//issue points
-				score = addIssuePoints(score);
-				break;
-			default:
-				L.w("Un implemented score method [%s]", scoreMethod);
-				score = 0;
-				break;
-		}
+		//build points
+		score = subtractBuildPoints(score);
+		//issue points
+		score = subtractIssuePoints(score, issuePerCommitThreshold);
 
 		L.d("Calculated score for report [%d]", sqReportDTO.getIdentifier());
 		return score;
@@ -85,29 +73,9 @@ public class ScoreCalculator {
 			newScore += 50.0;
 		}
 		//reset if score < 0
-		if(newScore < 0.0) {
+		if(!isNegativeScores && newScore < 0.0) {
 			newScore = 0.0;
 		}
-		return newScore;
-	}
-
-	//=======================addition scoring method==========================
-	private double addBuildPoints(double score) {
-		double newScore = score;
-		if(this.sqReporDTO.getBuildResult()==ReportResultType.SUCCESS) {
-			newScore += 500.0;
-		}
-		else if(this.sqReporDTO.getBuildResult()==ReportResultType.FAILED){
-//			newScore -= 500.0;
-		}
-		return newScore;
-	}
-
-	private double addIssuePoints(double score) {
-		double newScore = score;
-		List<Issue> issues = sqReporDTO.getIssues();
-		//TODO:
-
 		return newScore;
 	}
 

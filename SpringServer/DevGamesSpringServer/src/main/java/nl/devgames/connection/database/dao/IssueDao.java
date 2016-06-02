@@ -69,16 +69,6 @@ public class IssueDao extends AbsDao<Issue, Long> {
         if(dto == null)
             return null;
         return dto.toModel();
-//        IssueDTO dto = null;
-//
-//        String responseString = Neo4JRestService.getInstance().postQuery(
-//                "MATCH (n:Issue) WHERE ID(n) = %d RETURN {id:id(n), labels: labels(n), data: n}",
-//                id
-//        );
-//
-//        dto = new IssueDTO().createFromNeo4jData(IssueDTO.findFirst(responseString));
-//
-//        return dto.toModel();
     }
 
     @Override
