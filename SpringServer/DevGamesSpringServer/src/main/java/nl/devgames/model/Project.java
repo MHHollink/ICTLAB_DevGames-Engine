@@ -13,7 +13,7 @@ public class Project extends Model {
     private String description;
     private User owner;
     private String token;
-
+    public Settings settings;
     public Set<User> developers;
 
     public Project() {
@@ -70,6 +70,14 @@ public class Project extends Model {
         this.token = token;
     }
 
+    public Settings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(Settings settings) {
+        this.settings = settings;
+    }
+
     @Override
     public String toString() {
         return "Project{" +
@@ -77,6 +85,7 @@ public class Project extends Model {
                 ", description='" + description + '\'' +
                 ", owner=" + owner +
                 ", token='" + token + '\'' +
+                ", settings=" + settings +
                 ", developers=" + developers +
                 "} " + super.toString();
     }

@@ -3,6 +3,7 @@ package nl.devgames.connection.database.dto;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import nl.devgames.model.Project;
+import nl.devgames.model.Settings;
 import nl.devgames.model.User;
 import nl.devgames.utils.L;
 
@@ -17,7 +18,7 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
     public String description;
     public User creator;
     public String token;
-
+    public Settings settings;
     public Set<User> developers;
 
     @Override
@@ -30,6 +31,7 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
         project.setOwner(creator);
         project.setDevelopers(developers);
         project.setToken(token);
+        project.setSettings(settings);
 
         return project;
     }
@@ -76,6 +78,7 @@ public class ProjectDTO extends ModelDTO<ProjectDTO, Project> {
                 ", description='" + description + '\'' +
                 ", creator=" + creator +
                 ", token='" + token + '\'' +
+                ", settings=" + settings +
                 ", developers=" + developers +
                 "} " + super.toString();
     }

@@ -14,6 +14,7 @@ import nl.devgames.rest.errors.EntityAlreadyExistsException;
 import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.rest.errors.NotFoundException;
+import nl.devgames.rules.AchievementManager;
 import nl.devgames.rules.ScoreCalculator;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -139,6 +140,9 @@ public class ProjectController extends BaseController{
             );
 
             result.put("message", "successfully parsed and saved report");
+
+            //start checking for achievements of user
+            new AchievementManager(author).checkAchievementsOfUser();
         } catch (ConnectException e) {
             L.e(e, "Database offline");
             throw new DatabaseOfflineException();
@@ -361,6 +365,64 @@ public class ProjectController extends BaseController{
             L.e(e, "database is offline!");
             throw new DatabaseOfflineException();
         }
+    }
+
+    /**
+     *
+     * @param session
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "{id}/settings", method = RequestMethod.PUT)
+    public Map updateProjectSettings(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
+                                     @PathVariable(value = "id") long id,
+                                     @RequestBody Settings settingsWithUpdateFields) {
+        L.d("Called");
+
+        java.util.Map<String, String> result = new java.util.HashMap<>();
+
+        if(settingsWithUpdateFields == null) {
+            L.w("Update settings received with empty body");
+            throw new BadRequestException("No body was passed with the request");
+        }
+
+        //check if session is valid
+        User caller = getUserFromSession( session );
+
+        Settings settings = null;
+        try {
+            settings = new SettingsDao().queryByProject(id);
+
+            //update settings fields
+            if(settingsWithUpdateFields.getIssuesPerCommitThreshold() != 0)
+                settings.setIssuesPerCommitThreshold(settingsWithUpdateFields.getIssuesPerCommitThreshold());
+
+            if(settingsWithUpdateFields.getProject() != null)
+                settings.setProject(settingsWithUpdateFields.getProject());
+
+            if(settingsWithUpdateFields.getStartScore() != 0)
+                settings.setStartScore(settingsWithUpdateFields.getStartScore());
+
+            settings.setNegativeScores(settingsWithUpdateFields.isNegativeScores());
+
+            settings.setPointStealing(settingsWithUpdateFields.isPointStealing());
+
+        } catch (ConnectException e) {
+            L.e("database is offline");
+            throw new DatabaseOfflineException();
+        }
+
+        //update in db
+        try {
+            int updated = new SettingsDao().update(settings);
+            if(updated != 1) throw new KnownInternalServerError("update settings failed. updated rows = %d", updated);
+            result.put("Message: ", "updating settings was successful");
+            return result;
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException();
+        }
+
     }
 
     /**

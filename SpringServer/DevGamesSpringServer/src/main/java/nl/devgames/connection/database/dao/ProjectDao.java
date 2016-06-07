@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.ProjectDTO;
+import nl.devgames.connection.database.dto.SettingsDTO;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.Settings;
@@ -30,6 +31,7 @@ public class ProjectDao extends AbsDao<Project, Long> {
         ProjectDTO dto = null;
         User creator = null;
         Set<User> developers = new HashSet<>();
+        Settings settings = null;
         String response = Neo4JRestService.getInstance().postQuery(
                 "MATCH (a:Project) " +
                         "WHERE ID(a) = %d " +
@@ -75,12 +77,15 @@ public class ProjectDao extends AbsDao<Project, Long> {
                                 row.getAsJsonObject().get("id").getAsLong()
                         );
                         break;
+                    case "Settings" :
+                        settings = new SettingsDTO().createFromNeo4jData(
+                                SettingsDTO.findFirst(row.getAsJsonObject().get("data").getAsJsonArray().get(0).getAsString())).toModel();
                     default:
                         L.w("Unimplemented case detected : '%s'", label);
                 }
             }
         }
-
+        //add project's developers
         response = Neo4JRestService.getInstance().postQuery(
                 "match (a:Project),(b:User) WHERE ID(a) = %d MATCH a<-[]-b RETURN id(b)", id
         );
@@ -115,6 +120,7 @@ public class ProjectDao extends AbsDao<Project, Long> {
 
         dto.creator = creator;
         dto.developers = developers;
+        dto.settings = settings;
 
         return dto.toModel();
     }
