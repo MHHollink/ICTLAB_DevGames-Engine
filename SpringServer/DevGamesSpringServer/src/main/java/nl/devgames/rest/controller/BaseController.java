@@ -1,21 +1,8 @@
 package nl.devgames.rest.controller;
 
 import nl.devgames.connection.database.Neo4JRestService;
-import nl.devgames.connection.database.dao.BusinessDao;
-import nl.devgames.connection.database.dao.CommitDao;
-import nl.devgames.connection.database.dao.DuplicationDao;
-import nl.devgames.connection.database.dao.IssueDao;
-import nl.devgames.connection.database.dao.ProjectDao;
-import nl.devgames.connection.database.dao.PushDao;
-import nl.devgames.connection.database.dao.UserDao;
-import nl.devgames.model.Business;
-import nl.devgames.model.Commit;
-import nl.devgames.model.Duplication;
-import nl.devgames.model.DuplicationFile;
-import nl.devgames.model.Issue;
-import nl.devgames.model.Project;
-import nl.devgames.model.Push;
-import nl.devgames.model.User;
+import nl.devgames.connection.database.dao.*;
+import nl.devgames.model.*;
 import nl.devgames.rest.errors.DatabaseOfflineException;
 import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.utils.L;
@@ -63,6 +50,25 @@ public abstract class BaseController {
         Project devGamesP = new Project("DevGames-Plugin","Jenkins plugin for DevGames Project");
         Project devGamesW = new Project("DevGames-Web","Webapplication for users to configure their projects and accounts in DevGames");
         Project devGamesA = new Project("DevGames-App","App that belongs to DevGames Project");
+
+        //settings of projects
+        Settings claritySettings = new Settings();
+        claritySettings.setDefault();
+
+        Settings adventureSettings = new Settings();
+        adventureSettings.setDefault();
+
+        Settings devGamesESettings = new Settings();
+        devGamesESettings.setDefault();
+
+        Settings devGamesPSettings = new Settings();
+        devGamesPSettings.setDefault();
+
+        Settings devGamesWSettings = new Settings();
+        devGamesWSettings.setDefault();
+
+        Settings devGamesASettings = new Settings();
+        devGamesASettings.setDefault();
 
         // Users that are used in the app for demo
         User marcel = new User("Marcel","Mjollnir94","Marcel",null,"Hollink", "DevGames");
@@ -121,6 +127,7 @@ public abstract class BaseController {
         DuplicationDao duplicationDao = new DuplicationDao();
         BusinessDao businessDao = new BusinessDao();
         PushDao pushDao = new PushDao();
+        SettingsDao settingsDao = new SettingsDao();
 
         // INSERTING!
         marcel = userDao.createIfNotExists(marcel);
@@ -128,11 +135,28 @@ public abstract class BaseController {
         jorik = userDao.createIfNotExists(jorik);
 
         adventure = projectDao.createIfNotExists(adventure);
+        adventureSettings = settingsDao.createIfNotExists(adventureSettings); // create settings
+        projectDao.saveRelationship(adventure, adventureSettings); // Set settings as project settings
+
         clarity   = projectDao.createIfNotExists(clarity);
+        claritySettings = settingsDao.createIfNotExists(claritySettings); // create settings
+        projectDao.saveRelationship(clarity, claritySettings); // Set settings as project settings
+
         devGamesA = projectDao.createIfNotExists(devGamesA);
+        devGamesASettings = settingsDao.createIfNotExists(devGamesASettings); // create settings
+        projectDao.saveRelationship(devGamesA, devGamesASettings); // Set settings as project settings
+
         devGamesP = projectDao.createIfNotExists(devGamesP);
+        devGamesPSettings = settingsDao.createIfNotExists(devGamesPSettings); // create settings
+        projectDao.saveRelationship(devGamesP, devGamesPSettings); // Set settings as project settings
+
         devGamesE = projectDao.createIfNotExists(devGamesE);
+        devGamesESettings = settingsDao.createIfNotExists(devGamesESettings); // create settings
+        projectDao.saveRelationship(devGamesE, devGamesESettings); // Set settings as project settings
+
         devGamesW = projectDao.createIfNotExists(devGamesW);
+        devGamesWSettings = settingsDao.createIfNotExists(devGamesWSettings); // create settings
+        projectDao.saveRelationship(devGamesW, devGamesWSettings); // Set settings as project settings
 
         userDao.saveRelationship(marcel, adventure);
         userDao.saveRelationship(marcel, clarity);

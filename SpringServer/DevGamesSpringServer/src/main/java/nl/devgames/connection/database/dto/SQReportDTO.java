@@ -79,9 +79,10 @@ public class SQReportDTO {
             throw new DatabaseOfflineException();
         }
     }
-	
-	/**
-     * Saves the report data to the neo4j database
+
+    /**
+     * Saves the parsed report to the neo4j database incl relationships
+     * @throws ConnectException
      */
 	public void saveReportToDatabase() throws ConnectException {
         if(!hasBeenBuilt()) {
@@ -94,7 +95,7 @@ public class SQReportDTO {
         }
 
         L.i("Saving report to database [%d]", identifier);
-        //=====================NODES================
+
         //push push to database
         PushDao pushDAO = new PushDao();
         Push newPush = pushDAO.createIfNotExists(new Push(UUID.randomUUID().toString(), this.timestamp, this.score));
@@ -115,7 +116,7 @@ public class SQReportDTO {
         );
 
         IssueDao issueDao = new IssueDao();
-        issues.stream().forEach(
+        issues.parallelStream().forEach(
                 issue -> {
                     try {
                         Issue i = issueDao.createIfNotExists(issue);
@@ -128,7 +129,7 @@ public class SQReportDTO {
         );
 
         DuplicationDao duplicationDAO = new DuplicationDao();
-        duplications.stream().forEach(
+        duplications.parallelStream().forEach(
                 duplication -> {
                     try {
                         Duplication d = duplicationDAO.createIfNotExists(duplication);
@@ -152,8 +153,8 @@ public class SQReportDTO {
 
 	/**
 	 * Parses the push author from the json object
-	 * @param username		    the gitUsername of the user who pushed
-	 * @return project			the project with the project name
+	 * @param username		    the gitUsername of the user who pushed as string
+	 * @return author			the author of the push
 	 */
 	private User parseAuthor(String username) throws ConnectException {
         try {
@@ -167,7 +168,7 @@ public class SQReportDTO {
 	
 	/**
 	 * Parses the push result from the json object
-	 * @param reportAsJson		the json object of the report
+	 * @param buildResult		the build result of the report as string
 	 * @return resultType		the push result as ReportResultType
 	 */
 	private ReportResultType parseResultType(String buildResult) {
@@ -179,12 +180,12 @@ public class SQReportDTO {
                 default: return ReportResultType.UNDEFINED;
 			}
 		}
-        throw new ReportParseExeption("Build result was null, did you succeed or fail?");
+        throw new ReportParseExeption("Build result was null");
 	}
 	
 	/**
 	 * Parses the push timestamp from the json object
-	 * @param reportAsJson		the json object of the report
+	 * @param buildTimestamp		the timestamp of the report as String
 	 * @return timestamp		the push timestamp as a Long
 	 */
 	private Long parseTimeStamp(String buildTimestamp) {
@@ -196,13 +197,13 @@ public class SQReportDTO {
                 return System.currentTimeMillis();
 			}
 		}
-        throw new ReportParseExeption("Time of the build was empty. we could not parse!");
+        throw new ReportParseExeption("Time of the build was empty, could not parse!");
     }
 	
 	/**
 	 * Parses the push commits from the json object
-	 * @param reportAsJson		the json object of the report
-	 * @return commitsList		the push commits as a List of commits
+	 * @param commitsArray		the json array of the report holding the commits
+	 * @return commits		the push commits as a List of commits
 	 */
 	private List<Commit> parseCommits(JsonArray commitsArray) {
         List<Commit> commits = new ArrayList<>();
@@ -212,15 +213,15 @@ public class SQReportDTO {
             );
         });
        if (commits.size() == 0) {
-           L.e("we had 0 commits. If no changes in code were made, why did you build?");
-           throw new ReportParseExeption("we had 0 commits. If no changes in code were made, why did you build?");
+           L.e("we had 0 commits in the report, did something go wrong?");
+           throw new ReportParseExeption("we had 0 commits in the report, did something go wrong?");
        }
         return commits;
 	}
 	
 	/**
 	 * Parses the push issues from the json object
-	 * @param reportAsJson		the json object of the report
+	 * @param issuesArray		the json array of the report holding the issues
 	 * @return issueList		the push issues as a List of issues
 	 */
 	private List<Issue> parseIssues(JsonArray issuesArray) {
@@ -235,7 +236,7 @@ public class SQReportDTO {
             return issues;
         } catch (NullPointerException e) {
             L.e(e, "Error parsing issues");
-            throw new ReportParseExeption("Issues could not be parsed. however: this should not happen!");
+            throw new ReportParseExeption("Issues could not be parsed.");
         }
 	}
 	
@@ -245,8 +246,6 @@ public class SQReportDTO {
 	 * @return duplicationsList		the push Duplications as a List of Duplications
 	 */
 	private List<Duplication> parseDuplications(JsonObject reportAsJson) {
-        // FIXME: 25-5-2016 Rewrite
-        //default
 		try {
             List<Duplication> duplicationsList = new ArrayList<>();
             JsonArray duplicationsArray = reportAsJson.get("duplications").getAsJsonArray();
@@ -263,7 +262,7 @@ public class SQReportDTO {
                     if (duplicationFile.isValid()) {
                         duplicationFilesSet.add(duplicationFile.toModel());
                     } else {
-                        throw new ReportParseExeption("Issues that we received were not correctly structured");
+                        throw new ReportParseExeption("Received DuplicationFiles were not correctly structured");
                     }
                 }
                 duplication.setFiles(duplicationFilesSet);
@@ -271,8 +270,8 @@ public class SQReportDTO {
             }
             return duplicationsList;
         } catch (NullPointerException e) {
-            L.e(e, "Error parsing duplication");
-            throw new ReportParseExeption("Dupplications could not be parsed. however: this should not happen!");
+            L.e(e, "Error parsing duplications");
+            throw new ReportParseExeption("Duplications could not be parsed.");
         }
 	}
 

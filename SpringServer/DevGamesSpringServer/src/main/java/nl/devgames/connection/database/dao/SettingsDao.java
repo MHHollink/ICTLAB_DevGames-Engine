@@ -158,9 +158,11 @@ public class SettingsDao extends AbsDao<Settings, Long>  {
     public int create(Settings settings) throws ConnectException {
         L.d("Creating settings: %s", settings);
         String response = Neo4JRestService.getInstance().postQuery(
-                "CREATE (n:Settings { projectId: %d, issuesPerCommitThreshold: %f, pointStealing: %b, negativeScore: %b }) RETURN n ",
-                settings.getProject().getId(),
-                settings.getIssuesPerCommitThreshold(),
+                "CREATE (n:Settings { generatedUUID: '%s', startScore: %s, issuesPerCommitThreshold: %s, pointStealing: %b, negativeScore: %b }) " +
+                        "RETURN {id:id(n), labels: labels(n), data: n} ",
+                settings.getUuid(),
+                new Formatter(Locale.US).format("%.2f", settings.getStartScore()),
+                new Formatter(Locale.US).format("%.2f", settings.getIssuesPerCommitThreshold()),
                 settings.isPointStealing(),
                 settings.isNegativeScores()
         );
@@ -179,7 +181,7 @@ public class SettingsDao extends AbsDao<Settings, Long>  {
             if (inserted == 0)
                 return null;
             L.d("Created %d rows", inserted);
-            return queryByField("projectId", data.getProject().getId()).get(0);
+            return queryByField("generatedUUID", data.getUuid()).get(0);
         } else return settings;
     }
 
@@ -190,10 +192,10 @@ public class SettingsDao extends AbsDao<Settings, Long>  {
             String response = Neo4JRestService.getInstance().postQuery(
                     "MATCH (n:Settings) " +
                             "WHERE ID(n) = %d " +
-                            "SET n.projectId = %d, n.issuesPerCommitThreshold = %f," +
+                            "SET n.startScore = %f, n.issuesPerCommitThreshold = %f," +
                             "s.pointStealing: %b, negativeScore: %b " +
                             "RETURN {id:id(n), labels: labels(n), data: n} ",
-                    settings.getProject().getId(),
+                    settings.getStartScore(),
                     settings.getIssuesPerCommitThreshold(),
                     settings.isPointStealing(),
                     settings.isNegativeScores()

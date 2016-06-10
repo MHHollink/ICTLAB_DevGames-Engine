@@ -311,7 +311,6 @@ public class DuplicationDao extends AbsDao<Duplication, Long>  {
         } else return duplication;
     }
 
-    //todo: is deze nodig marcel?
     @Override
     public int update(Duplication duplication) throws ConnectException, IndexOutOfBoundsException {
         if(duplication != null && queryById(duplication.getId()) != null) {

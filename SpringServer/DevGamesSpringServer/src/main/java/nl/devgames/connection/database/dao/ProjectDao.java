@@ -40,7 +40,7 @@ public class ProjectDao extends AbsDao<Project, Long> {
                                 "WHERE ID(a) = %d " +
                         "RETURN " +
                             "{id:id(a), labels: labels(a), data: a}," +
-                            "{id:id(b), labels: labels(b)}",
+                            "{id:id(b), labels: labels(b), data: b}",
                 id, id
         );
 
@@ -78,8 +78,7 @@ public class ProjectDao extends AbsDao<Project, Long> {
                         );
                         break;
                     case "Settings" :
-                        settings = new SettingsDTO().createFromNeo4jData(
-                                SettingsDTO.findFirst(row.getAsJsonObject().get("data").getAsJsonArray().get(0).getAsString())).toModel();
+                        settings = new SettingsDTO().createFromNeo4jData(row.getAsJsonObject()).toModel();
                     default:
                         L.w("Unimplemented case detected : '%s'", label);
                 }

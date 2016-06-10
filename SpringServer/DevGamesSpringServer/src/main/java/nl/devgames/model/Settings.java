@@ -1,5 +1,7 @@
 package nl.devgames.model;
 
+import java.util.UUID;
+
 /**
  * TODO: Write class level documentation
  *
@@ -8,6 +10,7 @@ package nl.devgames.model;
  */
 public class Settings extends Model {
 
+    private String uuid; // using uuid for unique field
     Project project;
     double issuesPerCommitThreshold;
     double startScore;
@@ -15,6 +18,7 @@ public class Settings extends Model {
     boolean negativeScores;
 
     public Settings() {
+        generateUUID();
     }
 
     public Settings(Project project, boolean pointStealing, double issuesPerCommitThreshold, boolean negativeScores, double startScore) {
@@ -23,6 +27,18 @@ public class Settings extends Model {
         this.issuesPerCommitThreshold = issuesPerCommitThreshold;
         this.negativeScores = negativeScores;
         this.startScore = startScore;
+    }
+
+    public void generateUUID() {
+        uuid = UUID.randomUUID().toString();
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public void setDefault() {

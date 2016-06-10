@@ -49,7 +49,6 @@ public class ScoreCalculator {
 	}
 
 	//======================subtract scoring method========================
-	
 	private double subtractBuildPoints(double score) {
 		double newScore = score;
 		if(this.sqReporDTO.getBuildResult()==ReportResultType.SUCCESS) {
