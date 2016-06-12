@@ -34,6 +34,11 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/users")
 public class UserController extends BaseController {
 
+    /**
+     * creates a new user
+     * @param user      the user to be created
+     * @return          the created user with id
+     */
     @RequestMapping(method = RequestMethod.POST)
     public User createNewUser(@RequestBody User user) {
         L.d("Called");
@@ -65,6 +70,11 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * gets the user calling
+     * @param session       the session id as String
+     * @return              the user calling
+     */
     @RequestMapping(method = RequestMethod.GET)
     public User getOwnUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session) {
         User caller = getUserFromSession( session );
@@ -72,6 +82,12 @@ public class UserController extends BaseController {
         return caller;
     }
 
+    /**
+     * gets a user by id
+     * @param session       the session id as String
+     * @param id            the id of the user
+     * @return              the user with that id
+     */
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public User getUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                         @PathVariable Long id)
@@ -89,6 +105,13 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * updates a user with id
+     * @param session               the session id as String
+     * @param id                    the id of the user
+     * @param userWithUpdateFields  the user to be updated
+     * @return                      the updates user
+     */
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public User updateOwnUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                               @PathVariable long id,
@@ -140,6 +163,12 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * delets a user with id
+     * @param session               the session id as String
+     * @param id                    the id of the user
+     * @return return               a map with the return message
+     */
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     public Map deleteUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                           @PathVariable long id)
@@ -160,6 +189,12 @@ public class UserController extends BaseController {
 
     }
 
+    /**
+     * gets the projects linked to user with id
+     * @param session               the session id as String
+     * @param id                    the id of the user
+     * @return                      a set of projects which the user is developing
+     */
     @RequestMapping(value = "{id}/projects", method = RequestMethod.GET)
     public Set<Project> getProjects(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                      @PathVariable Long id)
@@ -186,6 +221,12 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * gets the pushes linked to user with id
+     * @param session               the session id as String
+     * @param id                    the id of the user
+     * @return                      a set of pushes which the user pushed
+     */
     @RequestMapping(value = "{id}/pushes", method = RequestMethod.GET)
     public Set<Push> getPushes(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                 @PathVariable Long id)
@@ -211,6 +252,12 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * gets the commits linked to user with id
+     * @param session               the session id as String
+     * @param id                    the id of the user
+     * @return                      a set of commits which the user pushed
+     */
     @RequestMapping(value = "{id}/commits", method = RequestMethod.GET)
     public Set<Commit> getCommits(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                    @PathVariable Long id)
@@ -229,6 +276,12 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * gets the issues linked to user with id
+     * @param session               the session id as String
+     * @param id                    the id of the user
+     * @return                      a set of issues which the user pushed
+     */
     @RequestMapping(value = "{id}/issues", method = RequestMethod.GET)
     public Set<Issue> getIssues(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                  @PathVariable Long id)
@@ -247,6 +300,12 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * gets the duplications linked to user with id
+     * @param session               the session id as String
+     * @param id                    the id of the user
+     * @return                      a set of duplications which the user pushed
+     */
     @RequestMapping(value = "{id}/duplications", method = RequestMethod.GET)
     public Set<Duplication> getDuplications(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                 @PathVariable Long id)
@@ -265,6 +324,12 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * gets the businesses linked to user with id
+     * @param session               the session id as String
+     * @param id                    the id of the user
+     * @return                      a set of businesses which the user pushed
+     */
     @RequestMapping(value = "{id}/businesses", method = RequestMethod.GET)
     public Set<Business> getBusinesses(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                        @PathVariable Long id)

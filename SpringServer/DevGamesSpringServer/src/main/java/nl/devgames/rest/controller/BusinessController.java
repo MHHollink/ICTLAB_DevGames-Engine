@@ -3,6 +3,7 @@ package nl.devgames.rest.controller;
 import nl.devgames.Application;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dao.BusinessDao;
+import nl.devgames.connection.database.dao.ProjectDao;
 import nl.devgames.connection.database.dao.UserDao;
 import nl.devgames.connection.database.dto.BusinessDTO;
 import nl.devgames.model.Business;
@@ -34,6 +35,13 @@ import java.util.Set;
 @RequestMapping(value = "/businesses")
 public class BusinessController extends BaseController{
 
+    /**
+     * creates a business
+     * @param session       the session id as a String
+     * @param business      the business data to be created
+     * @return              the created business
+     * @throws ConnectException
+     */
     @RequestMapping(method = RequestMethod.POST)
     public Business createBusiness(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                    @RequestBody Business business) throws ConnectException {
@@ -51,9 +59,11 @@ public class BusinessController extends BaseController{
     }
 
     /**
-     *
-     * @param session
-     * @return
+     * gets a business by id
+     * @param session       the session id as a String
+     * @param id            the id of the business
+     * @return              the gotten business
+     * @throws ConnectException
      */
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public Business getBusiness(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
@@ -74,6 +84,12 @@ public class BusinessController extends BaseController{
         }
     }
 
+    /**
+     * deletes a business by id
+     * @param session       the session id as a String
+     * @param id            the id of the business
+     * @return result       a map with the return message
+     */
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     public Map deleteBusiness(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                               @PathVariable(value = "id") long id)
@@ -99,10 +115,10 @@ public class BusinessController extends BaseController{
     }
 
     /**
-     *
-     * @param session
-     * @param id
-     * @return
+     *gets the users of a business
+     * @param session       the session id as a String
+     * @param id            the id of the business to get users from
+     * @return              a set of Users linked to that business
      */
     @RequestMapping(value = "{id}/users", method = RequestMethod.GET)
     public Set<User> getEmployees(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
@@ -127,11 +143,11 @@ public class BusinessController extends BaseController{
     }
 
     /**
-     *
-     * @param session
-     * @param id
-     * @param uid
-     * @return
+     * adds a user to a business
+     * @param session       the session id as a String
+     * @param id            the id of the business
+     * @param uid           the id of the user
+     * @return result       a map with the return message
      */
     @RequestMapping(value = "{id}/users/{uid}", method = RequestMethod.PUT)
     public Map addEmployeeToBusiness(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
@@ -145,20 +161,33 @@ public class BusinessController extends BaseController{
         //check if session is valid
         User caller = getUserFromSession( session );
 
+        try {
+            BusinessDao businessDao = new BusinessDao();
+            Business business = businessDao.queryById(id);
 
-        // TODO : 1 -> check if session is valid, 2 -> add a relation between nodes
-        throw new UnsupportedOperationException();
+            UserDao userDao = new UserDao();
+            User user = userDao.queryById(uid);
+            int saved = businessDao.saveRelationship(business, caller);
+            if (saved != 1) throw new KnownInternalServerError("add user to business failed. user with id: %d", uid);
+            result.put("message", "succesfully saved user to business");
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException();
+        }
+        return result;
     }
 
     /**
-     *
-     * @param session
-     * @param id
-     * @return
+     *  adds a project to the business
+     * @param session           the session id as a String
+     * @param id                the id of the business
+     * @param pid               the id of the project
+     * @return    result        a map with the return message
      */
-    @RequestMapping(value = "{id}/projects", method = RequestMethod.GET)
-    public Set<Project> getProjects(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
-                                    @PathVariable(value = "id") long id)
+    @RequestMapping(value = "{id}/projects/{pid}", method = RequestMethod.PUT)
+    public Map addProjectToBusiness(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
+                                         @PathVariable(value = "id") long id,
+                                         @PathVariable(value = "pid") long pid)
     {
         L.d("Called");
 
@@ -167,25 +196,20 @@ public class BusinessController extends BaseController{
         //check if session is valid
         User caller = getUserFromSession( session );
 
+        try {
+            BusinessDao businessDao = new BusinessDao();
+            Business business = businessDao.queryById(id);
 
-        // TODO : 1 -> check if session is valid, 2 -> return all projects that have a relation
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     *
-     * @param session
-     * @param id
-     * @param pid
-     * @return
-     */
-    @RequestMapping(value = "{id}/projects/{pid}", method = RequestMethod.PUT)
-    public Map addProjectToBusiness(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
-                                         @PathVariable(value = "id") long id,
-                                         @PathVariable(value = "pid") long pid)
-    {
-        // TODO : 1 -> check if session is valid, 2 -> add a relation between nodes
-        throw new UnsupportedOperationException();
+            ProjectDao projecDao = new ProjectDao();
+            Project project = projecDao.queryById(pid);
+            int saved = businessDao.saveRelationship(business, project);
+            if (saved != 1) throw new KnownInternalServerError("add project to business failed. project with id: %d", pid);
+            result.put("message", "succesfully saved project to business");
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException();
+        }
+        return result;
     }
 
 }

@@ -381,7 +381,7 @@ public class UserDao extends AbsDao<User, Long> {
 
     @Override
     public int deleteIds(Collection<Long> ids) throws ConnectException {
-        L.d("Deleting users with ids: %d", ids);
+        L.d("Deleting users with ids: %d", 8);
         int changed = 0;
         for(Long id : ids)
             changed += deleteById(id);

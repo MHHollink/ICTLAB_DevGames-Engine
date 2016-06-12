@@ -10,7 +10,7 @@ import nl.devgames.model.User;
 import java.net.ConnectException;
 
 /**
- * Class to implement a method that creates any relation!k
+ * Class to implement a method that creates any relation!
  */
 public abstract class AbsDao<T, ID> implements Dao<T, ID> {
 

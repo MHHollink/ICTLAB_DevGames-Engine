@@ -15,7 +15,7 @@ import nl.devgames.rest.errors.InvalidSessionException;
 import nl.devgames.rest.errors.KnownInternalServerError;
 import nl.devgames.rest.errors.NotFoundException;
 import nl.devgames.rules.AchievementManager;
-import nl.devgames.rules.ScoreCalculator;
+import nl.devgames.rules.IssueScoreCalculator;
 import nl.devgames.utils.L;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -92,10 +92,10 @@ public class ProjectController extends BaseController{
      * </code>
      */
 
-     /**
-     * @param token
-     * @param json
-     * @return
+     /**parses an incoming build report, saves it and sends a message to the user of the sent report
+     * @param token     project token as String
+     * @param json      report data as string
+     * @return          a Map containing the return message
      *
      */
     @RequestMapping(value = "/{token}/build", method = RequestMethod.POST)
@@ -124,7 +124,7 @@ public class ProjectController extends BaseController{
             //get settings and calculate score
             Settings settings = new SettingsDao().queryByProject(project.getId());
             report.setScore(
-                    new ScoreCalculator(settings).calculateScoreFromReport(report)
+                    new IssueScoreCalculator(settings).calculateScoreFromReport(report)
             );
 
             report.saveReportToDatabase();
@@ -151,11 +151,11 @@ public class ProjectController extends BaseController{
         return result;
     }
 
-    /**
+    /**creates a project
      *
-     * @param session
-     * @param project
-     * @return
+     * @param session       the session of the user calling the method as String
+     * @param project       the Project to be created
+     * @return              the project created
      */
     @RequestMapping(method = RequestMethod.POST)
     public Project createProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
@@ -200,11 +200,11 @@ public class ProjectController extends BaseController{
         }
     }
 
-    /**
+    /**gets a project by id
      *
-     * @param session
-     * @param id
-     * @return
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the project to get
+     * @return              the project gotten from the id
      */
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public Project getProjectById(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
@@ -226,11 +226,11 @@ public class ProjectController extends BaseController{
         }
     }
 
-    /**
+    /**deletes a project by id
      *
-     * @param session
-     * @param id
-     * @return
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the project to delete
+     * @return  result      a map containing the return message
      */
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     public Map deleteProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
@@ -255,11 +255,11 @@ public class ProjectController extends BaseController{
         return result;
     }
 
-    /**
+    /**updates a project by id
      *
-     * @param session
-     * @param id
-     * @return
+     * @param session      the session of the user calling the method as String
+     * @param id           the id of the project to update
+     * @return             the updated project
      */
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public Project updateProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
@@ -274,9 +274,6 @@ public class ProjectController extends BaseController{
 
         //check if session is valid
         User caller = getUserFromSession( session );
-
-        //check if user has update rights for project
-        //todo  check if user has update rights for project
 
         Project project = null;
         try {
@@ -293,7 +290,6 @@ public class ProjectController extends BaseController{
             L.e("database is offline");
             throw new DatabaseOfflineException();
         }
-        // TODO: 17-5-2016 all fields?
 
         //update in db
         try {
@@ -308,11 +304,11 @@ public class ProjectController extends BaseController{
     }
 
 
-    /**
+    /**gets the users of a project by id
      *
-     * @param session
-     * @param id
-     * @return
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the project to return the developers for
+     * @return              a set of users which are developing said project
      */
     @RequestMapping(value = "{id}/users", method = RequestMethod.GET)
     public Set<User> getDevelopersFromProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
@@ -336,11 +332,11 @@ public class ProjectController extends BaseController{
 
 
     /**
-     *
-     * @param session
-     * @param id
-     * @param uid
-     * @return
+     *  adds a user to the project as developer
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the project to add a developer for
+     * @param uid           the id of the user to add to the project
+     * @return  result      a map containing the return message
      */
     @RequestMapping(value = "{id}/users/{uid}", method = RequestMethod.PUT)
     public Map addDeveloperToProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
@@ -353,8 +349,6 @@ public class ProjectController extends BaseController{
         //check if session is valid
         User caller = getUserFromSession( session );
 
-        //check if user has update rights for project
-        //todo  check if user has update rights for project
         //add user to project
         try {
             UserDao dao = new UserDao();
@@ -368,10 +362,10 @@ public class ProjectController extends BaseController{
     }
 
     /**
-     *
-     * @param session
-     * @param id
-     * @return
+     *  updates aa projects' settings
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the project to update the settings for
+     * @return result      a map containing the return message
      */
     @RequestMapping(value = "{id}/settings", method = RequestMethod.PUT)
     public Map updateProjectSettings(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
@@ -426,10 +420,10 @@ public class ProjectController extends BaseController{
     }
 
     /**
-     *
-     * @param session
-     * @param id
-     * @return
+     *  gets the issues for a project
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the project to get the issues for
+     * @return              a set of issues of the project
      */
     @RequestMapping(value = "{id}/issues", method = RequestMethod.GET)
     public Set<Issue> getIssuesFromProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
@@ -453,10 +447,10 @@ public class ProjectController extends BaseController{
     }
 
     /**
-     *
-     * @param session
-     * @param id
-     * @return
+     * gets the duplications for a project
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the project to get the duplications for
+     * @return              a set of duplications of the project
      */
     @RequestMapping(value = "{id}/duplications", method = RequestMethod.GET)
     public Set<Duplication> getDuplicationsFromProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
@@ -479,10 +473,10 @@ public class ProjectController extends BaseController{
     }
 
     /**
-     *
-     * @param session
-     * @param id
-     * @return
+     *gets the pushes for a project
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the project to get the pushes for
+     * @return              a set of pushes of the project
      */
     @RequestMapping(value = "{id}/pushes", method = RequestMethod.GET)
     public Set<Push> getPushesFromProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
@@ -505,10 +499,10 @@ public class ProjectController extends BaseController{
     }
 
     /**
-     *
-     * @param session
-     * @param id
-     * @return
+     *gets the commits for a project
+     * @param @param session        the session of the user calling the method as String
+     * @param id                    the id of the project to get the commits for
+     * @return                      a set of commits of the project
      */
     @RequestMapping(value = "{id}/commits", method = RequestMethod.GET)
     public Set<Commit> getCommitsFromProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
@@ -531,11 +525,10 @@ public class ProjectController extends BaseController{
     }
 
     /**
-     *
-     * @param session
-     * @param id
-     * @return
-     */
+     * gets the businesses for a project
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the project to get the businesses for
+     * @return              a set of businesses of the project     */
     @RequestMapping(value = "{id}/businesses", method = RequestMethod.GET)
     public Set<Business> getBusinessesFromProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                             @PathVariable(value = "id") long id)
@@ -556,9 +549,12 @@ public class ProjectController extends BaseController{
         }
     }
 
-
-
-    // todo move method to more appropriate class
+    /**
+     * gets the gcm tokens of the users developing a project
+     * @param uid           the user id to get the tokens from
+     * @param projectId     the project id to get the tokens from
+     * @return              a list of gcm tokens from the users of that project
+     */
     public List<String> getProjectMembersTokens(long uid, long projectId) {
         try {
             return new UserDao().userTokensFromProject(uid, projectId);

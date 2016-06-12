@@ -1,21 +1,20 @@
 package nl.devgames.connection.database.dao;
 
 import nl.devgames.BaseTest;
+import nl.devgames.model.Commit;
 import nl.devgames.model.Project;
+import nl.devgames.model.Push;
+import nl.devgames.model.User;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 
-/**
- * Created by Marcel on 19-5-2016.
- */
 public class ProjectDaoTest extends BaseTest {
 
     Project testProject = new Project(
@@ -53,7 +52,7 @@ public class ProjectDaoTest extends BaseTest {
     public void testQueryForAll() throws Exception {
         assertThat(
                 dao.queryForAll(),
-                hasSize(1)
+                hasSize(2)
         );
     }
 
@@ -89,12 +88,38 @@ public class ProjectDaoTest extends BaseTest {
 
     @Test
     public void testAddUserToProject() throws Exception {
-        throw new Exception();
+        User user = new UserDao().createIfNotExists(
+                new User("TestUser", "TestGitUser", "TestFName", "TestTween","TestLName", 25, "TestJob", null, null, null, null, "TestPassword")
+        );
+
+        assertThat(
+                new ProjectDao().saveRelationship(project1, user)
+                ,
+                equalTo(
+                        1
+                )
+        );
+
+
     }
 
     @Test
     public void testGetProjectForPush() throws Exception {
-        throw new Exception();
+        PushDao pushDao = new PushDao();
+        Push push = pushDao.createIfNotExists(
+                new Push(UUID.randomUUID().toString(), 1455994686, (new Random().nextInt(150)+100))
+        );
+        pushDao.saveRelationship(push, project1);
+
+
+        assertThat(
+                dao.getProjectByPush(
+                        push.getId()
+                ),
+                equalTo(
+                        project1
+                )
+        );
     }
 
     @Test
@@ -154,21 +179,95 @@ public class ProjectDaoTest extends BaseTest {
 
     @Test
     public void testDelete() throws Exception {
-        throw new Exception();
+        Project project = dao.createIfNotExists(
+                new Project(
+                        "TestProject", "TestDescription"
+                )
+        );
+
+        assertThat(
+                dao.delete(
+                        project
+                ),
+                equalTo(
+                        1
+                )
+        );
     }
 
     @Test
     public void testDeleteById() throws Exception {
-        throw new Exception();
+        Project project = dao.createIfNotExists(
+                new Project(
+                        "TestProject", "TestDescription"
+                )
+        );
+
+        assertThat(
+                dao.deleteById(
+                        project.getId()
+                ),
+                equalTo(
+                        1
+                )
+        );
     }
 
     @Test
-    public void testDelete1() throws Exception {
-        throw new Exception();
+    public void testDeleteCollection() throws Exception {
+        List<Project> projects = new ArrayList<>();
+        projects.add(
+                dao.createIfNotExists(new Project(
+                        "TestProject1", "TestDescription"
+                ))
+        );
+        projects.add(
+                dao.createIfNotExists(new Project(
+                        "TestProject2", "TestDescription"
+                ))
+        );
+        projects.add(
+                dao.createIfNotExists(new Project(
+                        "TestProject3", "TestDescription"
+                ))
+        );
+
+        assertThat(
+                dao.delete(
+                        projects
+                ),
+                equalTo(
+                        3
+                )
+        );
     }
 
     @Test
     public void testDeleteIds() throws Exception {
-        throw new Exception();
+        List<Long> ids = new ArrayList<>();
+        ids.add(
+                dao.createIfNotExists(new Project(
+                        "TestProject1", "TestDescription"
+                )).getId()
+        );
+        ids.add(
+                dao.createIfNotExists(new Project(
+                        "TestProject2", "TestDescription"
+                )).getId()
+        );
+        ids.add(
+                dao.createIfNotExists(new Project(
+                        "TestProject3", "TestDescription"
+                )).getId()
+        );
+
+        assertThat(
+                dao.deleteIds(
+                        ids
+                ),
+                equalTo(
+                        3
+                )
+        );
     }
 }

@@ -31,6 +31,12 @@ import java.util.Set;
 @RequestMapping(value = "/pushes")
 public class PushController extends BaseController {
 
+    /**
+     * gets a push by id
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the push to get
+     * @return
+     */
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public Push getPushById(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                             @PathVariable long id)
@@ -51,6 +57,12 @@ public class PushController extends BaseController {
         }
     }
 
+    /**
+     * gets the user who pushed the push
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the push
+     * @return              the user who pushed the push
+     */
     @RequestMapping(value = "/{id}/users", method = RequestMethod.GET)
     public User getPushPusher(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                               @PathVariable long id)
@@ -71,6 +83,12 @@ public class PushController extends BaseController {
         }
     }
 
+    /**
+     * gets the project to which the push was pushed
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the push
+     * @return              the project to which the push was pushed
+     */
     @RequestMapping(value = "/{id}/projects", method = RequestMethod.GET)
     public Project getProjectFromPush(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                            @PathVariable long id)
@@ -91,6 +109,12 @@ public class PushController extends BaseController {
         }
     }
 
+    /**
+     * gets the commits of the push
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the push
+     * @return              the commits in relation to the push
+     */
     @RequestMapping(value = "/{id}/commits", method = RequestMethod.GET)
     public Set<Commit> getUnderLayingCommits(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                              @PathVariable long id) {
@@ -110,6 +134,12 @@ public class PushController extends BaseController {
         }
     }
 
+    /**
+     * gets the issues of the push
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the push
+     * @return              the issues in relation to the push
+     */
     @RequestMapping(value = "/{id}/issues", method = RequestMethod.GET)
     public Set<Issue> getUnderLayingIssues(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                         @PathVariable long id) {
@@ -129,6 +159,12 @@ public class PushController extends BaseController {
         }
     }
 
+    /**
+     * gets the duplications of the push
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the push
+     * @return              the duplications in relation to the push
+     */
     @RequestMapping(value = "/{id}/duplications", method = RequestMethod.GET)
     public Set<Duplication> getDuplicationsFromPush(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                                     @PathVariable long id) {

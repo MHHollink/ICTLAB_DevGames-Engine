@@ -86,11 +86,11 @@ public class SQReportDTO {
      */
 	public void saveReportToDatabase() throws ConnectException {
         if(!hasBeenBuilt()) {
-            L.w("Hey developer! wake up! you forgot to build the report.");
+            L.w("Warning, you already built this SQReport from json data, skipping save");
             return;
         }
         if(hasBeenSaved()) {
-            L.w("Hey developer! wake up! saving twice is really stupid.");
+            L.w("Warning, you already saved this SQReport, skipping save");
             return;
         }
 
@@ -258,7 +258,6 @@ public class SQReportDTO {
                 for (int i = 0; i < fileArray.size(); i++) {
                     JsonObject object = fileArray.get(i).getAsJsonObject();
                     DuplicationFileDTO duplicationFile = new Gson().fromJson(object, DuplicationFileDTO.class);
-                    //check if fields aren't empty
                     if (duplicationFile.isValid()) {
                         duplicationFilesSet.add(duplicationFile.toModel());
                     } else {

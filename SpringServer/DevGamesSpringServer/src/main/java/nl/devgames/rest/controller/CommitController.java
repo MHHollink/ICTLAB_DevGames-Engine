@@ -29,6 +29,13 @@ import java.net.ConnectException;
 @RequestMapping(value = "/commits")
 public class CommitController extends BaseController{
 
+    /**
+     * gets a commit by id
+     * @param session       the session id as String
+     * @param id            the id of the commit
+     * @return              the commit with id id
+     * @throws ConnectException
+     */
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public Commit getCommitById(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                 @PathVariable long id) throws ConnectException {
@@ -47,6 +54,13 @@ public class CommitController extends BaseController{
         }
     }
 
+    /**
+     * gets pushes of a commit
+     * @param session       the session id as String
+     * @param id            the id of the commit
+     * @return              the push of the commit
+     * @throws ConnectException
+     */
     @RequestMapping(value = "{id}/pushes", method = RequestMethod.GET)
     public Push getPush(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                         @PathVariable long id) throws ConnectException {
@@ -66,6 +80,13 @@ public class CommitController extends BaseController{
         }
     }
 
+    /**
+     * gets the user of the commit
+     * @param session       the session id as String
+     * @param id            the id of the commit
+     * @return              the user who made the commit
+     * @throws ConnectException
+     */
     @RequestMapping(value = "{id}/user", method = RequestMethod.GET)
     public User getUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                         @PathVariable long id) throws ConnectException {
@@ -85,6 +106,13 @@ public class CommitController extends BaseController{
         }
     }
 
+    /**
+     * gets the project of the commit
+     * @param session       the session id as String
+     * @param id            the id of the commit
+     * @return              the project to which the commit was pushed to
+     * @throws ConnectException
+     */
     @RequestMapping(value = "{id}/projects", method = RequestMethod.GET)
     public Project getProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                               @PathVariable long id) throws ConnectException {

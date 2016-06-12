@@ -30,6 +30,13 @@ import java.net.ConnectException;
 @RequestMapping(value = "/issues")
 public class IssueController extends BaseController{
 
+    /**
+     * gets an issue by id
+     * @param session       the session id as String
+     * @param id            the id of the issue
+     * @return              the issue of the id
+     * @throws ConnectException
+     */
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public Issue getIssueById(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                    @PathVariable long id) throws ConnectException {
@@ -49,6 +56,13 @@ public class IssueController extends BaseController{
         }
     }
 
+    /**
+     * get the pushes of an issue
+     * @param session       the session id as String
+     * @param id            the id of the issue
+     * @return              the push in relation with the issue
+     * @throws ConnectException
+     */
     @RequestMapping(value = "{id}/pushes", method = RequestMethod.GET)
     public Push getPush(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                         @PathVariable long id) throws ConnectException {
@@ -68,6 +82,13 @@ public class IssueController extends BaseController{
         }
     }
 
+    /**
+     * gets the user who pushed the issue
+     * @param session       the session id as String
+     * @param id            the id of the issue
+     * @return              the user who pushed the issue
+     * @throws ConnectException
+     */
     @RequestMapping(value = "{id}/user", method = RequestMethod.GET)
     public User getUser(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                         @PathVariable long id) throws ConnectException {
@@ -87,6 +108,13 @@ public class IssueController extends BaseController{
         }
     }
 
+    /**
+     * gets the project to which the issue was pushed
+     * @param session       the session id as String
+     * @param id            the id of the issue
+     * @return              the project to which the issue was pushed
+     * @throws ConnectException
+     */
     @RequestMapping(value = "{id}/projects", method = RequestMethod.GET)
     public Project getProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                               @PathVariable long id) throws ConnectException {

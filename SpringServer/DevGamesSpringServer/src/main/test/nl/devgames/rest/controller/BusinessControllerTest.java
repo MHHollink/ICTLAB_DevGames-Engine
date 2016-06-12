@@ -1,26 +1,63 @@
 package nl.devgames.rest.controller;
 
+import nl.devgames.Application;
+import nl.devgames.BaseTest;
+import nl.devgames.connection.database.dao.UserDao;
+import nl.devgames.model.Business;
+import nl.devgames.model.User;
+import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.nio.BufferUnderflowException;
+import java.util.Collection;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Created by Marcel on 17-5-2016.
  */
-public class BusinessControllerTest {
+public class BusinessControllerTest extends BaseTest {
+
+    BusinessController controller = new BusinessController();
+    User user = new User("testUsername", null, null, null, null, "testPassword");
+    String session = null;
+
 
     @Before
     public void setUp() throws Exception {
+        user = new UserDao().createIfNotExists(user);
+        Collection<String> values = new AuthController().login("testUsername", "testPassword").values();
+        session = values.iterator().next();
+    }
 
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     @Test
     public void testCreateBusiness() throws Exception {
-
+        Business business = new Business("DevGames");
+        assertThat(
+                controller.createBusiness(session, business)
+                ,
+                notNullValue()
+        );
     }
+
 
     @Test
     public void testGetBusiness() throws Exception {
-
+        assertThat(
+                controller.getBusiness(session, business1.getId())
+                ,
+                equalTo(business1)
+        );
     }
 
     @Test

@@ -45,7 +45,7 @@ public class Settings extends Model {
         this.project = null;
         this.pointStealing = false;
         this.issuesPerCommitThreshold = 10.0;
-        this.issuesPerCommitThreshold = 1000.0;
+        this.startScore = 1000.0;
         this.negativeScores = false;
 }
 
