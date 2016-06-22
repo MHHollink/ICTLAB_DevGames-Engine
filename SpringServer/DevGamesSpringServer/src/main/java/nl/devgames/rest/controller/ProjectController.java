@@ -617,7 +617,7 @@ public class ProjectController extends BaseController{
             Set<User> usersOfProject = getDevelopersFromProject(session, id);
             for(User user : usersOfProject) {
                 Double totalUserScore = 0.0;
-                List<Push> pushesOfUser = pushDao.queryByUser(user.getId());
+                List<Push> pushesOfUser = pushDao.queryByUserAndProject(user.getId(), id);
                 for(Push push : pushesOfUser) {
                     totalUserScore+=push.getScore();
                 }

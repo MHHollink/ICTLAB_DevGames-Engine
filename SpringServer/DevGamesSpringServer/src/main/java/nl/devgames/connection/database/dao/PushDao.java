@@ -234,6 +234,21 @@ public class PushDao extends AbsDao<Push, Long>  {
         return response;
     }
 
+    public List<Push> queryByUserAndProject(long uid, long pid) throws ConnectException {
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:Push)<-[:%s]-(b:User)-[:%s]->(c:Project) " +
+                        "WHERE ID(b) = %d AND ID(c) = %d " +
+                        "RETURN {id:id(a), labels: labels(a), data: a}",
+                User.Relations.HAS_PUSHED.name(), User.Relations.IS_DEVELOPING, uid, pid
+        );
+
+        List<Push> response = new ArrayList<>();
+        for (JsonObject object : PushDTO.findAll(responseString)) {
+            response.add(new PushDTO().createFromNeo4jData(object).toModel());
+        }
+        return response;
+    }
+
     public Push queryByDuplication(long id) throws ConnectException {
         String responseString = Neo4JRestService.getInstance().postQuery(
                 "MATCH (a:Push)-[:has_duplication]->(b:Duplication) " +
