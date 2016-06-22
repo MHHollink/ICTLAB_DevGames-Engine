@@ -23,12 +23,12 @@ public class AchievementManager {
         pushDao = new PushDao();
     }
 
-    private void sendAchievementMessage(Integer achievementId) {
+    private void sendAchievementMessage(String achievementId) {
         L.i("Sending GCM message to %s", user.getUsername());
         GCMMessageComposer.sendMessage(
-                GCMMessageType.ACHIEVEMENT_UNLOCKED,
+                GCMMessageType.ACHIEVEMENT,
                 "",
-                achievementId.toString(),
+                achievementId,
                 user.getId()
         );
     }
@@ -52,7 +52,7 @@ public class AchievementManager {
         }
         if(pushesInLast10Minutes.size() > 2 ) {
             //achievement unlocked
-
+            sendAchievementMessage("CgkI6sj_ys4REAIQAA");
         }
 
     }

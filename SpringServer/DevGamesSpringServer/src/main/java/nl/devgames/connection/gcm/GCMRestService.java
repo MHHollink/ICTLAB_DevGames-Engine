@@ -13,7 +13,10 @@ import java.io.IOException;
 public class GCMRestService extends AbsRestService {
 
     //devgames project
-    private static final String API_TOKEN = "AIzaSyC9G357o3fykQPsbANNtn6KXOkHJi6_kwA";
+
+
+    //joriks devgames project
+    private static final String API_TOKEN = "AIzaSyAW3nAfcMKPD_WWI42Tzb8p0dG-Jh8Ybx8";
 	
 	//test project
 //	private static final String API_TOKEN = "AIzaSyAYYJpgR6yk4AePQioLiMKVNsOVyMrcKVU";
