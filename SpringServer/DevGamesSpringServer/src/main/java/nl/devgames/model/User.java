@@ -31,8 +31,10 @@ public class User extends Model {
     private String gcmId;
 
     private String password;
+    private double totalScore;
 
     public User() {
+        this.totalScore = 0.0;
     }
 
     public User(String username, String firstName, String gitUsername, String tween, String lastName, String password) {
@@ -42,6 +44,8 @@ public class User extends Model {
         this.tween = tween;
         this.lastName = lastName;
         this.password = password;
+
+        this.totalScore = 0.0;
     }
 
     public User(String username, String gitUsername, String firstName, String tween, String lastName, int age, String mainJob, Set<Project> projects, Set<Push> pushes, String sessionId, String gcmId, String password) {
@@ -99,6 +103,14 @@ public class User extends Model {
 
     public String getGcmId() {
         return gcmId;
+    }
+
+    public double getTotalScore() {
+        return totalScore;
+    }
+
+    public void setTotalScore(double totalScore) {
+        this.totalScore = totalScore;
     }
 
     public String getPassword() {

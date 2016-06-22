@@ -19,13 +19,13 @@ public class IssueScoreCalculator implements ScoreCalculator {
 	public IssueScoreCalculator(Settings settings) {
 
         if(settings == null) {
-            Settings s = new Settings();
-            s.setDefault();
-            issuePerCommitThreshold = s.getIssuesPerCommitThreshold();
-            isPointStealing = s.isPointStealing();
-			isNegativeScores = s.isNegativeScores();
-			startScore = s.getStartScore();
+			settings = new Settings();
+			settings.setDefault();
         }
+		issuePerCommitThreshold = settings.getIssuesPerCommitThreshold();
+		isPointStealing = settings.isPointStealing();
+		isNegativeScores = settings.isNegativeScores();
+		startScore = settings.getStartScore();
 	}
 
 	/**

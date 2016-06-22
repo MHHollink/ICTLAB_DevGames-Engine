@@ -119,8 +119,9 @@ public class ProjectController extends BaseController{
 
             //get settings and calculate score
             Settings settings = new SettingsDao().queryByProject(project.getId());
+            double pushScore = new IssueScoreCalculator(settings).calculateScoreFromReport(report);
             report.setScore(
-                    new IssueScoreCalculator(settings).calculateScoreFromReport(report)
+                    pushScore
             );
 
             report.saveReportToDatabase();
@@ -134,6 +135,10 @@ public class ProjectController extends BaseController{
                     String.valueOf(report.getScore().intValue()),
                     author.getId()
             );
+
+            //increment totalScore
+            author.setTotalScore(author.getTotalScore()+pushScore);
+            new UserDao().update(author);
 
             result.put("message", "successfully parsed and saved report");
 

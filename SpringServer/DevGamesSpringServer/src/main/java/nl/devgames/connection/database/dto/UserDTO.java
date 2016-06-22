@@ -28,6 +28,7 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
     public String gcmId;
 
     public String password;
+    public double totalScore;
 
     public boolean deleted;
 
@@ -48,6 +49,7 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
         this.session = user.getSessionId();
         this.gcmId = user.getGcmId();
         this.password = user.getPassword();
+        this.totalScore = user.getTotalScore();
     }
 
     @Override
@@ -69,6 +71,7 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
         user.setSessionId(this.session);
         user.setGcmId(this.gcmId);
         user.setPassword(this.password);
+        user.setTotalScore(this.totalScore);
 
         return user;
     }
@@ -129,6 +132,7 @@ public class UserDTO extends ModelDTO<UserDTO, User> {
                 ", session='" + session + '\'' +
                 ", gcmId='" + gcmId + '\'' +
                 ", password='" + password + '\'' +
+                ", totalScore='" + totalScore + '\'' +
                 "} " + super.toString();
     }
 }

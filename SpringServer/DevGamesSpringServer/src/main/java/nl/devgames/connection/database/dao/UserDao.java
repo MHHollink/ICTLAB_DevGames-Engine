@@ -277,7 +277,7 @@ public class UserDao extends AbsDao<User, Long> {
     public int create(User user) throws ConnectException {
         L.d("Creating user: %s", user);
         String response = Neo4JRestService.getInstance().postQuery(
-                "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmId: '%s' }) " +
+                "CREATE (n:User { username: '%s', gitUsername: '%s', firstName: '%s', lastName: '%s', age: %d, mainJob: '%s', password: '%s', gcmId: '%s', totalScore: %s }) " +
                         "RETURN {id:id(n), labels: labels(n), data: n} ",
                 user.getUsername(),
                 user.getGitUsername(),
@@ -286,7 +286,8 @@ public class UserDao extends AbsDao<User, Long> {
                 user.getAge(),
                 user.getMainJob(),
                 user.getPassword(),
-                user.getGcmId()
+                user.getGcmId(),
+                user.getTotalScore()
         );
 
         JsonObject json = new JsonParser().parse(response).getAsJsonObject();
@@ -322,7 +323,7 @@ public class UserDao extends AbsDao<User, Long> {
                     "MATCH (n:User) " +
                             "WHERE ID(n) = %d " +
                             "SET n.username = '%s', n.password = '%s', n.firstName = '%s', n.lastName = '%s', n.age = %d, " +
-                                "n.gcmId = '%s', n.session = '%s', n.mainJob = '%s', n.gitUsername = '%s' " +
+                                "n.gcmId = '%s', n.session = '%s', n.mainJob = '%s', n.gitUsername = '%s', n.totalScore = %s " +
                             "RETURN {id:id(n), labels: labels(n), data: n}",
                     user.getId(),
                     user.getUsername(),
@@ -333,7 +334,8 @@ public class UserDao extends AbsDao<User, Long> {
                     user.getGcmId(),
                     user.getSessionId(),
                     user.getMainJob(),
-                    user.getGitUsername()
+                    user.getGitUsername(),
+                    user.getTotalScore()
             );
 
             JsonObject json = new JsonParser().parse(response).getAsJsonObject();
