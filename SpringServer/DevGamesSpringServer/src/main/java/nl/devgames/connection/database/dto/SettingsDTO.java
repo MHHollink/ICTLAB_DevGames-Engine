@@ -15,6 +15,7 @@ public class SettingsDTO extends ModelDTO<SettingsDTO, Settings>{
     double issuesPerCommitThreshold;
     boolean pointStealing;
     boolean negativeScores;
+    double startScore;
 
     @Override
     public Settings toModel() {
@@ -25,6 +26,7 @@ public class SettingsDTO extends ModelDTO<SettingsDTO, Settings>{
         settings.setIssuesPerCommitThreshold(this.issuesPerCommitThreshold);
         settings.setPointStealing(this.pointStealing);
         settings.setNegativeScores(this.negativeScores);
+        settings.setStartScore(startScore);
 
         return settings;
     }
@@ -71,6 +73,7 @@ public class SettingsDTO extends ModelDTO<SettingsDTO, Settings>{
                 "project=" + project +
                 ", issuesPerCommitThreshold=" + issuesPerCommitThreshold +
                 ", pointStealing=" + pointStealing +
+                ", startScore=" + startScore +
                 ", negativeScores=" + negativeScores + '\'' +
                 "} " + super.toString();
     }
