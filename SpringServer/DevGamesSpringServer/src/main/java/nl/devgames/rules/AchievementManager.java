@@ -35,12 +35,31 @@ public class AchievementManager {
 
     public void checkAchievementsOfUser() throws ConnectException {
         checkTwoPushesIn10MinutesAchievements();
+
+        checkFirstPushAchievement();
+
+        check10PushesTotalAchievement();
+    }
+
+    private void check10PushesTotalAchievement() throws ConnectException {
+        List<Push> userPushes = pushDao.queryByUser(user.getId());
+
+        if(userPushes.size() == 10) {
+            //achievement unlocked
+            sendAchievementMessage("CgkI6sj_ys4REAIQAg");
+        }
+    }
+
+    private void checkFirstPushAchievement() throws ConnectException {
+        List<Push> userPushes = pushDao.queryByUser(user.getId());
+
+        if(userPushes.size() == 1) {
+            //achievement unlocked
+            sendAchievementMessage("CgkI6sj_ys4REAIQAQ");
+        }
     }
 
     private void checkTwoPushesIn10MinutesAchievements() throws ConnectException {
-        //cehck if already achieved
-
-
         Long currentTime = System.currentTimeMillis();
         List<Push> pushesInLast10Minutes = new ArrayList<>();
 
