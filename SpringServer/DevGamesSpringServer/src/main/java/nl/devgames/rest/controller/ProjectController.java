@@ -25,11 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.ConnectException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "/projects")
@@ -371,7 +367,7 @@ public class ProjectController extends BaseController{
     @RequestMapping(value = "{id}/users/{uid}", method = RequestMethod.PUT)
     public Map addDevelopersToProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                      @PathVariable(value = "id") long id,
-                                     @RequestBody List<Long> uids) {
+                                     @RequestBody Collection<Long> uids) {
         L.d("Called");
 
         java.util.Map<String, String> result = new java.util.HashMap<>();
@@ -596,6 +592,41 @@ public class ProjectController extends BaseController{
             throw new DatabaseOfflineException();
         } catch (IndexOutOfBoundsException e) {
             L.w("Issues not found");
+            throw new InvalidSessionException("Session invalid!");
+        }
+    }
+
+    /**
+     * gets the users and their sum scores for a project
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the project to get the businesses for
+     * @return              a set of users and their scores of the project     */
+    @RequestMapping(value = "{id}/totalScoresOfUsers", method = RequestMethod.GET)
+    public void getTotalScoresOfUsers(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
+                                                  @PathVariable(value = "id") long id)
+    {
+        L.d("Called");
+
+        //check if session is valid
+        User caller = getUserFromSession( session );
+
+        try {
+            PushDao pushDao = new PushDao();
+
+
+            Set<User> usersOfProject = getDevelopersFromProject(session, id);
+            for(User user : usersOfProject) {
+                Double totalUserScore = 0.0;
+                List<Push> pushesOfUser = pushDao.queryByUser(user.getId());
+                for(Push push : pushesOfUser) {
+                    totalUserScore+=push.getScore();
+                }
+            }
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException();
+        } catch (IndexOutOfBoundsException e) {
+            L.w("Users not found");
             throw new InvalidSessionException("Session invalid!");
         }
     }

@@ -11,8 +11,6 @@ public class Achievement extends Model {
 
     private AchievementType type;
 
-
-
     private String uuid; // using uuid for unique field
 
     public Achievement() {

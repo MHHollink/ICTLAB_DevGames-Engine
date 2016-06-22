@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.UserDTO;
+import nl.devgames.model.Achievement;
 import nl.devgames.model.Project;
 import nl.devgames.model.Push;
 import nl.devgames.model.User;
@@ -436,5 +437,27 @@ public class UserDao extends AbsDao<User, Long> {
         return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
     }
 
+    /**
+     * This method is used to create a relationship between a User and a Achievement. The id's from both parameters are used in the qeury.
+     *
+     * The objects returned from creating an object with {@link #createIfNotExists(User)} and {@link AchievementDao#createIfNotExists(Achievement)} should have a valid ID
+     *
+     * @param user
+     * @param achievement
+     * @return
+     * @throws ConnectException
+     */
+    public int saveRelationship(User user, Achievement achievement) throws ConnectException {
+        if (user.getId() == null || achievement.getId() == null) {
+            L.e("Id from user or achievement was null: user[%b], achievement[%b]",
+                    user.getId()==null, achievement.getId()==null);
+            return 0;
+        }
+        L.d("Creating relationship between user: %d and achievement: %d",
+                user.getId(), achievement.getId());
 
+        String response = createRelationship(user.getId(), achievement.getId(), User.Relations.HAS_ACHIEVEMENT);
+
+        return new JsonParser().parse(response).getAsJsonObject().get("errors").getAsJsonArray().size() == 0 ? 1 : 0;
+    }
 }

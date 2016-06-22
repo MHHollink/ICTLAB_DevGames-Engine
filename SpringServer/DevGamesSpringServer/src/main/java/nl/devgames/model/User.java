@@ -10,7 +10,8 @@ public class User extends Model {
 
     public enum Relations {
         IS_DEVELOPING,
-        HAS_PUSHED
+        HAS_PUSHED,
+        HAS_ACHIEVEMENT
     }
 
     private String username;

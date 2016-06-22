@@ -8,11 +8,7 @@ import com.google.gson.JsonParser;
 import nl.devgames.connection.database.Neo4JRestService;
 import nl.devgames.connection.database.dto.PushDTO;
 import nl.devgames.connection.database.dto.UserDTO;
-import nl.devgames.model.Commit;
-import nl.devgames.model.Duplication;
-import nl.devgames.model.Issue;
-import nl.devgames.model.Project;
-import nl.devgames.model.Push;
+import nl.devgames.model.*;
 import nl.devgames.utils.L;
 
 import java.net.ConnectException;
@@ -191,7 +187,7 @@ public class PushDao extends AbsDao<Push, Long>  {
         );
 
         List<Push> response = new ArrayList<>();
-        for (JsonObject object : UserDTO.findAll(responseString)) {
+        for (JsonObject object : PushDTO.findAll(responseString)) {
             response.add(new PushDTO().createFromNeo4jData(object).toModel());
         }
         return response;
@@ -220,6 +216,21 @@ public class PushDao extends AbsDao<Push, Long>  {
 
         Push response = new PushDTO().createFromNeo4jData(PushDTO.findFirst(responseString)).toModel();
 
+        return response;
+    }
+
+    public List<Push> queryByUser(long id) throws ConnectException {
+        String responseString = Neo4JRestService.getInstance().postQuery(
+                "MATCH (a:Push)<-[:%s]-(b:User) " +
+                        "WHERE ID(b) = %d " +
+                        "RETURN {id:id(a), labels: labels(a), data: a}",
+                User.Relations.HAS_PUSHED.name(), id
+        );
+
+        List<Push> response = new ArrayList<>();
+        for (JsonObject object : PushDTO.findAll(responseString)) {
+            response.add(new PushDTO().createFromNeo4jData(object).toModel());
+        }
         return response;
     }
 
