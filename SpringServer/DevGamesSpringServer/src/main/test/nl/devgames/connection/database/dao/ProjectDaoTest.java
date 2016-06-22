@@ -1,10 +1,7 @@
 package nl.devgames.connection.database.dao;
 
 import nl.devgames.BaseTest;
-import nl.devgames.model.Commit;
-import nl.devgames.model.Project;
-import nl.devgames.model.Push;
-import nl.devgames.model.User;
+import nl.devgames.model.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,8 +15,9 @@ import static org.hamcrest.Matchers.hasSize;
 public class ProjectDaoTest extends BaseTest {
 
     Project testProject = new Project(
-            "TestProject", "TestDescription"
+            "TestProject", "TestDescription", UUID.randomUUID().toString()
     );
+    Settings testSettings = new Settings();
     ProjectDao dao;
 
     @Before
@@ -27,8 +25,10 @@ public class ProjectDaoTest extends BaseTest {
         super.setUp();
         dao = new ProjectDao();
 
-        dao.create(testProject);
-        testProject = dao.queryByField("name", testProject.getName()).get(0);
+        testProject = dao.createIfNotExists(testProject);
+        testSettings.setDefault();
+        testSettings = new SettingsDao().createIfNotExists(testSettings); // Set default and create settings
+        dao.saveRelationship(testProject, testSettings); // Set settings as project settings
     }
 
     @After
@@ -52,7 +52,7 @@ public class ProjectDaoTest extends BaseTest {
     public void testQueryForAll() throws Exception {
         assertThat(
                 dao.queryForAll(),
-                hasSize(2)
+                hasSize(1)
         );
     }
 
@@ -93,7 +93,7 @@ public class ProjectDaoTest extends BaseTest {
         );
 
         assertThat(
-                new ProjectDao().saveRelationship(project1, user)
+                new ProjectDao().saveRelationship(testProject, user)
                 ,
                 equalTo(
                         1
@@ -109,7 +109,7 @@ public class ProjectDaoTest extends BaseTest {
         Push push = pushDao.createIfNotExists(
                 new Push(UUID.randomUUID().toString(), 1455994686, (new Random().nextInt(150)+100))
         );
-        pushDao.saveRelationship(push, project1);
+        pushDao.saveRelationship(push, testProject);
 
 
         assertThat(
@@ -117,7 +117,7 @@ public class ProjectDaoTest extends BaseTest {
                         push.getId()
                 ),
                 equalTo(
-                        project1
+                        testProject
                 )
         );
     }

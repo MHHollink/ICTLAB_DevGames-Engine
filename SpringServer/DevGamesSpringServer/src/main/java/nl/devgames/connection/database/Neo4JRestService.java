@@ -53,7 +53,7 @@ public class Neo4JRestService extends AbsRestService {
      *              "statement":"MATCH n DETACH DELETE n"
      *          }
      *       ]
-     *  }
+     *  }x
      */
     private String queryToJson(String query) {
         return "{\"statements\":[{\"statement\":\""+query+"\"}]}";

@@ -14,12 +14,19 @@ import static org.hamcrest.Matchers.hasSize;
 
 public class DuplicationDaoTest extends BaseTest {
 
+    Duplication duplication1 = new Duplication();
     DuplicationDao dao;
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
         dao = new DuplicationDao();
+
+        Set<DuplicationFile> files = new HashSet<>();
+        files.add(new DuplicationFile("File Name", 88, 93, 93-88 ));
+        files.add(new DuplicationFile("File Name", 88, 93, 93-88 ));
+        duplication1.setFiles(files);
+        duplication1 = dao.createIfNotExists(duplication1);
     }
 
     @After

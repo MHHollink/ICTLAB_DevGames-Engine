@@ -364,31 +364,31 @@ public class ProjectController extends BaseController{
      * @param uids           the ids of the users to add to the project
      * @return  result      a map containing the return message
      */
-    @RequestMapping(value = "{id}/users/{uid}", method = RequestMethod.PUT)
-    public Map addDevelopersToProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
-                                     @PathVariable(value = "id") long id,
-                                     @RequestBody Collection<Long> uids) {
-        L.d("Called");
-
-        java.util.Map<String, String> result = new java.util.HashMap<>();
-
-        //check if session is valid
-        User caller = getUserFromSession( session );
-
-        //add user to project
-        try {
-            UserDao dao = new UserDao();
-            int updated = 0;
-            for(Long uid : uids) {
-                updated += dao.saveRelationship(dao.queryById(uid), new ProjectDao().queryById(id));
-            }
-            result.put("message", String.format("succesfully updated %d user(s)", updated));
-            return result;
-        } catch (ConnectException e) {
-            L.e(e, "database is offline!");
-            throw new DatabaseOfflineException();
-        }
-    }
+//    @RequestMapping(value = "{id}/users/{uid}", method = RequestMethod.PUT)
+//    public Map addDevelopersToProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
+//                                     @PathVariable(value = "id") long id,
+//                                     @RequestBody Collection<Long> uids) {
+//        L.d("Called");
+//
+//        java.util.Map<String, String> result = new java.util.HashMap<>();
+//
+//        //check if session is valid
+//        User caller = getUserFromSession( session );
+//
+//        //add user to project
+//        try {
+//            UserDao dao = new UserDao();
+//            int updated = 0;
+//            for(Long uid : uids) {
+//                updated += dao.saveRelationship(dao.queryById(uid), new ProjectDao().queryById(id));
+//            }
+//            result.put("message", String.format("succesfully updated %d user(s)", updated));
+//            return result;
+//        } catch (ConnectException e) {
+//            L.e(e, "database is offline!");
+//            throw new DatabaseOfflineException();
+//        }
+//    }
 
     /**
      *  updates aa projects' settings
@@ -602,7 +602,7 @@ public class ProjectController extends BaseController{
      * @param id            the id of the project to get the businesses for
      * @return              a set of users and their scores of the project     */
     @RequestMapping(value = "{id}/totalScoresOfUsers", method = RequestMethod.GET)
-    public Map<User, Double> getTotalScoresOfUsers(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
+    public List<UserWithTotalScore> getTotalScoresOfUsers(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                                   @PathVariable(value = "id") long id)
     {
         L.d("Called");
@@ -612,7 +612,7 @@ public class ProjectController extends BaseController{
 
         try {
             PushDao pushDao = new PushDao();
-            Map<User, Double> returnMap = new HashMap<>();
+            List<UserWithTotalScore> returnList = new ArrayList<>();
 
             Set<User> usersOfProject = getDevelopersFromProject(session, id);
             for(User user : usersOfProject) {
@@ -621,10 +621,10 @@ public class ProjectController extends BaseController{
                 for(Push push : pushesOfUser) {
                     totalUserScore+=push.getScore();
                 }
-                returnMap.put(user, totalUserScore);
+                returnList.add(new UserWithTotalScore(user.getId(), user.getUsername(), totalUserScore));
             }
 
-            return returnMap;
+            return returnList;
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException();

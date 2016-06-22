@@ -2,7 +2,9 @@ package nl.devgames.rest.controller;
 
 import nl.devgames.Application;
 import nl.devgames.BaseTest;
+import nl.devgames.connection.database.dao.BusinessDao;
 import nl.devgames.connection.database.dao.UserDao;
+import nl.devgames.connection.database.dto.BusinessDTO;
 import nl.devgames.model.Business;
 import nl.devgames.model.User;
 import org.junit.After;
@@ -18,21 +20,22 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-/**
- * Created by Marcel on 17-5-2016.
- */
 public class BusinessControllerTest extends BaseTest {
 
     BusinessController controller = new BusinessController();
     User user = new User("testUsername", null, null, null, null, "testPassword");
     String session = null;
-
+    Business business1 = new Business("business test");
+    BusinessDao dao;
 
     @Before
     public void setUp() throws Exception {
         user = new UserDao().createIfNotExists(user);
         Collection<String> values = new AuthController().login("testUsername", "testPassword").values();
         session = values.iterator().next();
+
+        dao = new BusinessDao();
+        business1 = dao.createIfNotExists(business1);
     }
 
     @After

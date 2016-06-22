@@ -13,13 +13,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 
 public class UserDaoTest extends BaseTest {
-
+    User loggedInUser = new User("TestUser", "TestGitUser", "TestFName", "TestTween","TestLName", 25, "TestJob", null, null, null, null, "TestPassword");
     UserDao dao;
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
         dao = new UserDao();
+
+        loggedInUser = dao.createIfNotExists(loggedInUser);
     }
 
     @After

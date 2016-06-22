@@ -18,11 +18,13 @@ import static org.hamcrest.Matchers.hasSize;
 public class IssueDaoTest extends BaseTest{
 
     IssueDao dao;
+    Issue issue1 = new Issue(UUID.randomUUID().toString(), "MAJOR", "nl.devgames.Application", 11, 13, "OPEN", null,"Define a constant instead of duplicating this literal [New Text] 8 times.", 840, 1455217086L, 1459624317L, 0L);
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
         dao = new IssueDao();
+        issue1 = dao.createIfNotExists(issue1);
     }
 
     @After

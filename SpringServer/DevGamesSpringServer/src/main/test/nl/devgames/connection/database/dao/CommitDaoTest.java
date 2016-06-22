@@ -17,12 +17,16 @@ import static org.hamcrest.Matchers.hasSize;
 
 public class CommitDaoTest extends BaseTest {
 
+    Commit commit1 = new Commit("123456", "sdsdfsdfsf", System.currentTimeMillis());
+
     CommitDao dao;
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
         dao = new CommitDao();
+
+        commit1 = dao.createIfNotExists(commit1);
     }
 
     @After

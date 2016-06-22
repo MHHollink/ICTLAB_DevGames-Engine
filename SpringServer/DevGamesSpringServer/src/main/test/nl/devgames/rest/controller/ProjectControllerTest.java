@@ -1,13 +1,15 @@
 package nl.devgames.rest.controller;
 
+import nl.devgames.model.Project;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Created by Marcel on 17-5-2016.
- */
+import java.util.UUID;
+
+
 public class ProjectControllerTest {
+
 
     @Before
     public void setUp() throws Exception {

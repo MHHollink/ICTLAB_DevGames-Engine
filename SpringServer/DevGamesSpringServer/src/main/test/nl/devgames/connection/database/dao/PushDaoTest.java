@@ -17,9 +17,7 @@ import static org.hamcrest.Matchers.hasSize;
 
 public class PushDaoTest extends BaseTest{
 
-    Push testPush = new Push(
-            "TestIssueId", System.currentTimeMillis(), 147
-    );
+    Push testPush = new Push(UUID.randomUUID().toString(), 1455994686, (new Random().nextInt(150)+100));
 
     PushDao dao;
 
@@ -27,8 +25,7 @@ public class PushDaoTest extends BaseTest{
     public void setUp() throws Exception {
         dao = new PushDao();
 
-        dao.create(testPush);
-        testPush = dao.queryByField("key", testPush.getKey()).get(0);
+        testPush = dao.createIfNotExists(testPush);
     }
 
     @After
@@ -125,8 +122,9 @@ public class PushDaoTest extends BaseTest{
 
     @Test
     public void testCreate() throws Exception {
+        Push push =  new Push(UUID.randomUUID().toString(), 1455994686, (new Random().nextInt(150)+100));
         assertThat(
-                dao.create(push1)
+                dao.create(push)
                 ,equalTo(1)
         );
     }
