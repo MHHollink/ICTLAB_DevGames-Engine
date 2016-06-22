@@ -192,9 +192,10 @@ public class SettingsDao extends AbsDao<Settings, Long>  {
             String response = Neo4JRestService.getInstance().postQuery(
                     "MATCH (n:Settings) " +
                             "WHERE ID(n) = %d " +
-                            "SET n.startScore = %f, n.issuesPerCommitThreshold = %f," +
-                            "s.pointStealing: %b, negativeScore: %b " +
+                            "SET n.startScore = %s, n.issuesPerCommitThreshold = %s, " +
+                            "n.pointStealing = %b, n.negativeScore = %b " +
                             "RETURN {id:id(n), labels: labels(n), data: n} ",
+                    settings.getId(),
                     settings.getStartScore(),
                     settings.getIssuesPerCommitThreshold(),
                     settings.isPointStealing(),
