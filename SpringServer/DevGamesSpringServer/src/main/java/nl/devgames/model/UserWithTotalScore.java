@@ -6,12 +6,12 @@ package nl.devgames.model;
 public class UserWithTotalScore {
     private Long id;
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public Long getId() {
@@ -22,7 +22,7 @@ public class UserWithTotalScore {
         this.id = id;
     }
 
-    private String name;
+    private String username;
 
     public double getTotalScore() {
         return totalScore;
@@ -36,7 +36,7 @@ public class UserWithTotalScore {
 
     public UserWithTotalScore(Long id, String name, double totalScore) {
         this.id = id;
-        this.name = name;
+        this.username = name;
         this.totalScore = totalScore;
     }
 
