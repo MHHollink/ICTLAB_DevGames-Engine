@@ -602,7 +602,7 @@ public class ProjectController extends BaseController{
      * @param id            the id of the project to get the businesses for
      * @return              a set of users and their scores of the project     */
     @RequestMapping(value = "{id}/totalScoresOfUsers", method = RequestMethod.GET)
-    public void getTotalScoresOfUsers(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
+    public Map<User, Double> getTotalScoresOfUsers(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
                                                   @PathVariable(value = "id") long id)
     {
         L.d("Called");
@@ -612,7 +612,7 @@ public class ProjectController extends BaseController{
 
         try {
             PushDao pushDao = new PushDao();
-
+            Map<User, Double> returnMap = new HashMap<>();
 
             Set<User> usersOfProject = getDevelopersFromProject(session, id);
             for(User user : usersOfProject) {
@@ -621,7 +621,10 @@ public class ProjectController extends BaseController{
                 for(Push push : pushesOfUser) {
                     totalUserScore+=push.getScore();
                 }
+                returnMap.put(user, totalUserScore);
             }
+
+            return returnMap;
         } catch (ConnectException e) {
             L.e("Database service is offline!");
             throw new DatabaseOfflineException();
