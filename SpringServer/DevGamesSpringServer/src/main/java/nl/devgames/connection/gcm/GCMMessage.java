@@ -35,6 +35,7 @@ public class GCMMessage{
             case ACCOUNT_UPDATED:
             case BROKEN_BUILD:
             case NEW_PUSH_RECEIVED:
+            case ACHIEVEMENT:
                 data.put("type", type.toString());
                 data.put("title", title);
                 data.put("text", message);
