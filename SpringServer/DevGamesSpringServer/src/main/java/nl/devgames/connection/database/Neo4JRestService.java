@@ -30,7 +30,7 @@ public class Neo4JRestService extends AbsRestService {
      */
     public String post(String json) throws ConnectException {
         try {
-            super.post(json, new Tuple<>("Authorization","Basic bmVvNGo6ZGV2Z2FtZXM="));
+            super.post(json, new Tuple<>("Authorization","Basic bmVvNGo6ajByaWtpdDA="));
         } catch (IOException e) {
             L.e(e, "Failure in reading response");
             return null;

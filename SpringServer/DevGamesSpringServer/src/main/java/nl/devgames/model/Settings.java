@@ -27,6 +27,7 @@ public class Settings extends Model {
         this.issuesPerCommitThreshold = issuesPerCommitThreshold;
         this.negativeScores = negativeScores;
         this.startScore = startScore;
+        generateUUID();
     }
 
     public void generateUUID() {

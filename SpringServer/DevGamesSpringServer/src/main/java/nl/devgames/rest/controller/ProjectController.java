@@ -362,6 +362,39 @@ public class ProjectController extends BaseController{
     }
 
     /**
+     *  adds users to a project as developer
+     * @param session       the session of the user calling the method as String
+     * @param id            the id of the project to add a developer for
+     * @param uids           the ids of the users to add to the project
+     * @return  result      a map containing the return message
+     */
+    @RequestMapping(value = "{id}/users/{uid}", method = RequestMethod.PUT)
+    public Map addDevelopersToProject(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session,
+                                     @PathVariable(value = "id") long id,
+                                     @RequestBody List<Long> uids) {
+        L.d("Called");
+
+        java.util.Map<String, String> result = new java.util.HashMap<>();
+
+        //check if session is valid
+        User caller = getUserFromSession( session );
+
+        //add user to project
+        try {
+            UserDao dao = new UserDao();
+            int updated = 0;
+            for(Long uid : uids) {
+                updated += dao.saveRelationship(dao.queryById(uid), new ProjectDao().queryById(id));
+            }
+            result.put("message", String.format("succesfully updated %d user(s)", updated));
+            return result;
+        } catch (ConnectException e) {
+            L.e(e, "database is offline!");
+            throw new DatabaseOfflineException();
+        }
+    }
+
+    /**
      *  updates aa projects' settings
      * @param session       the session of the user calling the method as String
      * @param id            the id of the project to update the settings for
