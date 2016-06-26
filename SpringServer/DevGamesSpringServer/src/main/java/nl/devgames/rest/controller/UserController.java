@@ -24,15 +24,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.ConnectException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/users")
 public class UserController extends BaseController {
+
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public List<User> getAllUsers(@RequestHeader(value = Application.SESSION_HEADER_KEY, required = false) String session){
+        getUserFromSession( session );
+        L.d("Called");
+        try {
+            return new UserDao().queryForAll();
+        } catch (ConnectException e) {
+            L.e("Database service is offline!");
+            throw new DatabaseOfflineException();
+        }
+    }
 
     /**
      * creates a new user

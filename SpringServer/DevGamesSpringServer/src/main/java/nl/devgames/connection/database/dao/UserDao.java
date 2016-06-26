@@ -170,7 +170,7 @@ public class UserDao extends AbsDao<User, Long> {
 
         List<User> response = new ArrayList<>();
         for (JsonObject object : UserDTO.findAll(r)) {
-            response.add(new UserDTO().createFromJsonObject(object).toModel());
+            response.add(new UserDTO().createFromNeo4jData(object).toModel());
         }
         return response;
     }
